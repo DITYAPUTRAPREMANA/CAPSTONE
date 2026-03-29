@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 /**
- * Komponen utama App - routing dan provider untuk KampusLend
+ * Komponen utama App - routing dan provider untuk SODALIS
  * Menggunakan @tanstack/react-router
  */
 import {
@@ -41,11 +41,11 @@ function SeedLoader() {
   const { actor } = useActor();
   useEffect(() => {
     if (!actor) return;
-    const seeded = localStorage.getItem("kampuslend_seeded");
+    const seeded = localStorage.getItem("sodalis_seeded");
     if (!seeded) {
       actor
         .addSeedData()
-        .then(() => localStorage.setItem("kampuslend_seeded", "true"))
+        .then(() => localStorage.setItem("sodalis_seeded", "true"))
         .catch(() => {});
     }
   }, [actor]);

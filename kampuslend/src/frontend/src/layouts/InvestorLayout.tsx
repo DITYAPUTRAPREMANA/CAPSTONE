@@ -38,7 +38,7 @@ export default function InvestorLayout() {
           <div className="flex items-center gap-2">
             <span className="text-2xl">🎓</span>
             <span className="font-bold text-xl text-white tracking-tight">
-              KampusLend
+              SODALIS
             </span>
           </div>
           <p className="text-white/50 text-xs mt-1">Investor Dashboard</p>
@@ -101,7 +101,7 @@ export default function InvestorLayout() {
               Selamat Datang, {user?.name} 👋
             </h1>
             <p className="text-xs text-muted-foreground">
-              KampusLend Investor Portal
+              SODALIS Investor Portal
             </p>
           </div>
         </header>

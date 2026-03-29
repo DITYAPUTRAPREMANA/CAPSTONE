@@ -41,7 +41,7 @@ export default function BorrowerLayout() {
           <div className="flex items-center gap-2">
             <span className="text-2xl">🎓</span>
             <span className="font-bold text-xl text-white tracking-tight">
-              KampusLend
+              SODALIS
             </span>
           </div>
           <p className="text-white/50 text-xs mt-1">Peminjam Dashboard</p>
@@ -102,7 +102,7 @@ export default function BorrowerLayout() {
           <div>
             <h1 className="font-bold text-foreground">Halo, {user?.name} 👋</h1>
             <p className="text-xs text-muted-foreground">
-              KampusLend Peminjam Portal
+              SODALIS Peminjam Portal
             </p>
           </div>
         </header>

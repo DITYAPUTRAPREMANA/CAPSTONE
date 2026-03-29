@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useRouter } from "@tanstack/react-router";
 /**
- * Halaman Registrasi KampusLend - 2 langkah: pilih role lalu isi data
+ * Halaman Registrasi SODALIS - 2 langkah: pilih role lalu isi data
  */
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -65,7 +65,7 @@ export default function RegisterPage() {
       );
       // Backend already stores profile in registerUser; skip saveCallerUserProfile to avoid permission mismatch on anonymous login
       login({ userId: String(userId), role, name: nama });
-      toast.success("Akun berhasil dibuat! Selamat datang di KampusLend 🎓");
+      toast.success("Akun berhasil dibuat! Selamat datang di SODALIS 🎓");
       router.navigate({
         to: role === "Investor" ? "/investor/dashboard" : "/borrower/dashboard",
       });
@@ -96,7 +96,7 @@ export default function RegisterPage() {
         )}
         <Link to="/" className="flex items-center gap-2 w-fit">
           <span className="text-2xl">🎓</span>
-          <span className="font-bold text-xl">KampusLend</span>
+          <span className="font-bold text-xl">SODALIS</span>
         </Link>
       </nav>
 
@@ -128,7 +128,7 @@ export default function RegisterPage() {
                 Daftar Sebagai Apa?
               </h2>
               <p className="text-muted-foreground text-center mb-8">
-                Pilih peran Anda di KampusLend
+                Pilih peran Anda di SODALIS
               </p>
               <div className="grid grid-cols-2 gap-6">
                 <Card

@@ -1,4 +1,4 @@
-# KampusLend - P2P Lending Platform untuk Mahasiswa
+# SODALIS - P2P Lending Platform untuk Mahasiswa
 
 ## Current State
 Proyek baru, belum ada kode aplikasi.

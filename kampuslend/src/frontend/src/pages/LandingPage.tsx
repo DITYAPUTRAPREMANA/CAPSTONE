@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 /**
- * Halaman Landing KampusLend - halaman utama untuk pengunjung
+ * Halaman Landing SODALIS - halaman utama untuk pengunjung
  */
 import { useRouter } from "@tanstack/react-router";
 
@@ -70,7 +70,7 @@ export default function LandingPage() {
       <nav className="bg-navy text-white px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-lg">
         <div className="flex items-center gap-2">
           <span className="text-2xl">🎓</span>
-          <span className="font-bold text-xl tracking-tight">KampusLend</span>
+          <span className="font-bold text-xl tracking-tight">SODALIS</span>
         </div>
         <div className="hidden md:flex items-center gap-6 text-sm">
           <a
@@ -255,7 +255,7 @@ export default function LandingPage() {
       <section className="py-20 px-6 bg-navy text-white text-center">
         <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl font-bold mb-4">
-            Siap Bergabung di KampusLend?
+            Siap Bergabung di SODALIS?
           </h2>
           <p className="text-white/80 mb-8">
             Daftar sekarang dan mulai perjalanan finansialmu sebagai mahasiswa.
@@ -281,10 +281,10 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="bg-navy text-white/70 py-8 px-6 text-center text-sm">
-        <p className="mb-2 font-bold text-white text-base">🎓 KampusLend</p>
+        <p className="mb-2 font-bold text-white text-base">🎓 SODALIS</p>
         <p className="mb-4">Platform P2P Lending Khusus Mahasiswa Indonesia</p>
         <p>
-          © {new Date().getFullYear()}. Dibuat dengan ❤️ KampusLend.
+          © {new Date().getFullYear()}. Dibuat dengan ❤️ SODALIS.
         </p>
       </footer>
     </div>

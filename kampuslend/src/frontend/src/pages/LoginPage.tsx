@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Link, useRouter } from "@tanstack/react-router";
 /**
- * Halaman Login KampusLend
+ * Halaman Login SODALIS
  */
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -102,7 +102,7 @@ export default function LoginPage() {
       <nav className="bg-navy text-white px-6 py-4">
         <Link to="/" className="flex items-center gap-2 w-fit">
           <span className="text-2xl">🎓</span>
-          <span className="font-bold text-xl">KampusLend</span>
+          <span className="font-bold text-xl">SODALIS</span>
         </Link>
       </nav>
 
@@ -111,7 +111,7 @@ export default function LoginPage() {
           <CardHeader className="text-center pb-4">
             <div className="text-4xl mb-2">🎓</div>
             <CardTitle className="text-2xl font-bold text-navy">
-              Masuk ke KampusLend
+              Masuk ke SODALIS
             </CardTitle>
             <p className="text-muted-foreground text-sm">
               Gunakan akun demo untuk mencoba aplikasi

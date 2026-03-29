@@ -66,7 +66,7 @@ export default {
           border: "oklch(var(--sidebar-border))",
           ring: "oklch(var(--sidebar-ring))",
         },
-        /* Token kustom KampusLend */
+        /* Token kustom SODALIS */
         navy: "oklch(var(--navy))",
         "brand-green": "oklch(var(--brand-green))",
         "brand-blue": "oklch(var(--brand-blue))",

@@ -1,4 +1,4 @@
-## KampusLend
+## SODALIS
 
 Project ini merupakan aplikasi P2P Lending untuk mahasiswa, dibangun secara mandiri tanpa tergantung layanan pihak ketiga.
 

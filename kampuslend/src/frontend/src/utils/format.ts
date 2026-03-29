@@ -1,5 +1,5 @@
 /**
- * Utilitas format untuk KampusLend
+ * Utilitas format untuk SODALIS
  */
 
 /** Format angka ke format Rupiah Indonesia */

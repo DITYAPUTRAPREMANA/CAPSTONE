@@ -1,5 +1,5 @@
 /**
- * Konteks autentikasi untuk KampusLend
+ * Konteks autentikasi untuk SODALIS
  * Menyimpan data user yang sedang login
  */
 import { type ReactNode, createContext, useContext, useState } from "react";
@@ -10,7 +10,7 @@ export interface AuthUser {
   name: string;
 }
 
-const STORAGE_KEY = "kampuslend_user";
+const STORAGE_KEY = "sodalis_user";
 
 interface AuthContextType {
   user: AuthUser | null;
