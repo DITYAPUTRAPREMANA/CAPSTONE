@@ -13,13 +13,13 @@ import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 import UserApproval "user-approval/approval";
 
-actor {
+persistent actor {
   // Initialize the access control system
-  let accessControlState = AccessControl.initState();
+  transient let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
   // User Approval State
-  let userApproval = UserApproval.initState(accessControlState);
+  transient let userApproval = UserApproval.initState(accessControlState);
 
   // MODULES
 
@@ -137,14 +137,14 @@ actor {
 
   // STATE
 
-  let users = Map.empty<Nat, User>();
-  let loans = Map.empty<Nat, Loan>();
-  let payments = Map.empty<Nat, Payment>();
-  let userProfiles = Map.empty<Principal, UserProfile>();
+  transient let users = Map.empty<Nat, User>();
+  transient let loans = Map.empty<Nat, Loan>();
+  transient let payments = Map.empty<Nat, Payment>();
+  transient let userProfiles = Map.empty<Principal, UserProfile>();
 
-  var nextUserId = 1;
-  var nextLoanId = 1;
-  var nextPaymentId = 1;
+  transient var nextUserId = 1;
+  transient var nextLoanId = 1;
+  transient var nextPaymentId = 1;
 
   // HELPER FUNCTIONS
 

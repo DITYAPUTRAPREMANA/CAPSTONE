@@ -1,7 +1,8 @@
-## 
+## KampusLend
 
-This source code has been exported from [Caffeine](https://caffeine.ai/)
+Project ini merupakan aplikasi P2P Lending untuk mahasiswa, dibangun secara mandiri tanpa tergantung layanan pihak ketiga.
 
-### Coming Soon
+### Build & Deploy
 
-We are working on tools to help you build locally and deploy your apps back to caffeine.
+- Jalankan `pnpm --filter '@caffeine/template-frontend' build:skip-bindings` (atau paket frontend Anda) sebelum deploy.
+- Jalankan `dfx deploy` untuk deploy backend + frontend.
