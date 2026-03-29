@@ -37,14 +37,33 @@ export async function loadConfig(): Promise<Config> {
   const envBaseUrl = import.meta.env.VITE_BASE_URL || "/";
   const baseUrl = envBaseUrl.endsWith("/") ? envBaseUrl : `${envBaseUrl}/`;
 
+  const getFrontendCanisterId = (): string | undefined => {
+    if (typeof window === "undefined") return undefined;
+    const match = window.location.hostname.match(/^([a-z0-9\-]+)\.localhost$/);
+    return match?.[1];
+  };
+
   const backendCanisterIdFromQuery = (() => {
     if (typeof window === "undefined") return undefined;
     const params = new URLSearchParams(window.location.search);
-    // Only accept explicit backend canister ID from URL to avoid frontend canister being mistaken as backend.
-    return params.get("backendId") ?? undefined;
+    const frontendCanisterIdFromHost = getFrontendCanisterId();
+
+    const urlBackendId =
+      params.get("backendId") ?? params.get("id") ?? params.get("canisterId");
+
+    if (!urlBackendId) {
+      return undefined;
+    }
+
+    if (urlBackendId === frontendCanisterIdFromHost) {
+      return undefined;
+    }
+
+    return urlBackendId;
   })();
 
-  const backendCanisterId = backendCanisterIdFromEnv || backendCanisterIdFromQuery;
+  const backendCanisterId =
+    backendCanisterIdFromEnv || backendCanisterIdFromQuery;
   try {
     const response = await fetch(`${baseUrl}env.json`);
     const config = (await response.json()) as JsonConfig;
@@ -53,7 +72,16 @@ export async function loadConfig(): Promise<Config> {
         ? config.backend_canister_id
         : backendCanisterId;
 
-    const finalCanisterId = resolvedCanisterId;
+    const fallbackId = (() => {
+      if (typeof window === "undefined") return undefined;
+      const params = new URLSearchParams(window.location.search);
+      const candidate = params.get("backendId") ?? params.get("id") ?? params.get("canisterId");
+      const frontendCanisterId = getFrontendCanisterId();
+      if (!candidate || candidate === frontendCanisterId) return undefined;
+      return candidate;
+    })();
+
+    const finalCanisterId = resolvedCanisterId || fallbackId;
 
     if (!finalCanisterId) {
       console.warn(
@@ -98,7 +126,15 @@ export async function loadConfig(): Promise<Config> {
     configCache = fullConfig;
     return fullConfig;
   } catch {
-    const finalCanisterId = backendCanisterId || backendCanisterIdFromQuery;
+    const fallbackId = (() => {
+      if (typeof window === "undefined") return undefined;
+      const params = new URLSearchParams(window.location.search);
+      const candidate = params.get("backendId") ?? params.get("id") ?? params.get("canisterId");
+      const frontendCanisterId = getFrontendCanisterId();
+      if (!candidate || candidate === frontendCanisterId) return undefined;
+      return candidate;
+    })();
+    const finalCanisterId = backendCanisterId || backendCanisterIdFromQuery || fallbackId;
     if (!finalCanisterId) {
       console.warn("CANISTER_ID_BACKEND is not set during fallback path.");
     }
@@ -175,6 +211,7 @@ export async function createActorWithConfig(
   }
 
   const config = await loadConfig();
+  console.debug("createActorWithConfig config:", config);
   if (!config.backend_canister_id) {
     throw new Error(
       "backend_canister_id is not set. Ensure env.json has backend_canister_id and/or VITE_CANISTER_ID_BACKEND is configured.",

@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build:skip-bindings": "vite build && pnpm copy:env",
-    "build": "vite build && pnpm copy:env",
-    "copy:env": "cp env.json dist/",
+    "build:skip-bindings": "node scripts/generate-env.js && vite build && pnpm copy:env",
+    "build": "node scripts/generate-env.js && vite build && pnpm copy:env",
+    "copy:env": "node scripts/generate-env.js && cp env.json dist/",
     "typecheck": "tsc --noEmit --incremental --tsBuildInfoFile node_modules/.cache/tsconfig.tsbuildinfo --pretty",
     "check": "biome check src",
     "fix": "biome check --write src"

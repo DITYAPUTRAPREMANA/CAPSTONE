@@ -14,7 +14,7 @@ import { useActor } from "../hooks/useActor";
 export default function RegisterPage() {
   const router = useRouter();
   const { login } = useAuth();
-  const { actor } = useActor();
+  const { actor, isFetching: isActorFetching, isError: isActorError, error: actorError } = useActor();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [role, setRole] = useState<"Investor" | "Peminjam" | "">("");
@@ -35,6 +35,12 @@ export default function RegisterPage() {
   useEffect(() => {
     setIsBackendReady(Boolean(actor));
   }, [actor]);
+
+  useEffect(() => {
+    if (isActorError) {
+      console.error("Actor creation error", actorError);
+    }
+  }, [isActorError, actorError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,6 +87,11 @@ export default function RegisterPage() {
         {!isBackendReady && (
           <div className="text-white text-sm text-center py-2 bg-red-600">
             Koneksi backend sedang disiapkan, tunggu sebentar sebelum mendaftar.
+            {isActorError && actorError instanceof Error && (
+              <div className="mt-1 text-xs bg-black/30 px-2 py-1 rounded">
+                Err: {actorError.message}
+              </div>
+            )}
           </div>
         )}
         <Link to="/" className="flex items-center gap-2 w-fit">
