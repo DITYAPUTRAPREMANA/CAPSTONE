@@ -6,7 +6,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 /**
  * Halaman Registrasi KampusLend - 2 langkah: pilih role lalu isi data
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext";
 import { useActor } from "../hooks/useActor";
@@ -19,6 +19,7 @@ export default function RegisterPage() {
   const [step, setStep] = useState<1 | 2>(1);
   const [role, setRole] = useState<"Investor" | "Peminjam" | "">("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isBackendReady, setIsBackendReady] = useState(false);
 
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
@@ -31,9 +32,20 @@ export default function RegisterPage() {
     setStep(2);
   };
 
+  useEffect(() => {
+    setIsBackendReady(Boolean(actor));
+  }, [actor]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!actor || !role) return;
+    if (!actor) {
+      // backend masih loading, seharusnya submit tidak aktif jika belum siap
+      return;
+    }
+    if (!role) {
+      toast.error("Pilih role terlebih dahulu sebelum mendaftar.");
+      return;
+    }
     setIsLoading(true);
     try {
       const gpaNum = role === "Peminjam" ? Number.parseFloat(gpa) || 0 : 0;
@@ -45,22 +57,19 @@ export default function RegisterPage() {
         rekening,
         gpaNum,
       );
-      await actor.saveCallerUserProfile({
-        name: nama,
-        email,
-        role,
-        ktm,
-        bankAccount: rekening,
-        gpa: gpaNum,
-        isVerified: false,
-      });
+      // Backend already stores profile in registerUser; skip saveCallerUserProfile to avoid permission mismatch on anonymous login
       login({ userId: String(userId), role, name: nama });
       toast.success("Akun berhasil dibuat! Selamat datang di KampusLend 🎓");
       router.navigate({
         to: role === "Investor" ? "/investor/dashboard" : "/borrower/dashboard",
       });
-    } catch {
-      toast.error("Gagal mendaftar. Silakan coba lagi.");
+    } catch (error) {
+      console.error("Registrasi gagal:", error);
+      toast.error(
+        error instanceof Error
+          ? `Gagal mendaftar: ${error.message}`
+          : "Gagal mendaftar. Silakan coba lagi.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -69,6 +78,11 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <nav className="bg-navy text-white px-6 py-4">
+        {!isBackendReady && (
+          <div className="text-white text-sm text-center py-2 bg-red-600">
+            Koneksi backend sedang disiapkan, tunggu sebentar sebelum mendaftar.
+          </div>
+        )}
         <Link to="/" className="flex items-center gap-2 w-fit">
           <span className="text-2xl">🎓</span>
           <span className="font-bold text-xl">KampusLend</span>
@@ -243,7 +257,7 @@ export default function RegisterPage() {
                     </Button>
                     <Button
                       type="submit"
-                      disabled={isLoading}
+                      disabled={isLoading || !isBackendReady}
                       className="flex-1 rounded-full bg-navy hover:bg-navy/90 text-white"
                       data-ocid="register.submit_button"
                     >

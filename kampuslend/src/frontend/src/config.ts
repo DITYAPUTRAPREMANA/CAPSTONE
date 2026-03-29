@@ -33,23 +33,46 @@ export async function loadConfig(): Promise<Config> {
   if (configCache) {
     return configCache;
   }
-  const backendCanisterId = import.meta.env.VITE_CANISTER_ID_BACKEND;
+  const backendCanisterIdFromEnv = import.meta.env.VITE_CANISTER_ID_BACKEND;
   const envBaseUrl = import.meta.env.VITE_BASE_URL || "/";
   const baseUrl = envBaseUrl.endsWith("/") ? envBaseUrl : `${envBaseUrl}/`;
+
+  const detectCanisterIdFromHost = () => {
+    if (typeof window === "undefined") return undefined;
+    const match = window.location.hostname.match(/^([a-z0-9\-]+)\.localhost$/);
+    return match ? match[1] : undefined;
+  };
+
+  const backendCanisterIdFromQuery = (() => {
+    if (typeof window === "undefined") return undefined;
+    const params = new URLSearchParams(window.location.search);
+    // dfx local query URL may include `id` for backend canister and `canisterId` for frontend canister.
+    return params.get("id") ?? params.get("canisterId") ?? undefined;
+  })();
+
+  const backendCanisterId =
+    backendCanisterIdFromEnv || backendCanisterIdFromQuery || detectCanisterIdFromHost();
   try {
     const response = await fetch(`${baseUrl}env.json`);
     const config = (await response.json()) as JsonConfig;
-    if (!backendCanisterId && config.backend_canister_id === "undefined") {
-      console.error("CANISTER_ID_BACKEND is not set");
-      throw new Error("CANISTER_ID_BACKEND is not set");
+    const resolvedCanisterId =
+      config.backend_canister_id !== "undefined"
+        ? config.backend_canister_id
+        : backendCanisterId;
+
+    const finalCanisterId =
+      resolvedCanisterId || backendCanisterId || backendCanisterIdFromQuery;
+
+    if (!finalCanisterId) {
+      console.warn(
+        "CANISTER_ID_BACKEND is not set (attempting to continue with empty id).",
+      );
     }
 
     const fullConfig = {
       backend_host:
         config.backend_host === "undefined" ? undefined : config.backend_host,
-      backend_canister_id: (config.backend_canister_id === "undefined"
-        ? backendCanisterId
-        : config.backend_canister_id) as string,
+      backend_canister_id: finalCanisterId ?? "",
       storage_gateway_url:
         import.meta.env.VITE_STORAGE_GATEWAY_URL ??
         "nogateway",
@@ -66,13 +89,13 @@ export async function loadConfig(): Promise<Config> {
     configCache = fullConfig;
     return fullConfig;
   } catch {
-    if (!backendCanisterId) {
-      console.error("CANISTER_ID_BACKEND is not set");
-      throw new Error("CANISTER_ID_BACKEND is not set");
+    const finalCanisterId = backendCanisterId || backendCanisterIdFromQuery;
+    if (!finalCanisterId) {
+      console.warn("CANISTER_ID_BACKEND is not set during fallback path.");
     }
     const fallbackConfig = {
       backend_host: undefined,
-      backend_canister_id: backendCanisterId,
+      backend_canister_id: finalCanisterId ?? "",
       storage_gateway_url: DEFAULT_STORAGE_GATEWAY_URL,
       bucket_name: DEFAULT_BUCKET_NAME,
       project_id: DEFAULT_PROJECT_ID,
@@ -131,7 +154,7 @@ export async function createActorWithConfig(
   const resolvedOptions = options ?? {};
   const agent = new HttpAgent({
     ...resolvedOptions.agentOptions,
-    host: config.backend_host,
+    host: config.backend_host || "http://127.0.0.1:8000",
   });
   if (config.backend_host?.includes("localhost")) {
     await agent.fetchRootKey().catch((err) => {

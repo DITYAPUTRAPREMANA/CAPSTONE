@@ -215,6 +215,9 @@ persistent actor {
   // USER MANAGEMENT
 
   public shared ({ caller }) func registerUser(name : Text, email : Text, role : Text, ktm : Text, bankAccount : Text, gpa : Float) : async Nat {
+    // Ensure caller has an access role set before creating profile, so saveCallerUserProfile can be called after register
+    ignore AccessControl.initialize(accessControlState, caller, "", "");
+
     // Anyone can register (including anonymous for initial registration)
     let userId = nextUserId;
     nextUserId += 1;
@@ -287,8 +290,9 @@ persistent actor {
   };
 
   public query ({ caller }) func getUsersByRole(role : Text) : async [User] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view users by role");
+    // Allow guest access so demo login can fetch user lists before authentication.
+    if (not (AccessControl.hasPermission(accessControlState, caller, #guest))) {
+      Runtime.trap("Unauthorized: Only users can view users by role");
     };
 
     users.values().toArray().filter(func(user) { Text.equal(user.role, role) });
