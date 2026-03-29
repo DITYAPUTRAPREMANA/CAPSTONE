@@ -215,12 +215,16 @@ persistent actor {
   // USER MANAGEMENT
 
   public shared ({ caller }) func registerUser(name : Text, email : Text, role : Text, ktm : Text, bankAccount : Text, gpa : Float) : async Nat {
-    // Ensure caller has an access role set before creating profile, so saveCallerUserProfile can be called after register
-    ignore AccessControl.initialize(accessControlState, caller, "", "");
+    // Register should write directly to backend canister storage (blockchain state).
+    // If caller is authenticated, initialize access control to keep user role state in sync.
+    if (not caller.isAnonymous()) {
+      ignore AccessControl.initialize(accessControlState, caller, "", "");
+    };
 
-    // Anyone can register (including anonymous for initial registration)
+    // Persist user record immediately in canister state.
     let userId = nextUserId;
     nextUserId += 1;
+
     let newUser : User = {
       id = userId;
       principal = caller;
@@ -235,7 +239,7 @@ persistent actor {
 
     users.add(userId, newUser);
 
-    // Also save to user profile
+    // Also persist profile state (direct blockchain write as well)
     let profile : UserProfile = {
       name;
       email;

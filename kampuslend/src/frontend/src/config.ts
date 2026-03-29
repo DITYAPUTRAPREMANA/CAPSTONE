@@ -37,31 +37,23 @@ export async function loadConfig(): Promise<Config> {
   const envBaseUrl = import.meta.env.VITE_BASE_URL || "/";
   const baseUrl = envBaseUrl.endsWith("/") ? envBaseUrl : `${envBaseUrl}/`;
 
-  const detectCanisterIdFromHost = () => {
-    if (typeof window === "undefined") return undefined;
-    const match = window.location.hostname.match(/^([a-z0-9\-]+)\.localhost$/);
-    return match ? match[1] : undefined;
-  };
-
   const backendCanisterIdFromQuery = (() => {
     if (typeof window === "undefined") return undefined;
     const params = new URLSearchParams(window.location.search);
-    // dfx local query URL may include `id` for backend canister and `canisterId` for frontend canister.
-    return params.get("id") ?? params.get("canisterId") ?? undefined;
+    // Only accept explicit backend canister ID from URL to avoid frontend canister being mistaken as backend.
+    return params.get("backendId") ?? undefined;
   })();
 
-  const backendCanisterId =
-    backendCanisterIdFromEnv || backendCanisterIdFromQuery || detectCanisterIdFromHost();
+  const backendCanisterId = backendCanisterIdFromEnv || backendCanisterIdFromQuery;
   try {
     const response = await fetch(`${baseUrl}env.json`);
     const config = (await response.json()) as JsonConfig;
     const resolvedCanisterId =
-      config.backend_canister_id !== "undefined"
+      config.backend_canister_id !== "undefined" && config.backend_canister_id
         ? config.backend_canister_id
         : backendCanisterId;
 
-    const finalCanisterId =
-      resolvedCanisterId || backendCanisterId || backendCanisterIdFromQuery;
+    const finalCanisterId = resolvedCanisterId;
 
     if (!finalCanisterId) {
       console.warn(
@@ -69,9 +61,26 @@ export async function loadConfig(): Promise<Config> {
       );
     }
 
+    const resolveLocalHost = () => {
+      if (typeof window !== "undefined") {
+        const hostName = window.location.hostname;
+        const origin = window.location.origin;
+        if (
+          hostName.endsWith(".localhost") ||
+          hostName === "localhost" ||
+          hostName === "127.0.0.1"
+        ) {
+          return origin;
+        }
+      }
+      return "http://127.0.0.1:8000";
+    };
+
     const fullConfig = {
       backend_host:
-        config.backend_host === "undefined" ? undefined : config.backend_host,
+        config.backend_host === "undefined" || !config.backend_host
+          ? resolveLocalHost()
+          : config.backend_host,
       backend_canister_id: finalCanisterId ?? "",
       storage_gateway_url:
         import.meta.env.VITE_STORAGE_GATEWAY_URL ??
@@ -93,8 +102,23 @@ export async function loadConfig(): Promise<Config> {
     if (!finalCanisterId) {
       console.warn("CANISTER_ID_BACKEND is not set during fallback path.");
     }
+    const resolveLocalHost = () => {
+      if (typeof window !== "undefined") {
+        const hostName = window.location.hostname;
+        const origin = window.location.origin;
+        if (
+          hostName.endsWith(".localhost") ||
+          hostName === "localhost" ||
+          hostName === "127.0.0.1"
+        ) {
+          return origin;
+        }
+      }
+      return "http://127.0.0.1:8000";
+    };
+
     const fallbackConfig = {
-      backend_host: undefined,
+      backend_host: resolveLocalHost(),
       backend_canister_id: finalCanisterId ?? "",
       storage_gateway_url: DEFAULT_STORAGE_GATEWAY_URL,
       bucket_name: DEFAULT_BUCKET_NAME,
@@ -151,12 +175,21 @@ export async function createActorWithConfig(
   }
 
   const config = await loadConfig();
+  if (!config.backend_canister_id) {
+    throw new Error(
+      "backend_canister_id is not set. Ensure env.json has backend_canister_id and/or VITE_CANISTER_ID_BACKEND is configured.",
+    );
+  }
   const resolvedOptions = options ?? {};
   const agent = new HttpAgent({
     ...resolvedOptions.agentOptions,
     host: config.backend_host || "http://127.0.0.1:8000",
   });
-  if (config.backend_host?.includes("localhost")) {
+  if (
+    config.backend_host &&
+    (config.backend_host.includes("localhost") ||
+      config.backend_host.includes("127.0.0.1"))
+  ) {
     await agent.fetchRootKey().catch((err) => {
       console.warn(
         "Unable to fetch root key. Check to ensure that your local replica is running",
