@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import landingSvg from "@/components/icon/landing.svg";
 import logoSvg from "@/components/icon/logo.svg";
 import vectorSvg from "@/components/icon/vector.svg";
+import bintikSVG from "@/components/icon/bintik.svg";
 /**
  * Halaman Landing SODALIS - halaman utama untuk pengunjung
  */
@@ -13,53 +14,17 @@ const features = [
   {
     icon: "🤖",
     title: "AI Scoring Canggih",
-    desc: "Sistem AI kami menilai kelayakan peminjam berdasarkan GPA, riwayat pinjaman, dan tujuan pinjaman secara real-time.",
+    desc: "Our AI system assesses borrower eligibility based on GPA, loan history, and loan objectives in real-time..",
   },
   {
     icon: "⛓️",
     title: "Blockchain ICP",
-    desc: "Setiap transaksi dicatat di blockchain Internet Computer Protocol (ICP) — transparan, aman, dan tidak bisa dimanipulasi.",
+    desc: "Every transaction is recorded on the Internet Computer Protocol (ICP) blockchain — transparent, secure, and unmanipulated.",
   },
   {
     icon: "🏦",
     title: "Virtual Account IDR",
-    desc: "Transfer dana langsung via Virtual Account BCA, Mandiri, BRI, BNI, dan BSI. Mudah dan terpercaya.",
-  },
-];
-
-const borrowerSteps = [
-  {
-    step: 1,
-    title: "Daftar & Verifikasi",
-    desc: "Upload KTM, isi data akademik dan rekening bank",
-  },
-  {
-    step: 2,
-    title: "Ajukan Pinjaman",
-    desc: "Tentukan nominal, tenor, dan tujuan pinjaman",
-  },
-  {
-    step: 3,
-    title: "Terima Dana",
-    desc: "Dana masuk ke rekening setelah investor menyetujui",
-  },
-];
-
-const investorSteps = [
-  {
-    step: 1,
-    title: "Daftar & Verifikasi",
-    desc: "Upload KTM dan data rekening bank Anda",
-  },
-  {
-    step: 2,
-    title: "Pilih Peminjam",
-    desc: "Lihat profil lengkap + skor AI kelayakan peminjam",
-  },
-  {
-    step: 3,
-    title: "Terima Cicilan",
-    desc: "Cicilan bulanan masuk otomatis ke rekening Anda",
+    desc: "Transfer funds directly via virtual accounts at BCA, Mandiri, BRI, BNI, and BSI. Easy and reliable.",
   },
 ];
 
@@ -231,64 +196,70 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section style={{
-        padding: "80px 48px 64px",
-        backgroundImage: `url(${landingSvg})`,
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "right center",
-        backgroundSize: "50% auto",
-        maxWidth: "1200px",
-        margin: "0 auto",
+      <div style={{
+        backgroundImage: `url(${bintikSVG})`,
+        backgroundRepeat: "repeat",
+        backgroundSize: "auto",
       }}>
-        <div style={{ maxWidth: "560px" }}>
-          <h1 style={{ fontSize: "2.9rem", fontWeight: 800, color: "#1a3a5c", lineHeight: 1.18, marginBottom: "20px" }}>
-            Empowering Your Academic Journey through{" "}
-            <span style={{ color: "#1d6fbf" }}>Community Trust.</span>
-          </h1>
-          <p style={{ color: "#4a5568", fontSize: "0.97rem", lineHeight: 1.75, marginBottom: "32px" }}>
-            Sodalis is a decentralized student loan ecosystem specifically for University, powered by AI-driven credit scoring and secure ICP smart contracts.
-          </p>
-          <div className="flex gap-4 flex-wrap">
-            <Button
-              className="sodalis-btn"
-              style={{ borderRadius: "999px", background: "#1d6fbf", color: "white", padding: "14px 32px", fontSize: "0.97rem", fontWeight: 600 }}
-              onClick={() => goTo("/register")}
-              data-ocid="hero.daftar_button"
-            >
-              Mulai Sekarang
-            </Button>
-            <Button
-              className="sodalis-btn"
-              variant="outline"
-              style={{ borderRadius: "999px", border: "1.5px solid #1a3a5c", color: "#1a3a5c", background: "transparent", padding: "14px 32px", fontSize: "0.97rem", fontWeight: 600 }}
-              onClick={() => goTo("/login")}
-              data-ocid="hero.login_button"
-            >
-              Sudah Punya Akun
-            </Button>
+        <section style={{
+          padding: "80px 48px 64px",
+          backgroundImage: `url(${landingSvg})`,
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "right center",
+          backgroundSize: "50% auto",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}>
+          <div style={{ maxWidth: "560px" }}>
+            <h1 style={{ fontSize: "2.9rem", fontWeight: 800, color: "#1a3a5c", lineHeight: 1.18, marginBottom: "20px" }}>
+              Empowering Your Academic Journey through{" "}
+              <span style={{ color: "#1d6fbf" }}>Community Trust.</span>
+            </h1>
+            <p style={{ color: "#4a5568", fontSize: "0.97rem", lineHeight: 1.75, marginBottom: "32px" }}>
+              Sodalis is a decentralized student loan ecosystem specifically for University, powered by AI-driven credit scoring and secure ICP smart contracts.
+            </p>
+            <div className="flex gap-4 flex-wrap">
+              <Button
+                className="sodalis-btn"
+                style={{ borderRadius: "999px", background: "#1d6fbf", color: "white", padding: "14px 32px", fontSize: "0.97rem", fontWeight: 600 }}
+                onClick={() => goTo("/register")}
+                data-ocid="hero.daftar_button"
+              >
+                Mulai Sekarang
+              </Button>
+              <Button
+                className="sodalis-btn"
+                variant="outline"
+                style={{ borderRadius: "999px", border: "1.5px solid #1a3a5c", color: "#1a3a5c", background: "transparent", padding: "14px 32px", fontSize: "0.97rem", fontWeight: 600 }}
+                onClick={() => goTo("/login")}
+                data-ocid="hero.login_button"
+              >
+                Sudah Punya Akun
+              </Button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Stats */}
-      <section style={{ padding: "0 48px 64px", maxWidth: "1200px", margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px" }}>
-          {[
-            { label: "Total Pengguna", value: "2.400+", icon: "👨‍🎓" },
-            { label: "Dana Tersalur", value: "Rp 4,8M", icon: "💰" },
-            { label: "Tingkat Pengembalian", value: "98.2%", icon: "📈" },
-            { label: "Universitas Mitra", value: "32", icon: "🏫" },
-          ].map((stat) => (
-            <Card key={stat.label} style={{ borderRadius: "16px", background: "white", boxShadow: "0 2px 12px rgba(0,0,0,0.07)", border: "none" }}>
-              <CardContent style={{ padding: "20px", textAlign: "center" }}>
-                <div style={{ fontSize: "2rem", marginBottom: "8px" }}>{stat.icon}</div>
-                <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#1a3a5c" }}>{stat.value}</div>
-                <div style={{ fontSize: "0.78rem", color: "#718096", marginTop: "4px" }}>{stat.label}</div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+        {/* Stats */}
+        <section style={{ padding: "0 48px 64px", maxWidth: "1200px", margin: "0 auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px" }}>
+            {[
+              { label: "Total Pengguna", value: "2.400+", icon: "👨‍🎓" },
+              { label: "Dana Tersalur", value: "Rp 4,8M", icon: "💰" },
+              { label: "Tingkat Pengembalian", value: "98.2%", icon: "📈" },
+              { label: "Universitas Mitra", value: "32", icon: "🏫" },
+            ].map((stat) => (
+              <Card key={stat.label} style={{ borderRadius: "16px", background: "white", boxShadow: "0 2px 12px rgba(0,0,0,0.07)", border: "none" }}>
+                <CardContent style={{ padding: "20px", textAlign: "center" }}>
+                  <div style={{ fontSize: "2rem", marginBottom: "8px" }}>{stat.icon}</div>
+                  <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#1a3a5c" }}>{stat.value}</div>
+                  <div style={{ fontSize: "0.78rem", color: "#718096", marginTop: "4px" }}>{stat.label}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      </div>
 
       {/* Fitur Unggulan */}
       <section id="fitur" style={{ padding: "60px 48px", maxWidth: "1200px", margin: "0 auto" }}>
@@ -301,7 +272,7 @@ export default function LandingPage() {
             University-Grade Infrastructure
           </h3>
           <p style={{ color: "rgba(255,255,255,0.65)", textAlign: "center", fontSize: "0.88rem", lineHeight: 1.65, maxWidth: "520px", margin: "0 auto 36px" }}>
-            Dibangun di atas arsitektur multi-tenant yang aman dengan integrasi mendalam ke sistem data akademik dan manajemen kepatuhan otomatis yang skalabel.
+            Built on a secure multi-tenant architecture with deep integration into academic data systems and scalable, automated compliance management.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
             {features.map((f) => (
@@ -320,15 +291,15 @@ export default function LandingPage() {
       {/* Cara Kerja */}
       <section id="cara-kerja" style={{ padding: "80px 48px", maxWidth: "1200px", margin: "0 auto", position: "relative", minHeight: "420px" }}>
         <h2 style={{ textAlign: "center", fontSize: "2.05rem", fontWeight: 800, color: "#0d4e99", marginBottom: "10px" }}>How it Works.</h2>
-        <p style={{ textAlign: "center", color: "#3d557a", fontSize: "1rem", marginBottom: "48px" }}>
+        <p style={{ textAlign: "center", color: "#3d557a", fontSize: "1rem", marginBottom: "80px" }}>
           Our streamlined process gets you the funding you need quickly and efficiently.
         </p>
 
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none", zIndex: 0, transform: "translateY(80px)" }}>
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none", zIndex: 0, transform: "translateY(80px) translateX(6px)" }}>
           <img
             src={vectorSvg}
             alt="How it works vector"
-            style={{ width: "100%", maxWidth: "1000px", opacity: 1 }}
+            style={{ width: "100%", maxWidth: "1090px", opacity: 1 }}
           />
         </div>
 
@@ -382,10 +353,10 @@ export default function LandingPage() {
           </div>
           <div>
             {[
-              { q: "Apa itu SODALIS?", a: "SODALIS adalah platform P2P Lending terdesentralisasi khusus untuk ekosistem universitas. Platform ini menggunakan AI untuk mengevaluasi kelayakan mahasiswa dan Blockchain untuk mengelola pinjaman tanpa perantara bank tradisional." },
-              { q: "Siapa yang bisa mengajukan pinjaman?", a: "" },
-              { q: "Apakah data pribadi saya aman di Blockchain?", a: "" },
-              { q: "Bagaimana AI menghitung 'Skor Kelayakan' saya?", a: "" },
+              { q: "What is SODALIS?", a: "SODALIS is a decentralized P2P lending platform specifically designed for the university ecosystem. It leverages cutting-edge AI technology to evaluate student eligibility based on academic performance and financial history, while utilizing blockchain smart contracts to manage loans transparently and efficiently — all without the need for traditional bank intermediaries." },
+              { q: "Who can apply for a loan?", a: "Any active university student with a valid academic record and a demonstrated financial need can apply for a loan through SODALIS. The platform is open to students across all partner universities, regardless of their field of study. As long as you meet the minimum GPA requirement and can provide the necessary documentation, you are eligible to submit a loan application." },
+              { q: "Is my personal data safe on the Blockchain?", a: "Yes, the security and privacy of your personal data is our top priority. All sensitive information is encrypted using industry-standard protocols before being stored on the ICP blockchain. Since blockchain data is immutable and decentralized, there is no single point of failure or risk of unauthorized manipulation, giving you full confidence that your data remains protected at all times." },
+              { q: "How does AI calculate my 'Eligibility Score'?", a: "Our AI scoring engine performs a comprehensive analysis of multiple factors to determine your creditworthiness. It takes into account your academic performance including GPA and course history, your financial background, the stated purpose of your loan, and your repayment history if you are a returning borrower. The result is a personalized eligibility score that helps match you with the most suitable investors on the platform." },
             ].map((faq, i) => (
               <div key={i} className="sodalis-faq-item">
                 <button className="sodalis-faq-btn" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
@@ -428,13 +399,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer style={{ background: "#1a3a5c", borderTop: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)", padding: "28px 48px", textAlign: "center", fontSize: "0.85rem" }}>
-        <p style={{ fontWeight: 700, color: "white", fontSize: "1rem", marginBottom: "4px" }}>🎓 SODALIS</p>
-        <p style={{ marginBottom: "8px" }}>Platform P2P Lending Khusus Mahasiswa Indonesia</p>
-        <p>© {new Date().getFullYear()}. Dibuat dengan ❤️ SODALIS.</p>
-      </footer>
     </div>
   );
 }
