@@ -25,6 +25,7 @@ export default function RegisterPage() {
   const [ktm, setKtm] = useState("");
   const [rekening, setRekening] = useState("");
   const [gpa, setGpa] = useState("");
+  const [ktmFile, setKtmFile] = useState<File | null>(null);
 
   const handleRoleSelect = (selectedRole: "Investor" | "Peminjam") => {
     setRole(selectedRole);
@@ -68,6 +69,12 @@ export default function RegisterPage() {
       setIsLoading(false);
     }
   };
+
+if (ktmFile && ktmFile.size > 5 * 1024 * 1024) {
+   toast.error("Ukuran file maksimal 5MB.");
+   setIsLoading(false);
+   return;
+}
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#e8eef3" }}>
@@ -192,13 +199,13 @@ export default function RegisterPage() {
   <Card className="rounded-2xl shadow-md" style={{ maxWidth: "520px", margin: "0 auto" }}>
     <CardHeader className="pb-2">
       <div className="flex items-center gap-3">
-        <img src={CapIcon} width={36} height={36} alt="cap icon" />
+        <img src={role === "Investor" ? ShieldIcon : CapIcon} width={36} height={36} alt="role icon" />
         <div>
           <CardTitle className="text-lg font-bold" style={{ color: "#1a3a5c" }}>
             {role === "Investor" ? "Investor Data" : "Borrower Data"}
           </CardTitle>
           <p className="text-xs" style={{ color: "#4a7a9b" }}>
-            Fill Your Data For AI Trust Score.
+            {role === "Investor" ? "Fill Your Investor Profile Data." : "Fill Your Data For AI Trust Score."}
           </p>
         </div>
       </div>
@@ -232,20 +239,24 @@ export default function RegisterPage() {
           />
         </div>
 
-        <div className="space-y-1">
-          <Label htmlFor="ktm" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Student ID Card Number</Label>
-          <Input
-            id="ktm"
-            placeholder="123456"
-            value={ktm}
-            onChange={(e) => setKtm(e.target.value)}
-            required
-            className="rounded-lg text-sm"
-            data-ocid="register.ktm_input"
-          />
-        </div>
+        {/* Hanya untuk Peminjam */}
+        {role === "Peminjam" && (
+          <div className="space-y-1">
+            <Label htmlFor="ktm" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Student ID Card Number</Label>
+            <Input
+              id="ktm"
+              placeholder="123456"
+              value={ktm}
+              onChange={(e) => setKtm(e.target.value)}
+              required
+              className="rounded-lg text-sm"
+              data-ocid="register.ktm_input"
+            />
+          </div>
+        )}
 
-        <div className="grid grid-cols-2 gap-3">
+        {/* Bank Account & GPA — GPA hanya Peminjam */}
+        <div className={`grid gap-3 ${role === "Peminjam" ? "grid-cols-2" : "grid-cols-1"}`}>
           <div className="space-y-1">
             <Label htmlFor="rekening" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Bank Account</Label>
             <Input
@@ -258,45 +269,64 @@ export default function RegisterPage() {
               data-ocid="register.rekening_input"
             />
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="gpa" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>GPA</Label>
-            <Input
-              id="gpa"
-              type="number"
-              min="0"
-              max="4"
-              step="0.01"
-              placeholder="3.50"
-              value={gpa}
-              onChange={(e) => setGpa(e.target.value)}
-              required={role === "Peminjam"}
-              className="rounded-lg text-sm"
-              data-ocid="register.gpa_input"
-            />
-          </div>
+          {role === "Peminjam" && (
+            <div className="space-y-1">
+              <Label htmlFor="gpa" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>GPA</Label>
+              <Input
+                id="gpa"
+                type="number"
+                min="0"
+                max="4"
+                step="0.01"
+                placeholder="3.50"
+                value={gpa}
+                onChange={(e) => setGpa(e.target.value)}
+                required
+                className="rounded-lg text-sm"
+                data-ocid="register.gpa_input"
+              />
+            </div>
+          )}
         </div>
 
-        {/* Upload Student ID Card */}
-        <div className="space-y-1">
-          <Label className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Upload Your Student ID Card</Label>
-          <div
-            className="rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-blue-50 transition-all"
-            style={{ borderColor: "#b0c4d8", padding: "1.5rem" }}
-            onClick={() => document.getElementById("ktm-upload")?.click()}
-          >
-            <input id="ktm-upload" type="file" accept=".pdf" className="hidden" />
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-              <rect x="4" y="8" width="32" height="24" rx="4" fill="#b0c4d8"/>
-              <circle cx="14" cy="17" r="4" fill="#e8eef3"/>
-              <path d="M4 28 L13 20 L20 27 L27 21 L36 28" stroke="#e8eef3" strokeWidth="2" fill="none"/>
-              <circle cx="26" cy="26" r="6" fill="#1a3a5c"/>
-              <line x1="26" y1="23" x2="26" y2="29" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-              <line x1="23" y1="26" x2="29" y2="26" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-            <p className="text-xs font-medium" style={{ color: "#4a7a9b" }}>Drag Files Or Click To Browse</p>
-            <p className="text-xs" style={{ color: "#7a9ab5" }}>Format: PDF (MAX 5MB)</p>
-          </div>
-        </div>
+       {/* Upload KHS */}
+<div className="space-y-1">
+  <Label className="text-sm font-medium" style={{ color: "#1a3a5c" }}>
+    {role === "Investor" ? "Upload Your ID Card" : "Upload Your KHS"}
+  </Label>
+  <div
+    className="rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-blue-50 transition-all"
+    style={{ borderColor: ktmFile ? "#005596" : "#b0c4d8", padding: "1.5rem" }}
+    onClick={() => document.getElementById("ktm-upload")?.click()}
+  >
+    <input
+      id="ktm-upload"
+      type="file"
+      accept=".pdf"
+      className="hidden"
+      onChange={(e) => setKtmFile(e.target.files?.[0] ?? null)}
+    />
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+      <rect x="4" y="8" width="32" height="24" rx="4" fill="#b0c4d8"/>
+      <circle cx="14" cy="17" r="4" fill="#e8eef3"/>
+      <path d="M4 28 L13 20 L20 27 L27 21 L36 28" stroke="#e8eef3" strokeWidth="2" fill="none"/>
+      <circle cx="26" cy="26" r="6" fill="#1a3a5c"/>
+      <line x1="26" y1="23" x2="26" y2="29" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="23" y1="26" x2="29" y2="26" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+    {ktmFile ? (
+      <>
+        <p className="text-xs font-medium" style={{ color: "#005596" }}>✅ {ktmFile.name}</p>
+        <p className="text-xs" style={{ color: "#7a9ab5" }}>{(ktmFile.size / 1024).toFixed(1)} KB</p>
+      </>
+    ) : (
+      <>
+        <p className="text-xs font-medium" style={{ color: "#4a7a9b" }}>Drag Files Or Click To Browse</p>
+        <p className="text-xs" style={{ color: "#7a9ab5" }}>Format: PDF (MAX 5MB)</p>
+      </>
+    )}
+  </div>
+</div>
 
         <div className="flex gap-3 pt-1">
           <Button
@@ -333,6 +363,7 @@ export default function RegisterPage() {
     </CardContent>
   </Card>
 )}
+
         </div>
       </div>
     </div>

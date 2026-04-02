@@ -13,6 +13,7 @@
     "fix": "pnpm -r --if-present run fix"
   },
   "devDependencies": {
+    "baseline-browser-mapping": "^2.10.13",
     "sharp": "^0.34.4"
   }
 }
