@@ -1,4 +1,4 @@
-## SODALIS (KampusLend)
+## SODALIS
 
 SODALIS adalah aplikasi **P2P Lending untuk mahasiswa** yang dibangun di atas Internet Computer (ICP).
 Project ini terdiri dari:
