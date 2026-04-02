@@ -4,11 +4,8 @@ import landingSvg from "@/components/icon/landing.svg";
 import logoSvg from "@/components/icon/logo.svg";
 import vectorSvg from "@/components/icon/vector.svg";
 import bintikSVG from "@/components/icon/bintik.svg";
-/**
- * Halaman Landing SODALIS - halaman utama untuk pengunjung
- */
 import { useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const features = [
   {
@@ -31,6 +28,20 @@ const features = [
 export default function LandingPage() {
   const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [scrolled, setScrolled] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      setScrolled(currentY > 10);
+      setVisible(currentY < lastScrollY.current || currentY < 50);
+      lastScrollY.current = currentY;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const goTo = (path: string) => router.navigate({ to: path });
 
@@ -93,17 +104,7 @@ export default function LandingPage() {
           grid-template-columns: repeat(4, 1fr);
           gap: 0;
           position: relative;
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none", zIndex: 0 }}>
-            <img
-              src={vectorSvg}
-              alt="How it works vector"
-              style={{
-                width: "100%",
-                maxWidth: "980px",
-                opacity: 0.22,
-              }}
-            />
-          </div>          z-index: 1;
+          z-index: 1;
           margin-top: 48px;
           align-items: center;
           justify-items: center;
@@ -157,10 +158,20 @@ export default function LandingPage() {
 
       {/* Navbar */}
       <nav style={{
-        background: "white", padding: "14px 48px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        borderBottom: "1px solid #e8ecf0", position: "sticky", top: 0, zIndex: 50,
-        boxShadow: "0 1px 8px rgba(0,0,0,0.06)"
+        background: scrolled ? "rgba(255,255,255,0.72)" : "white",
+        backdropFilter: scrolled ? "blur(16px)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(16px)" : "none",
+        padding: "14px 48px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        borderBottom: "1px solid #e8ecf0",
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        boxShadow: scrolled ? "0 2px 16px rgba(0,0,0,0.08)" : "0 1px 8px rgba(0,0,0,0.06)",
+        transform: visible ? "translateY(0)" : "translateY(-100%)",
+        transition: "transform 0.35s cubic-bezier(0.4,0,0.2,1), background 0.3s ease, box-shadow 0.3s ease",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <img src={logoSvg} alt="Sodalis logo" style={{ width: 34, height: 34, objectFit: "contain" }} />
