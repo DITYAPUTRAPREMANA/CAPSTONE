@@ -3,13 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useRouter } from "@tanstack/react-router";
-/**
- * Halaman Registrasi SODALIS - 2 langkah: pilih role lalu isi data
- */
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext";
 import { useActor } from "../hooks/useActor";
+import CapIcon from "../assets/Cap.svg";
+import ShieldIcon from "../assets/Shield.svg";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -44,10 +43,7 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!actor) {
-      // backend masih loading, seharusnya submit tidak aktif jika belum siap
-      return;
-    }
+    if (!actor) return;
     if (!role) {
       toast.error("Pilih role terlebih dahulu sebelum mendaftar.");
       return;
@@ -55,15 +51,7 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       const gpaNum = role === "Peminjam" ? Number.parseFloat(gpa) || 0 : 0;
-      const userId = await actor.registerUser(
-        nama,
-        email,
-        role,
-        ktm,
-        rekening,
-        gpaNum,
-      );
-      // Backend already stores profile in registerUser; skip saveCallerUserProfile to avoid permission mismatch on anonymous login
+      const userId = await actor.registerUser(nama, email, role, ktm, rekening, gpaNum);
       login({ userId: String(userId), role, name: nama });
       toast.success("Akun berhasil dibuat! Selamat datang di SODALIS 🎓");
       router.navigate({
@@ -82,115 +70,138 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <nav className="bg-navy text-white px-6 py-4">
-        {!isBackendReady && (
-          <div className="text-white text-sm text-center py-2 bg-red-600">
-            Koneksi backend sedang disiapkan, tunggu sebentar sebelum mendaftar.
-            {isActorError && actorError instanceof Error && (
-              <div className="mt-1 text-xs bg-black/30 px-2 py-1 rounded">
-                Err: {actorError.message}
-              </div>
-            )}
-          </div>
-        )}
-        <Link to="/" className="flex items-center gap-2 w-fit">
-          <span className="text-2xl">🎓</span>
-          <span className="font-bold text-xl">SODALIS</span>
-        </Link>
-      </nav>
-
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-lg">
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <div className="flex items-center gap-2">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#e8eef3" }}>
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div
+          style={{
+            backgroundColor: "rgba(0, 85, 150, 0.1)",
+            backdropFilter: "blur(2px)",
+            borderRadius: "2rem",
+            padding: "3rem 4rem",
+            width: "100%",
+            maxWidth: "900px",
+          }}
+        >
+          {/* Stepper */}
+          <div className="flex items-center justify-center gap-8 mb-10">
+            <div className="flex items-center gap-3">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step >= 1 ? "bg-navy text-white" : "bg-gray-200 text-gray-500"}`}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+                style={{
+                  backgroundColor: step >= 1 ? "#005596" : "#b0c4d8",
+                  color: "white",
+                }}
               >
                 1
               </div>
-              <span className="text-sm font-medium">Pilih Role</span>
+              <span
+                className="text-sm font-semibold"
+                style={{ color: step >= 1 ? "#005596" : "#7a9ab5" }}
+              >
+                Choose Your Role
+              </span>
             </div>
-            <div className="w-12 h-0.5 bg-gray-200" />
-            <div className="flex items-center gap-2">
+            <div className="w-16 h-0.5" style={{ backgroundColor: "#b0c4d8" }} />
+            <div className="flex items-center gap-3">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step >= 2 ? "bg-navy text-white" : "bg-gray-200 text-gray-500"}`}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+                style={{
+                  backgroundColor: step >= 2 ? "#005596" : "#b0c4d8",
+                  color: "white",
+                }}
               >
                 2
               </div>
-              <span className="text-sm font-medium">Data Diri</span>
+              <span
+                className="text-sm font-semibold"
+                style={{ color: step >= 2 ? "#005596" : "#7a9ab5" }}
+              >
+                Personal Data
+              </span>
             </div>
           </div>
 
+          {/* Step 1: Role Selection */}
           {step === 1 && (
             <div>
-              <h2 className="text-2xl font-bold text-center text-foreground mb-2">
-                Daftar Sebagai Apa?
+              <h2
+                className="text-2xl font-bold text-center mb-1"
+                style={{ color: "#005596" }}
+              >
+                What Do You Want To Register As?
               </h2>
-              <p className="text-muted-foreground text-center mb-8">
-                Pilih peran Anda di SODALIS
+              <p className="text-center mb-8" style={{ color: "#005596" }}>
+                Choose Your Role!
               </p>
+
               <div className="grid grid-cols-2 gap-6">
-                <Card
-                  className="rounded-2xl shadow-card hover:shadow-lg transition-all cursor-pointer border-2 hover:border-amber-500"
+                {/* Borrower Card */}
+                <div
+                  className="bg-white rounded-2xl p-8 flex flex-col items-center cursor-pointer transition-all hover:shadow-lg border-2 border-transparent hover:border-blue-300"
                   onClick={() => handleRoleSelect("Peminjam")}
                   data-ocid="register.peminjam_card"
                 >
-                  <CardContent className="p-6 text-center">
-                    <div className="text-5xl mb-3">📚</div>
-                    <h3 className="font-bold text-lg text-foreground mb-2">
-                      Peminjam
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Ajukan pinjaman untuk kebutuhan kuliah Anda
-                    </p>
-                    <Button
-                      className="mt-4 w-full rounded-full bg-amber-500 hover:bg-amber-600 text-white text-sm"
-                      tabIndex={-1}
-                    >
-                      Pilih Peminjam
-                    </Button>
-                  </CardContent>
-                </Card>
-                <Card
-                  className="rounded-2xl shadow-card hover:shadow-lg transition-all cursor-pointer border-2 hover:border-brand-green"
+                  <div className="mb-5">
+                     <img src={CapIcon} width={100} height={100} alt="cap icon" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2" style={{ color: "#005596" }}>
+                    Borrower
+                  </h3>
+                  <p className="text-sm text-center mb-5" style={{ color: "#005596" }}>
+                    Unlock your academic potential. Get access to fair, AI-calculated loans based on your achievements and dedication.
+                  </p>
+                  <button
+                    className="w-full py-2.5 rounded-full font-semibold text-white text-sm transition-all hover:opacity-90"
+                    style={{ backgroundColor: "#005596" }}
+                    tabIndex={-1}
+                  >
+                    Continue
+                  </button>
+                </div>
+
+                {/* Investor Card */}
+                <div
+                  className="bg-white rounded-2xl p-8 flex flex-col items-center cursor-pointer transition-all hover:shadow-lg border-2 border-transparent hover:border-blue-300"
                   onClick={() => handleRoleSelect("Investor")}
                   data-ocid="register.investor_card"
                 >
-                  <CardContent className="p-6 text-center">
-                    <div className="text-5xl mb-3">💰</div>
-                    <h3 className="font-bold text-lg text-foreground mb-2">
-                      Investor
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Danai pinjaman mahasiswa dan dapatkan return
-                    </p>
-                    <Button
-                      className="mt-4 w-full rounded-full bg-brand-green hover:bg-brand-green/90 text-white text-sm"
-                      tabIndex={-1}
-                    >
-                      Pilih Investor
-                    </Button>
-                  </CardContent>
-                </Card>
+                  <div className="mb-5">
+                    <img src={ShieldIcon} width={100} height={100} alt="shield icon" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2" style={{ color: "#005596" }}>
+                    Investor
+                  </h3>
+                  <p className="text-sm text-center mb-5" style={{ color: "#005596" }}>
+                    Invest for the future of students. Support scholars through secure blockchain contracts and earn community-backed returns.
+                  </p>
+                  <button
+                    className="w-full py-2.5 rounded-full font-semibold text-white text-sm transition-all hover:opacity-90"
+                    style={{ backgroundColor: "#005596" }}
+                    tabIndex={-1}
+                  >
+                    Continue
+                  </button>
+                </div>
               </div>
             </div>
           )}
 
+          {/* Step 2: Personal Data Form */}
           {step === 2 && (
-            <Card className="rounded-2xl shadow-card">
+            <Card className="rounded-2xl shadow-md">
               <CardHeader>
-                <CardTitle className="text-xl font-bold text-navy">
-                  Data {role} {role === "Investor" ? "💰" : "📚"}
+                <CardTitle className="text-xl font-bold" style={{ color: "#1a3a5c" }}>
+                  {role === "Investor" ? "Investor Data 💰" : "Borrower Data 📚"}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="nama">Nama Lengkap</Label>
+                    <Label htmlFor="nama">Full Name</Label>
                     <Input
                       id="nama"
-                      placeholder="Nama sesuai KTM"
+                      placeholder="Name as on Student ID"
                       value={nama}
                       onChange={(e) => setNama(e.target.value)}
                       required
@@ -203,7 +214,7 @@ export default function RegisterPage() {
                     <Input
                       id="reg-email"
                       type="email"
-                      placeholder="email@kampus.ac.id"
+                      placeholder="email@campus.ac.id"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -212,10 +223,10 @@ export default function RegisterPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="ktm">Nomor KTM</Label>
+                    <Label htmlFor="ktm">Student ID Number</Label>
                     <Input
                       id="ktm"
-                      placeholder="Nomor Kartu Tanda Mahasiswa"
+                      placeholder="Student Card Number"
                       value={ktm}
                       onChange={(e) => setKtm(e.target.value)}
                       required
@@ -224,7 +235,7 @@ export default function RegisterPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="rekening">Rekening Bank</Label>
+                    <Label htmlFor="rekening">Bank Account</Label>
                     <Input
                       id="rekening"
                       placeholder="BCA-1234567890"
@@ -235,12 +246,12 @@ export default function RegisterPage() {
                       data-ocid="register.rekening_input"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Format: NamaBank-NomorRekening
+                      Format: BankName-AccountNumber
                     </p>
                   </div>
                   {role === "Peminjam" && (
                     <div className="space-y-2">
-                      <Label htmlFor="gpa">GPA / IPK (0.00 - 4.00)</Label>
+                      <Label htmlFor="gpa">GPA (0.00 - 4.00)</Label>
                       <Input
                         id="gpa"
                         type="number"
@@ -264,25 +275,27 @@ export default function RegisterPage() {
                       onClick={() => setStep(1)}
                       data-ocid="register.back_button"
                     >
-                      Kembali
+                      Back
                     </Button>
                     <Button
                       type="submit"
                       disabled={isLoading || !isBackendReady}
-                      className="flex-1 rounded-full bg-navy hover:bg-navy/90 text-white"
+                      className="flex-1 rounded-full text-white"
+                      style={{ backgroundColor: "#1a3a5c" }}
                       data-ocid="register.submit_button"
                     >
-                      {isLoading ? "Memproses..." : "Daftar Sekarang"}
+                      {isLoading ? "Processing..." : "Register Now"}
                     </Button>
                   </div>
                 </form>
                 <p className="text-center text-sm text-muted-foreground mt-4">
-                  Sudah punya akun?{" "}
+                  Already have an account?{" "}
                   <Link
                     to="/login"
-                    className="text-brand-blue font-semibold hover:underline"
+                    className="font-semibold hover:underline"
+                    style={{ color: "#1a6bbf" }}
                   >
-                    Masuk
+                    Sign In
                   </Link>
                 </p>
               </CardContent>

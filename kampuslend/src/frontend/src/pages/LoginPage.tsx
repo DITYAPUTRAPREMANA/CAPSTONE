@@ -99,13 +99,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <nav className="bg-navy text-white px-6 py-4">
-        <Link to="/" className="flex items-center gap-2 w-fit">
-          <span className="text-2xl">🎓</span>
-          <span className="font-bold text-xl">SODALIS</span>
-        </Link>
-      </nav>
-
       <div className="flex-1 flex items-center justify-center p-6">
         <Card className="w-full max-w-md rounded-2xl shadow-card">
           <CardHeader className="text-center pb-4">
