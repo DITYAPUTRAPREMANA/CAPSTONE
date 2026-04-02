@@ -187,120 +187,152 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* Step 2: Personal Data Form */}
-          {step === 2 && (
-            <Card className="rounded-2xl shadow-md">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold" style={{ color: "#1a3a5c" }}>
-                  {role === "Investor" ? "Investor Data 💰" : "Borrower Data 📚"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="nama">Full Name</Label>
-                    <Input
-                      id="nama"
-                      placeholder="Name as on Student ID"
-                      value={nama}
-                      onChange={(e) => setNama(e.target.value)}
-                      required
-                      className="rounded-full"
-                      data-ocid="register.nama_input"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-email">Email</Label>
-                    <Input
-                      id="reg-email"
-                      type="email"
-                      placeholder="email@campus.ac.id"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="rounded-full"
-                      data-ocid="register.email_input"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="ktm">Student ID Number</Label>
-                    <Input
-                      id="ktm"
-                      placeholder="Student Card Number"
-                      value={ktm}
-                      onChange={(e) => setKtm(e.target.value)}
-                      required
-                      className="rounded-full"
-                      data-ocid="register.ktm_input"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="rekening">Bank Account</Label>
-                    <Input
-                      id="rekening"
-                      placeholder="BCA-1234567890"
-                      value={rekening}
-                      onChange={(e) => setRekening(e.target.value)}
-                      required
-                      className="rounded-full"
-                      data-ocid="register.rekening_input"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Format: BankName-AccountNumber
-                    </p>
-                  </div>
-                  {role === "Peminjam" && (
-                    <div className="space-y-2">
-                      <Label htmlFor="gpa">GPA (0.00 - 4.00)</Label>
-                      <Input
-                        id="gpa"
-                        type="number"
-                        min="0"
-                        max="4"
-                        step="0.01"
-                        placeholder="3.50"
-                        value={gpa}
-                        onChange={(e) => setGpa(e.target.value)}
-                        required
-                        className="rounded-full"
-                        data-ocid="register.gpa_input"
-                      />
-                    </div>
-                  )}
-                  <div className="flex gap-3 pt-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex-1 rounded-full"
-                      onClick={() => setStep(1)}
-                      data-ocid="register.back_button"
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={isLoading || !isBackendReady}
-                      className="flex-1 rounded-full text-white"
-                      style={{ backgroundColor: "#1a3a5c" }}
-                      data-ocid="register.submit_button"
-                    >
-                      {isLoading ? "Processing..." : "Register Now"}
-                    </Button>
-                  </div>
-                </form>
-                <p className="text-center text-sm text-muted-foreground mt-4">
-                  Already have an account?{" "}
-                  <Link
-                    to="/login"
-                    className="font-semibold hover:underline"
-                    style={{ color: "#1a6bbf" }}
-                  >
-                    Sign In
-                  </Link>
-                </p>
-              </CardContent>
-            </Card>
-          )}
+{/* Step 2: Personal Data Form */}
+{step === 2 && (
+  <Card className="rounded-2xl shadow-md" style={{ maxWidth: "520px", margin: "0 auto" }}>
+    <CardHeader className="pb-2">
+      <div className="flex items-center gap-3">
+        <img src={CapIcon} width={36} height={36} alt="cap icon" />
+        <div>
+          <CardTitle className="text-lg font-bold" style={{ color: "#1a3a5c" }}>
+            {role === "Investor" ? "Investor Data" : "Borrower Data"}
+          </CardTitle>
+          <p className="text-xs" style={{ color: "#4a7a9b" }}>
+            Fill Your Data For AI Trust Score.
+          </p>
+        </div>
+      </div>
+    </CardHeader>
+    <CardContent>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="space-y-1">
+          <Label htmlFor="nama" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Fullname</Label>
+          <Input
+            id="nama"
+            placeholder="Your Full Name Based on Student ID Card."
+            value={nama}
+            onChange={(e) => setNama(e.target.value)}
+            required
+            className="rounded-lg text-sm"
+            data-ocid="register.nama_input"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="reg-email" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Email</Label>
+          <Input
+            id="reg-email"
+            type="email"
+            placeholder="email@kampus.ac.id"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="rounded-lg text-sm"
+            data-ocid="register.email_input"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="ktm" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Student ID Card Number</Label>
+          <Input
+            id="ktm"
+            placeholder="123456"
+            value={ktm}
+            onChange={(e) => setKtm(e.target.value)}
+            required
+            className="rounded-lg text-sm"
+            data-ocid="register.ktm_input"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label htmlFor="rekening" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Bank Account</Label>
+            <Input
+              id="rekening"
+              placeholder="BCA-123456"
+              value={rekening}
+              onChange={(e) => setRekening(e.target.value)}
+              required
+              className="rounded-lg text-sm"
+              data-ocid="register.rekening_input"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="gpa" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>GPA</Label>
+            <Input
+              id="gpa"
+              type="number"
+              min="0"
+              max="4"
+              step="0.01"
+              placeholder="3.50"
+              value={gpa}
+              onChange={(e) => setGpa(e.target.value)}
+              required={role === "Peminjam"}
+              className="rounded-lg text-sm"
+              data-ocid="register.gpa_input"
+            />
+          </div>
+        </div>
+
+        {/* Upload Student ID Card */}
+        <div className="space-y-1">
+          <Label className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Upload Your Student ID Card</Label>
+          <div
+            className="rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-blue-50 transition-all"
+            style={{ borderColor: "#b0c4d8", padding: "1.5rem" }}
+            onClick={() => document.getElementById("ktm-upload")?.click()}
+          >
+            <input id="ktm-upload" type="file" accept=".pdf" className="hidden" />
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+              <rect x="4" y="8" width="32" height="24" rx="4" fill="#b0c4d8"/>
+              <circle cx="14" cy="17" r="4" fill="#e8eef3"/>
+              <path d="M4 28 L13 20 L20 27 L27 21 L36 28" stroke="#e8eef3" strokeWidth="2" fill="none"/>
+              <circle cx="26" cy="26" r="6" fill="#1a3a5c"/>
+              <line x1="26" y1="23" x2="26" y2="29" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+              <line x1="23" y1="26" x2="29" y2="26" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            <p className="text-xs font-medium" style={{ color: "#4a7a9b" }}>Drag Files Or Click To Browse</p>
+            <p className="text-xs" style={{ color: "#7a9ab5" }}>Format: PDF (MAX 5MB)</p>
+          </div>
+        </div>
+
+        <div className="flex gap-3 pt-1">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1 rounded-full text-sm"
+            style={{ color: "#1a3a5c", borderColor: "#b0c4d8" }}
+            onClick={() => setStep(1)}
+            data-ocid="register.back_button"
+          >
+            Back
+          </Button>
+          <Button
+            type="submit"
+            disabled={isLoading || !isBackendReady}
+            className="flex-1 rounded-full text-white text-sm"
+            style={{ backgroundColor: "#1a3a5c" }}
+            data-ocid="register.submit_button"
+          >
+            {isLoading ? "Processing..." : "Register Now"}
+          </Button>
+        </div>
+      </form>
+      <p className="text-center text-xs text-muted-foreground mt-3">
+        Already have an account?{" "}
+        <Link
+          to="/login"
+          className="font-semibold hover:underline"
+          style={{ color: "#1a6bbf" }}
+        >
+          Sign In
+        </Link>
+      </p>
+    </CardContent>
+  </Card>
+)}
         </div>
       </div>
     </div>
