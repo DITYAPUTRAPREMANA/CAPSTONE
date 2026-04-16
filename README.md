@@ -1,4 +1,4 @@
-<img width="1440" height="1822" alt="image" src="https://github.com/user-attachments/assets/0cfb6505-f986-4673-b6a4-87ed5447d77d" />## SODALIS
+## SODALIS
 
 SODALIS adalah aplikasi **P2P Lending untuk mahasiswa** yang dibangun di atas Internet Computer (ICP).
 Project ini terdiri dari:
@@ -14,10 +14,8 @@ Project ini terdiri dari:
 
 ## Alur Sistem
 
+<img width="1440" height="1822" alt="image" src="https://github.com/user-attachments/assets/0cfb6505-f986-4673-b6a4-87ed5447d77d"/>
 <img width="1440" height="1822" alt="image" src="https://github.com/user-attachments/assets/9f440ec9-7453-4f9d-9bdb-212caad6cf02" />
-
-
-> Diagram di atas menggambarkan alur lengkap platform SODALIS, mulai dari pendaftaran investor dan peminjam, penilaian kelayakan AI, akad digital, transfer dana via Virtual Account, hingga pencatatan cicilan di ICP.
 
 ## Prasyarat
 
