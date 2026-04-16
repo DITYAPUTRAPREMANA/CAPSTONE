@@ -15,6 +15,11 @@ Project ini terdiri dari:
 ## Alur Sistem
 <img width="1440" height="1822" alt="image" src="https://github.com/user-attachments/assets/9f440ec9-7453-4f9d-9bdb-212caad6cf02" />
 
+Dan berikut bagian kedua: pencatatan ICP hingga siklus cicilan bulanan.
+
+<img width="1440" height="1312" alt="image" src="https://github.com/user-attachments/assets/feeee42e-3f2a-49d6-83af-c0fc480d8182" />
+
+
 ## Prasyarat
 
 Pastikan sudah terpasang:
