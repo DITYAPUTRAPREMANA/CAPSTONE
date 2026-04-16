@@ -12,6 +12,12 @@ Project ini terdiri dari:
 - `src/frontend/`: aplikasi frontend (React + Vite).
 - `dfx.json`: definisi canister `backend` (motoko) dan `frontend` (assets dari `src/frontend/dist`).
 
+## Alur Sistem
+
+![Alur Sistem SODALIS](alur_sistem.jpeg)
+
+> Diagram di atas menggambarkan alur lengkap platform SODALIS, mulai dari pendaftaran investor dan peminjam, penilaian kelayakan AI, akad digital, transfer dana via Virtual Account, hingga pencatatan cicilan di ICP.
+
 ## Prasyarat
 
 Pastikan sudah terpasang:
