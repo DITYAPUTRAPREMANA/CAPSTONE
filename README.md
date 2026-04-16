@@ -13,8 +13,6 @@ Project ini terdiri dari:
 - `dfx.json`: definisi canister `backend` (motoko) dan `frontend` (assets dari `src/frontend/dist`).
 
 ## Alur Sistem
-
-<img width="1440" height="1822" alt="image" src="https://github.com/user-attachments/assets/0cfb6505-f986-4673-b6a4-87ed5447d77d"/>
 <img width="1440" height="1822" alt="image" src="https://github.com/user-attachments/assets/9f440ec9-7453-4f9d-9bdb-212caad6cf02" />
 
 ## Prasyarat
