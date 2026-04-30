@@ -215,6 +215,15 @@ persistent actor {
   // USER MANAGEMENT
 
   public shared ({ caller }) func registerUser(name : Text, email : Text, role : Text, ktm : Text, bankAccount : Text, gpa : Float) : async Nat {
+    switch (getUserByPrincipal(caller)) {
+      case (?existingUser) {
+        Runtime.trap(
+          "Identity ini sudah terdaftar sebagai " # existingUser.role # ". Satu identity hanya dapat memiliki satu role."
+        );
+      };
+      case (null) {};
+    };
+
     // Register should write directly to backend canister storage (blockchain state).
     // If caller is authenticated, initialize access control to keep user role state in sync.
     if (not caller.isAnonymous()) {

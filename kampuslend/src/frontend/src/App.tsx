@@ -15,6 +15,7 @@ import {
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { useActor } from "./hooks/useActor";
+import { useInternetIdentity } from "./hooks/useInternetIdentity";
 
 // Halaman
 import LandingPage from "./pages/LandingPage";
@@ -65,7 +66,8 @@ function RootLayout() {
 
 /** Komponen redirect berdasarkan status login */
 function HomeRedirect() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const { identity } = useInternetIdentity();
   const navigate = rootRoute.useNavigate();
 
   useEffect(() => {
@@ -76,22 +78,28 @@ function HomeRedirect() {
             ? "/investor/dashboard"
             : "/borrower/dashboard",
       });
+      return;
     }
-  }, [user, navigate]);
+    if (!isLoading && identity) {
+      navigate({ to: "/register" });
+    }
+  }, [user, isLoading, identity, navigate]);
 
-  if (user) return null;
+  if (user || (identity && !isLoading)) return null;
   return <LandingPage />;
 }
 
 /** Wrapper layout investor dengan pengecekan auth */
 function InvestorLayoutWrapper() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const { identity } = useInternetIdentity();
   const navigate = rootRoute.useNavigate();
 
   useEffect(() => {
-    if (!user) navigate({ to: "/login" });
+    if (isLoading) return;
+    if (!user) navigate({ to: identity ? "/register" : "/login" });
     else if (user.role !== "Investor") navigate({ to: "/borrower/dashboard" });
-  }, [user, navigate]);
+  }, [user, isLoading, identity, navigate]);
 
   if (!user || user.role !== "Investor") return null;
   return <InvestorLayout />;
@@ -99,13 +107,15 @@ function InvestorLayoutWrapper() {
 
 /** Wrapper layout peminjam dengan pengecekan auth */
 function BorrowerLayoutWrapper() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const { identity } = useInternetIdentity();
   const navigate = rootRoute.useNavigate();
 
   useEffect(() => {
-    if (!user) navigate({ to: "/login" });
+    if (isLoading) return;
+    if (!user) navigate({ to: identity ? "/register" : "/login" });
     else if (user.role !== "Peminjam") navigate({ to: "/investor/dashboard" });
-  }, [user, navigate]);
+  }, [user, isLoading, identity, navigate]);
 
   if (!user || user.role !== "Peminjam") return null;
   return <BorrowerLayout />;

@@ -7,13 +7,15 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext";
 import { useActor } from "../hooks/useActor";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import CapIcon from "../assets/Cap.svg";
 import ShieldIcon from "../assets/Shield.svg";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { login } = useAuth();
-  const { actor, isFetching: isActorFetching, isError: isActorError, error: actorError } = useActor();
+  const { user, refreshUser } = useAuth();
+  const { actor, isError: isActorError, error: actorError } = useActor();
+  const { identity, login: loginWithII, isInitializing, isLoggingIn } = useInternetIdentity();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [role, setRole] = useState<"Investor" | "Peminjam" | "">("");
@@ -28,6 +30,10 @@ export default function RegisterPage() {
   const [ktmFile, setKtmFile] = useState<File | null>(null);
 
   const handleRoleSelect = (selectedRole: "Investor" | "Peminjam") => {
+    if (!identity) {
+      toast.error("Hubungkan Internet Identity terlebih dahulu.");
+      return;
+    }
     setRole(selectedRole);
     setStep(2);
   };
@@ -42,6 +48,28 @@ export default function RegisterPage() {
     }
   }, [isActorError, actorError]);
 
+  useEffect(() => {
+    if (user) {
+      router.navigate({
+        to: user.role === "Investor" ? "/investor/dashboard" : "/borrower/dashboard",
+      });
+    }
+  }, [user, router]);
+
+  useEffect(() => {
+    if (!actor || !identity) return;
+    actor
+      .getCurrentUser()
+      .then((existingUser) => {
+        if (!existingUser) return;
+        void refreshUser();
+        router.navigate({
+          to: existingUser.role === "Investor" ? "/investor/dashboard" : "/borrower/dashboard",
+        });
+      })
+      .catch(() => {});
+  }, [actor, identity, refreshUser, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!actor) return;
@@ -52,8 +80,8 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       const gpaNum = role === "Peminjam" ? Number.parseFloat(gpa) || 0 : 0;
-      const userId = await actor.registerUser(nama, email, role, ktm, rekening, gpaNum);
-      login({ userId: String(userId), role, name: nama });
+      await actor.registerUser(nama, email, role, ktm, rekening, gpaNum);
+      await refreshUser();
       toast.success("Akun berhasil dibuat! Selamat datang di SODALIS 🎓");
       router.navigate({
         to: role === "Investor" ? "/investor/dashboard" : "/borrower/dashboard",
@@ -90,6 +118,25 @@ if (ktmFile && ktmFile.size > 5 * 1024 * 1024) {
             maxWidth: "900px",
           }}
         >
+          {!identity && (
+            <Card className="rounded-2xl shadow-md mb-6" style={{ maxWidth: "520px", margin: "0 auto" }}>
+              <CardContent className="py-6 space-y-3">
+                <p className="text-sm" style={{ color: "#1a3a5c" }}>
+                  Daftar membutuhkan Internet Identity terlebih dahulu.
+                </p>
+                <Button
+                  type="button"
+                  onClick={loginWithII}
+                  disabled={isInitializing || isLoggingIn}
+                  className="w-full rounded-full text-white text-sm"
+                  style={{ backgroundColor: "#1a3a5c" }}
+                >
+                  {isLoggingIn ? "Menyambungkan..." : "Hubungkan Internet Identity"}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Stepper */}
           <div className="flex items-center justify-center gap-8 mb-10">
             <div className="flex items-center gap-3">
@@ -162,6 +209,7 @@ if (ktmFile && ktmFile.size > 5 * 1024 * 1024) {
                     className="w-full py-2.5 rounded-full font-semibold text-white text-sm transition-all hover:opacity-90"
                     style={{ backgroundColor: "#005596" }}
                     tabIndex={-1}
+                    disabled={!identity}
                   >
                     Continue
                   </button>
@@ -186,6 +234,7 @@ if (ktmFile && ktmFile.size > 5 * 1024 * 1024) {
                     className="w-full py-2.5 rounded-full font-semibold text-white text-sm transition-all hover:opacity-90"
                     style={{ backgroundColor: "#005596" }}
                     tabIndex={-1}
+                    disabled={!identity}
                   >
                     Continue
                   </button>
@@ -341,7 +390,7 @@ if (ktmFile && ktmFile.size > 5 * 1024 * 1024) {
           </Button>
           <Button
             type="submit"
-            disabled={isLoading || !isBackendReady}
+            disabled={isLoading || !isBackendReady || !identity}
             className="flex-1 rounded-full text-white text-sm"
             style={{ backgroundColor: "#1a3a5c" }}
             data-ocid="register.submit_button"

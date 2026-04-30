@@ -1,8 +1,17 @@
 /**
- * Konteks autentikasi untuk SODALIS
- * Menyimpan data user yang sedang login
+ * Konteks autentikasi untuk SODALIS berbasis Internet Identity.
  */
-import { type ReactNode, createContext, useContext, useState } from "react";
+import {
+  type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import type { User } from "../backend";
+import { useActor } from "../hooks/useActor";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
 
 export interface AuthUser {
   userId: string;
@@ -10,38 +19,60 @@ export interface AuthUser {
   name: string;
 }
 
-const STORAGE_KEY = "sodalis_user";
-
 interface AuthContextType {
   user: AuthUser | null;
-  login: (user: AuthUser) => void;
+  isLoading: boolean;
+  refreshUser: () => Promise<void>;
+  setFromUserRecord: (user: User) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? (JSON.parse(stored) as AuthUser) : null;
-    } catch {
-      return null;
-    }
-  });
+  const { actor } = useActor();
+  const { identity, clear } = useInternetIdentity();
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = (userData: AuthUser) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-    setUser(userData);
+  const setFromUserRecord = (userRecord: User) => {
+    setUser({
+      userId: String(userRecord.id),
+      role: userRecord.role,
+      name: userRecord.name,
+    });
   };
+
+  const refreshUser = useCallback(async () => {
+    if (!identity || !actor) {
+      setUser(null);
+      return;
+    }
+
+    try {
+      const currentUser = await actor.getCurrentUser();
+      if (!currentUser) {
+        setUser(null);
+      } else {
+        setFromUserRecord(currentUser);
+      }
+    } catch {
+      setUser(null);
+    }
+  }, [actor, identity]);
 
   const logout = () => {
-    localStorage.removeItem(STORAGE_KEY);
     setUser(null);
+    clear();
   };
 
+  useEffect(() => {
+    setIsLoading(true);
+    void refreshUser().finally(() => setIsLoading(false));
+  }, [refreshUser]);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, refreshUser, setFromUserRecord, logout }}>
       {children}
     </AuthContext.Provider>
   );
