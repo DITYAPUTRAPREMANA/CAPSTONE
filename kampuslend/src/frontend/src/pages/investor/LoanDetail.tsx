@@ -61,11 +61,11 @@ export default function InvestorLoanDetail() {
       setVaNumber(va);
       setShowAkad(false);
       setShowVA(true);
-      toast.success("Pinjaman berhasil disetujui!");
+      toast.success("Loan successfully approved!");
       const updated = await actor.getLoan(loan.id);
       setLoan(updated);
     } catch {
-      toast.error("Gagal memproses persetujuan. Coba lagi.");
+      toast.error("Failed to process approval. Please try again.");
     } finally {
       setIsApproving(false);
     }
@@ -88,12 +88,12 @@ export default function InvestorLoanDetail() {
   if (!loan) {
     return (
       <div className="text-center py-16">
-        <p className="text-muted-foreground">Pinjaman tidak ditemukan.</p>
+        <p className="text-muted-foreground">Loan not found.</p>
         <Button
           className="mt-4 rounded-full"
           onClick={() => router.navigate({ to: "/investor/browse" })}
         >
-          Kembali
+          Back
         </Button>
       </div>
     );
@@ -107,7 +107,7 @@ export default function InvestorLoanDetail() {
           onClick={() => router.navigate({ to: "/investor/browse" })}
           className="hover:text-foreground"
         >
-          Browse Peminjam
+          Browse Borrowers
         </button>
         <span>/</span>
         <span className="text-foreground font-medium">{loan.borrowerName}</span>
@@ -133,18 +133,18 @@ export default function InvestorLoanDetail() {
               <div className="grid grid-cols-2 gap-4">
                 {[
                   {
-                    label: "Nominal Pinjaman",
+                    label: "Loan Amount",
                     value: formatRupiah(loan.amount),
                     highlight: true,
                   },
-                  { label: "Tenor", value: `${Number(loan.tenor)} bulan` },
+                  { label: "Tenor", value: `${Number(loan.tenor)} months` },
                   {
-                    label: "Cicilan / Bulan",
+                    label: "Installment / Month",
                     value: formatRupiah(loan.monthlyInstallment),
                     highlight: true,
                   },
                   {
-                    label: "Total Bayar",
+                    label: "Total Payment",
                     value: formatRupiah(
                       loan.monthlyInstallment * Number(loan.tenor),
                     ),
@@ -164,27 +164,27 @@ export default function InvestorLoanDetail() {
               </div>
               <div className="bg-muted rounded-xl p-3">
                 <p className="text-xs text-muted-foreground mb-1">
-                  Tujuan Pinjaman
+                  Loan Purpose
                 </p>
                 <p className="text-sm font-medium">{loan.purpose}</p>
               </div>
             </CardContent>
           </Card>
 
-          {loan.status === "Menunggu" && (
+          {loan.status === "Pending" && (
             <Button
               className="w-full rounded-full bg-brand-green hover:bg-brand-green/90 text-white py-6 text-lg"
               onClick={() => setShowAkad(true)}
               data-ocid="loan.danai_button"
             >
-              💰 Danai Sekarang
+              💰 Fund Now
             </Button>
           )}
 
-          {loan.status !== "Menunggu" && (
+          {loan.status !== "Pending" && (
             <div className="bg-blue-50 rounded-2xl p-4 text-center">
               <p className="text-blue-700 font-semibold">
-                Pinjaman ini sudah {loan.status}
+                This loan is already {loan.status}
               </p>
             </div>
           )}

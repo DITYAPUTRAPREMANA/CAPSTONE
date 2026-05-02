@@ -33,7 +33,7 @@ export default function BorrowerRepayment() {
     actor
       .getLoansByBorrower(BigInt(user.userId))
       .then(async (loans) => {
-        const active = loans.find((l) => l.status === "Aktif");
+        const active = loans.find((l) => l.status === "Active");
         if (!active) {
           setIsLoading(false);
           return;
@@ -58,7 +58,7 @@ export default function BorrowerRepayment() {
       setVaNumber(va);
       setShowVA(true);
     } catch {
-      toast.error("Gagal membuat Virtual Account. Coba lagi.");
+      toast.error("Failed to create Virtual Account. Try again.");
     } finally {
       setIsCreatingVA(false);
     }
@@ -77,16 +77,16 @@ export default function BorrowerRepayment() {
     return (
       <div className="text-center py-16" data-ocid="repayment.empty_state">
         <p className="text-5xl mb-4">💳</p>
-        <h3 className="font-bold text-xl mb-2">Tidak Ada Pinjaman Aktif</h3>
+        <h3 className="font-bold text-xl mb-2">No Active Loan</h3>
         <p className="text-muted-foreground mb-6">
-          Ajukan pinjaman terlebih dahulu untuk melihat jadwal cicilan.
+          Apply for a loan first to view the installment schedule.
         </p>
         <Button
           className="rounded-full bg-amber-500 hover:bg-amber-600 text-white"
           onClick={() => router.navigate({ to: "/borrower/apply" })}
           data-ocid="repayment.apply_button"
         >
-          Ajukan Pinjaman
+          Apply for Loan
         </Button>
       </div>
     );
@@ -95,40 +95,40 @@ export default function BorrowerRepayment() {
   return (
     <div className="space-y-6" data-ocid="repayment.page">
       <div>
-        <h2 className="text-2xl font-bold text-foreground">Jadwal Cicilan</h2>
+        <h2 className="text-2xl font-bold text-foreground">Installment Schedule</h2>
         <p className="text-muted-foreground">
-          Pantau dan bayar cicilan bulanan Anda
+          Monitor and pay your monthly installments
         </p>
       </div>
 
       <Card className="rounded-2xl shadow-card">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Info Pinjaman</CardTitle>
+            <CardTitle className="text-lg">Loan Info</CardTitle>
             <StatusBadge status={loan.status} />
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <div className="bg-muted rounded-xl p-3">
-              <p className="text-xs text-muted-foreground">Nominal</p>
+              <p className="text-xs text-muted-foreground">Amount</p>
               <p className="font-bold text-brand-green">
                 {formatRupiah(loan.amount)}
               </p>
             </div>
             <div className="bg-muted rounded-xl p-3">
-              <p className="text-xs text-muted-foreground">Cicilan/bln</p>
+              <p className="text-xs text-muted-foreground">Installment/mo</p>
               <p className="font-bold text-amber-600">
                 {formatRupiah(loan.monthlyInstallment)}
               </p>
             </div>
             <div className="bg-muted rounded-xl p-3">
-              <p className="text-xs text-muted-foreground">Sisa Cicilan</p>
-              <p className="font-bold text-brand-blue">{cicilanSisa} bulan</p>
+              <p className="text-xs text-muted-foreground">Remaining Installment</p>
+              <p className="font-bold text-brand-blue">{cicilanSisa} months</p>
             </div>
             <div className="bg-muted rounded-xl p-3">
-              <p className="text-xs text-muted-foreground">Tenor Total</p>
-              <p className="font-bold">{Number(loan.tenor)} bulan</p>
+              <p className="text-xs text-muted-foreground">Total Tenor</p>
+              <p className="font-bold">{Number(loan.tenor)} months</p>
             </div>
           </div>
           <Button
@@ -138,17 +138,17 @@ export default function BorrowerRepayment() {
             data-ocid="repayment.pay_button"
           >
             {isCreatingVA
-              ? "Membuat VA..."
+              ? "Creating VA..."
               : cicilanSisa === 0
-                ? "✅ Lunas"
-                : "💳 Bayar Cicilan via VA"}
+                ? "✅ Paid Off"
+                : "💳 Pay Installment via VA"}
           </Button>
         </CardContent>
       </Card>
 
       <Card className="rounded-2xl shadow-card">
         <CardHeader>
-          <CardTitle className="text-lg">Timeline Cicilan</CardTitle>
+          <CardTitle className="text-lg">Installment Timeline</CardTitle>
         </CardHeader>
         <CardContent>
           <RepaymentTimeline payments={payments} tenor={Number(loan.tenor)} />
@@ -157,7 +157,7 @@ export default function BorrowerRepayment() {
 
       <Card className="rounded-2xl shadow-card">
         <CardHeader>
-          <CardTitle className="text-lg">Riwayat Pembayaran</CardTitle>
+          <CardTitle className="text-lg">Payment History</CardTitle>
         </CardHeader>
         <CardContent>
           {payments.length === 0 ? (
@@ -166,7 +166,7 @@ export default function BorrowerRepayment() {
               data-ocid="repayment.history.empty_state"
             >
               <p className="text-muted-foreground text-sm">
-                Belum ada riwayat pembayaran
+                No payment history yet
               </p>
             </div>
           ) : (
@@ -187,12 +187,12 @@ export default function BorrowerRepayment() {
                   </div>
                   <div className="text-right">
                     <span
-                      className={`text-xs font-semibold px-2 py-1 rounded-full ${p.status === "Lunas" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}
+                      className={`text-xs font-semibold px-2 py-1 rounded-full ${p.status === "Paid" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}
                     >
                       {p.status}
                     </span>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Sisa: {p.remainingInstallment} bln
+                      Remaining: {p.remainingInstallment} mo
                     </p>
                   </div>
                 </div>

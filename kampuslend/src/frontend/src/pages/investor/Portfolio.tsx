@@ -27,7 +27,7 @@ export default function InvestorPortfolio() {
         setLoans(data);
         // Ambil sisa cicilan semua pinjaman aktif secara paralel
         const sisaPromises = data
-          .filter((l) => l.status === "Aktif")
+          .filter((l) => l.status === "Active")
           .map(async (l) => {
             const sisa = await actor.getCicilanSisa(l.id);
             return { id: String(l.id), sisa };
@@ -46,15 +46,15 @@ export default function InvestorPortfolio() {
   return (
     <div className="space-y-6" data-ocid="investor.portfolio.page">
       <div>
-        <h2 className="text-2xl font-bold text-foreground">Portofolio Saya</h2>
+        <h2 className="text-2xl font-bold text-foreground">My Portfolio</h2>
         <p className="text-muted-foreground">
-          Semua pinjaman yang telah Anda danai
+          All loans you have funded
         </p>
       </div>
 
       <Card className="rounded-2xl shadow-card">
         <CardHeader>
-          <CardTitle className="text-lg">Daftar Pinjaman</CardTitle>
+          <CardTitle className="text-lg">Loan List</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -70,7 +70,7 @@ export default function InvestorPortfolio() {
             >
               <p className="text-4xl mb-3">📂</p>
               <p className="text-muted-foreground">
-                Belum ada pinjaman di portofolio Anda.
+                No loans in your portfolio yet.
               </p>
             </div>
           ) : (
@@ -98,14 +98,14 @@ export default function InvestorPortfolio() {
 
                     <div className="grid grid-cols-3 gap-4 text-sm mb-3">
                       <div>
-                        <p className="text-xs text-muted-foreground">Nominal</p>
+                        <p className="text-xs text-muted-foreground">Amount</p>
                         <p className="font-semibold">
                           {formatRupiah(loan.amount)}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">
-                          Cicilan/bln
+                          Installment/mo
                         </p>
                         <p className="font-semibold">
                           {formatRupiah(loan.monthlyInstallment)}
@@ -113,17 +113,17 @@ export default function InvestorPortfolio() {
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">
-                          Sisa Cicilan
+                          Remaining Installment
                         </p>
                         <p className="font-semibold text-amber-600">
-                          {sisa} bulan
+                          {sisa} months
                         </p>
                       </div>
                     </div>
 
                     <div>
                       <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                        <span>Progress Pembayaran</span>
+                        <span>Payment Progress</span>
                         <span>{Math.round(progress)}%</span>
                       </div>
                       <Progress value={progress} className="h-2" />

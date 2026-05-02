@@ -20,7 +20,7 @@ export default function RepaymentTimeline({
       <div className="flex items-start gap-0 min-w-max">
         {months.map((month) => {
           const payment = payments[month - 1];
-          const isLunas = payment?.status === "Lunas";
+          const isLunas = payment?.status === "Paid";
           const isCurrent = month === payments.length + 1;
 
           return (
@@ -67,7 +67,7 @@ export default function RepaymentTimeline({
 
               {/* Label bulan */}
               <p className="text-xs mt-2 text-muted-foreground text-center">
-                Bln {month}
+                Mo {month}
               </p>
             </div>
           );

@@ -16,7 +16,7 @@ export default function RegisterPage() {
   const { actor, isFetching: isActorFetching, isError: isActorError, error: actorError } = useActor();
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [role, setRole] = useState<"Investor" | "Peminjam" | "">("");
+  const [role, setRole] = useState<"Investor" | "Borrower" | "">("");
   const [isLoading, setIsLoading] = useState(false);
   const [isBackendReady, setIsBackendReady] = useState(false);
 
@@ -27,7 +27,7 @@ export default function RegisterPage() {
   const [gpa, setGpa] = useState("");
   const [ktmFile, setKtmFile] = useState<File | null>(null);
 
-  const handleRoleSelect = (selectedRole: "Investor" | "Peminjam") => {
+  const handleRoleSelect = (selectedRole: "Investor" | "Borrower") => {
     setRole(selectedRole);
     setStep(2);
   };
@@ -46,24 +46,24 @@ export default function RegisterPage() {
     e.preventDefault();
     if (!actor) return;
     if (!role) {
-      toast.error("Pilih role terlebih dahulu sebelum mendaftar.");
+      toast.error("Select a role before registering.");
       return;
     }
     setIsLoading(true);
     try {
-      const gpaNum = role === "Peminjam" ? Number.parseFloat(gpa) || 0 : 0;
+      const gpaNum = role === "Borrower" ? Number.parseFloat(gpa) || 0 : 0;
       const userId = await actor.registerUser(nama, email, role, ktm, rekening, gpaNum);
       login({ userId: String(userId), role, name: nama });
-      toast.success("Akun berhasil dibuat! Selamat datang di SODALIS 🎓");
+      toast.success("Account successfully created! Welcome to SODALIS 🎓");
       router.navigate({
         to: role === "Investor" ? "/investor/dashboard" : "/borrower/dashboard",
       });
     } catch (error) {
-      console.error("Registrasi gagal:", error);
+      console.error("Registration failed:", error);
       toast.error(
         error instanceof Error
-          ? `Gagal mendaftar: ${error.message}`
-          : "Gagal mendaftar. Silakan coba lagi.",
+          ? `Registration failed: ${error.message}`
+          : "Registration failed. Please try again.",
       );
     } finally {
       setIsLoading(false);
@@ -71,7 +71,7 @@ export default function RegisterPage() {
   };
 
 if (ktmFile && ktmFile.size > 5 * 1024 * 1024) {
-   toast.error("Ukuran file maksimal 5MB.");
+   toast.error("Maximum file size is 5MB.");
    setIsLoading(false);
    return;
 }
@@ -146,7 +146,7 @@ if (ktmFile && ktmFile.size > 5 * 1024 * 1024) {
                 {/* Borrower Card */}
                 <div
                   className="bg-white rounded-2xl p-8 flex flex-col items-center cursor-pointer transition-all hover:shadow-lg border-2 border-transparent hover:border-blue-300"
-                  onClick={() => handleRoleSelect("Peminjam")}
+                  onClick={() => handleRoleSelect("Borrower")}
                   data-ocid="register.peminjam_card"
                 >
                   <div className="mb-5">
@@ -239,8 +239,8 @@ if (ktmFile && ktmFile.size > 5 * 1024 * 1024) {
           />
         </div>
 
-        {/* Hanya untuk Peminjam */}
-        {role === "Peminjam" && (
+        {/* Borrower Only */}
+        {role === "Borrower" && (
           <div className="space-y-1">
             <Label htmlFor="ktm" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Student ID Card Number</Label>
             <Input
@@ -255,8 +255,8 @@ if (ktmFile && ktmFile.size > 5 * 1024 * 1024) {
           </div>
         )}
 
-        {/* Bank Account & GPA — GPA hanya Peminjam */}
-        <div className={`grid gap-3 ${role === "Peminjam" ? "grid-cols-2" : "grid-cols-1"}`}>
+        {/* Bank Account & GPA — GPA Borrower Only */}
+        <div className={`grid gap-3 ${role === "Borrower" ? "grid-cols-2" : "grid-cols-1"}`}>
           <div className="space-y-1">
             <Label htmlFor="rekening" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Bank Account</Label>
             <Input
@@ -269,7 +269,7 @@ if (ktmFile && ktmFile.size > 5 * 1024 * 1024) {
               data-ocid="register.rekening_input"
             />
           </div>
-          {role === "Peminjam" && (
+          {role === "Borrower" && (
             <div className="space-y-1">
               <Label htmlFor="gpa" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>GPA</Label>
               <Input

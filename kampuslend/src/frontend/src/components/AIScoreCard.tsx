@@ -10,7 +10,7 @@ interface AIScoreCardProps {
 
 export default function AIScoreCard({ result }: AIScoreCardProps) {
   const score = Number(result.score);
-  const isLayak = result.recommendation === "Layak";
+  const isLayak = result.recommendation === "Approved" || result.recommendation === "Considered";
 
   // Warna berdasarkan skor
   let scoreColor = "text-red-600";
@@ -31,7 +31,7 @@ export default function AIScoreCard({ result }: AIScoreCardProps) {
   return (
     <Card className="rounded-2xl shadow-card">
       <CardContent className="p-6">
-        <h3 className="font-semibold text-foreground mb-4">Penilaian AI</h3>
+        <h3 className="font-semibold text-foreground mb-4">AI Assessment</h3>
 
         {/* Gauge lingkaran */}
         <div className="flex flex-col items-center mb-4">
@@ -40,7 +40,7 @@ export default function AIScoreCard({ result }: AIScoreCardProps) {
               viewBox="0 0 100 100"
               className="w-full h-full -rotate-90"
               role="img"
-              aria-label={`Skor AI: ${score} dari 100`}
+              aria-label={`AI Score: ${score} out of 100`}
             >
               <circle
                 cx="50"
@@ -74,9 +74,7 @@ export default function AIScoreCard({ result }: AIScoreCardProps) {
 
         {/* Rekomendasi */}
         <div className={`rounded-xl p-3 text-center mb-3 ${bgColor}`}>
-          <p className={`text-lg font-bold ${scoreColor}`}>
-            {isLayak ? "✅ Layak" : "❌ Tidak Layak"}
-          </p>
+            {isLayak ? `✅ ${result.recommendation}` : `❌ ${result.recommendation}`}
         </div>
 
         {/* Alasan */}

@@ -10,13 +10,13 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
     "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ";
 
   switch (status) {
-    case "Aktif":
+    case "Active":
       className += "bg-green-600 text-white";
       break;
-    case "Menunggu":
+    case "Pending":
       className += "bg-amber-500 text-white";
       break;
-    case "Lunas":
+    case "Paid":
       className += "bg-blue-700 text-white";
       break;
     default:

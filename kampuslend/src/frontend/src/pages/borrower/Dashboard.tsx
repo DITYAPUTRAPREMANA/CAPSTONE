@@ -29,16 +29,16 @@ export default function BorrowerDashboard() {
       .finally(() => setIsLoading(false));
   }, [actor, user]);
 
-  const activeLoan = loans.find((l) => l.status === "Aktif");
-  const pendingLoan = loans.find((l) => l.status === "Menunggu");
+  const activeLoan = loans.find((l) => l.status === "Active");
+  const pendingLoan = loans.find((l) => l.status === "Pending");
 
   return (
     <div className="space-y-8" data-ocid="borrower.dashboard.page">
       <div>
         <h2 className="text-2xl font-bold text-foreground">
-          Dashboard Peminjam
+          Borrower Dashboard
         </h2>
-        <p className="text-muted-foreground">Pantau status pinjaman Anda</p>
+        <p className="text-muted-foreground">Monitor your loan status</p>
       </div>
 
       {isLoading ? (
@@ -50,42 +50,42 @@ export default function BorrowerDashboard() {
         <Card className="rounded-2xl shadow-card border-l-4 border-l-brand-green">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Pinjaman Aktif</CardTitle>
+              <CardTitle className="text-lg">Active Loan</CardTitle>
               <StatusBadge status={activeLoan.status} />
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-muted rounded-xl p-3">
-                <p className="text-xs text-muted-foreground">Nominal</p>
+                <p className="text-xs text-muted-foreground">Amount</p>
                 <p className="font-bold text-brand-green">
                   {formatRupiah(activeLoan.amount)}
                 </p>
               </div>
               <div className="bg-muted rounded-xl p-3">
                 <p className="text-xs text-muted-foreground">Tenor</p>
-                <p className="font-bold">{Number(activeLoan.tenor)} bulan</p>
+                <p className="text-bold">{Number(activeLoan.tenor)} months</p>
               </div>
               <div className="bg-muted rounded-xl p-3">
-                <p className="text-xs text-muted-foreground">Cicilan/bln</p>
+                <p className="text-xs text-muted-foreground">Installment/mo</p>
                 <p className="font-bold text-amber-600">
                   {formatRupiah(activeLoan.monthlyInstallment)}
                 </p>
               </div>
               <div className="bg-muted rounded-xl p-3">
-                <p className="text-xs text-muted-foreground">Mulai</p>
+                <p className="text-xs text-muted-foreground">Start</p>
                 <p className="font-bold">{formatDate(activeLoan.startDate)}</p>
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Tujuan: {activeLoan.purpose}
+              Purpose: {activeLoan.purpose}
             </p>
             <Button
               className="rounded-full bg-amber-500 hover:bg-amber-600 text-white"
               onClick={() => router.navigate({ to: "/borrower/repayment" })}
               data-ocid="borrower.repayment_button"
             >
-              Lihat Jadwal Cicilan
+              View Installment Schedule
             </Button>
           </CardContent>
         </Card>
@@ -93,18 +93,17 @@ export default function BorrowerDashboard() {
         <Card className="rounded-2xl shadow-card border-l-4 border-l-amber-500">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Pinjaman Diajukan</CardTitle>
+              <CardTitle className="text-lg">Applied Loan</CardTitle>
               <StatusBadge status={pendingLoan.status} />
             </div>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground text-sm mb-3">
-              Pinjaman Anda sebesar {formatRupiah(pendingLoan.amount)} sedang
-              menunggu persetujuan investor.
+              Your loan of {formatRupiah(pendingLoan.amount)} is waiting for investor approval.
             </p>
             <div className="flex items-center gap-2 text-amber-600">
               <span className="animate-pulse">⏳</span>
-              <span className="text-sm font-medium">Menunggu investor...</span>
+              <span className="text-sm font-medium">Waiting for investor...</span>
             </div>
           </CardContent>
         </Card>
@@ -115,17 +114,16 @@ export default function BorrowerDashboard() {
         >
           <CardContent className="py-12 text-center">
             <p className="text-5xl mb-4">📜</p>
-            <h3 className="font-bold text-lg mb-2">Belum Ada Pinjaman Aktif</h3>
+            <h3 className="font-bold text-lg mb-2">No Active Loans Yet</h3>
             <p className="text-muted-foreground mb-6">
-              Ajukan pinjaman pertama Anda dan dapatkan dana untuk kebutuhan
-              kuliah.
+              Apply for your first loan and get funds for college needs.
             </p>
             <Button
               className="rounded-full bg-amber-500 hover:bg-amber-600 text-white px-8"
               onClick={() => router.navigate({ to: "/borrower/apply" })}
               data-ocid="borrower.apply_button"
             >
-              Ajukan Pinjaman
+              Apply for Loan
             </Button>
           </CardContent>
         </Card>
@@ -134,7 +132,7 @@ export default function BorrowerDashboard() {
       {loans.length > 0 && (
         <Card className="rounded-2xl shadow-card">
           <CardHeader>
-            <CardTitle className="text-lg">Riwayat Pinjaman</CardTitle>
+            <CardTitle className="text-lg">Loan History</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -149,7 +147,7 @@ export default function BorrowerDashboard() {
                       {formatRupiah(loan.amount)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {Number(loan.tenor)} bulan • {loan.purpose}
+                      {Number(loan.tenor)} months • {loan.purpose}
                     </p>
                   </div>
                   <StatusBadge status={loan.status} />

@@ -42,7 +42,7 @@ export default function LoginPage() {
     if (!actor) return;
     Promise.all([
       actor.getUsersByRole("Investor"),
-      actor.getUsersByRole("Peminjam"),
+      actor.getUsersByRole("Borrower"),
     ])
       .then(([investors, borrowers]) => {
         setDemoUsers([...investors, ...borrowers]);
@@ -53,7 +53,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!actor) {
-      toast.error("Koneksi ke backend belum siap, coba lagi sebentar");
+      toast.error("Backend connection is not ready, please try again later");
       return;
     }
 
@@ -70,7 +70,7 @@ export default function LoginPage() {
       }
 
       if (!foundUser) {
-        toast.error("Pengguna tidak ditemukan. Gunakan akun demo di bawah.");
+        toast.error("User not found. Use the demo account below.");
         return;
       }
 
@@ -79,7 +79,7 @@ export default function LoginPage() {
         role: foundUser.role,
         name: foundUser.name,
       });
-      toast.success(`Selamat datang, ${foundUser.name}!`);
+      toast.success(`Welcome, ${foundUser.name}!`);
       router.navigate({
         to:
           foundUser.role === "Investor"
@@ -87,7 +87,7 @@ export default function LoginPage() {
             : "/borrower/dashboard",
       });
     } catch {
-      toast.error("Gagal login. Silakan coba lagi.");
+      toast.error("Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -141,11 +141,11 @@ export default function LoginPage() {
                 {demoUsers.length > 0 && (
                   <div className="space-y-1 p-3 bg-amber-50 rounded-xl border border-amber-200">
                     <p className="text-xs font-semibold text-amber-700">
-                      💡 Mode Demo: Pilih akun yang tersedia
+                      💡 Demo Mode: Choose an available account
                     </p>
                     <Select value={selectedDemo} onValueChange={setSelectedDemo}>
                       <SelectTrigger className="rounded-lg" data-ocid="login.select">
-                        <SelectValue placeholder="Pilih akun demo..." />
+                        <SelectValue placeholder="Select demo account..." />
                       </SelectTrigger>
                       <SelectContent>
                         {demoUsers.map((u) => (
@@ -181,7 +181,7 @@ export default function LoginPage() {
                   style={{ backgroundColor: "#1a3a5c" }}
                   data-ocid="login.submit_button"
                 >
-                  {isLoading ? "Memproses..." : "Sign In"}
+                  {isLoading ? "Processing..." : "Sign In"}
                 </Button>
               </form>
 

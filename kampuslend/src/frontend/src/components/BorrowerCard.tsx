@@ -31,7 +31,7 @@ export default function BorrowerCard({
 }: BorrowerCardProps) {
   const router = useRouter();
   const score = aiScore ? Number(aiScore.score) : 0;
-  const isLayak = aiScore?.recommendation === "Layak";
+  const isLayak = aiScore?.recommendation === "Approved" || aiScore?.recommendation === "Considered";
 
   return (
     <Card
@@ -54,7 +54,7 @@ export default function BorrowerCard({
 
         <div className="grid grid-cols-2 gap-2 mb-4 text-sm">
           <div>
-            <p className="text-muted-foreground text-xs">Nominal</p>
+            <p className="text-muted-foreground text-xs">Amount</p>
             <p className="font-semibold text-foreground">
               {formatRupiah(loan.amount)}
             </p>
@@ -62,17 +62,17 @@ export default function BorrowerCard({
           <div>
             <p className="text-muted-foreground text-xs">Tenor</p>
             <p className="font-semibold text-foreground">
-              {Number(loan.tenor)} bulan
+              {Number(loan.tenor)} months
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground text-xs">Cicilan/bln</p>
+            <p className="text-muted-foreground text-xs">Installment/mo</p>
             <p className="font-semibold text-foreground">
               {formatRupiah(loan.monthlyInstallment)}
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground text-xs">Tujuan</p>
+            <p className="text-muted-foreground text-xs">Purpose</p>
             <p className="font-medium text-foreground text-xs truncate">
               {loan.purpose}
             </p>
@@ -82,7 +82,7 @@ export default function BorrowerCard({
         {aiScore ? (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-muted-foreground">Skor AI</span>
+              <span className="text-xs text-muted-foreground">AI Score</span>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold">{score}/100</span>
                 <span
@@ -97,7 +97,7 @@ export default function BorrowerCard({
         ) : (
           <div className="mb-4 h-8 flex items-center">
             <span className="text-xs text-muted-foreground">
-              Menghitung skor...
+              Calculating score...
             </span>
           </div>
         )}
@@ -109,7 +109,7 @@ export default function BorrowerCard({
           }
           data-ocid={`borrower.detail_button.${index}`}
         >
-          Lihat Detail
+          View Details
         </Button>
       </CardContent>
     </Card>

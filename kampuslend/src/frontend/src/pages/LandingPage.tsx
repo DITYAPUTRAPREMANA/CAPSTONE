@@ -179,10 +179,10 @@ export default function LandingPage() {
         </div>
         <div className="hidden md:flex items-center gap-6 text-sm">
           <a href="#cara-kerja" style={{ color: "#1a3a5c", fontWeight: 500, textDecoration: "none", fontSize: "0.9rem" }}>
-            Cara Kerja
+            How it Works
           </a>
           <a href="#fitur" style={{ color: "#1a3a5c", fontWeight: 500, textDecoration: "none", fontSize: "0.9rem" }}>
-            Fitur
+            Features
           </a>
         </div>
         <div className="flex items-center gap-3">
@@ -192,7 +192,7 @@ export default function LandingPage() {
             style={{ borderRadius: "999px", color: "#1d6fbf", borderColor: "#1d6fbf", fontSize: "0.88rem" }}
             onClick={() => goTo("/login")}
           >
-            Masuk
+            Sign In
           </Button>
           <Button
             className="sodalis-nav-btn"
@@ -235,7 +235,7 @@ export default function LandingPage() {
                 onClick={() => goTo("/register")}
                 data-ocid="hero.daftar_button"
               >
-                Mulai Sekarang
+                Get Started
               </Button>
               <Button
                 className="sodalis-btn"
@@ -243,7 +243,7 @@ export default function LandingPage() {
                 style={{ borderRadius: "999px", color: "#1d6fbf", borderColor: "#1d6fbf", padding: "14px 32px", fontSize: "0.97rem", fontWeight: 600, background: "white" }}
                 onClick={() => goTo("/login")}
               >
-                Sudah Punya Akun
+                Already have an account
               </Button>
             </div>
           </div>
@@ -253,10 +253,10 @@ export default function LandingPage() {
         <section style={{ padding: "0 48px 64px", maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px" }}>
             {[
-              { label: "Total Pengguna", value: "2.400+", icon: "👨‍🎓" },
-              { label: "Dana Tersalur", value: "Rp 4,8M", icon: "💰" },
-              { label: "Tingkat Pengembalian", value: "98.2%", icon: "📈" },
-              { label: "Universitas Mitra", value: "32", icon: "🏫" },
+              { label: "Total Users", value: "2.400+", icon: "👨‍🎓" },
+              { label: "Funds Disbursed", value: "Rp 4,8M", icon: "💰" },
+              { label: "Repayment Rate", value: "98.2%", icon: "📈" },
+              { label: "Partner Universities", value: "32", icon: "🏫" },
             ].map((stat) => (
               <Card key={stat.label} style={{ borderRadius: "16px", background: "white", boxShadow: "0 2px 12px rgba(0,0,0,0.07)", border: "none" }}>
                 <CardContent style={{ padding: "20px", textAlign: "center" }}>
@@ -270,11 +270,10 @@ export default function LandingPage() {
         </section>
       </div>
 
-      {/* Fitur Unggulan */}
       <section id="fitur" style={{ padding: "60px 48px", maxWidth: "1200px", margin: "0 auto" }}>
         <h2 style={{ textAlign: "center", fontSize: "1.8rem", fontWeight: 800, color: "#1a3a5c", marginBottom: "8px" }}>Features.</h2>
         <p style={{ textAlign: "center", color: "#718096", fontSize: "0.95rem", marginBottom: "36px" }}>
-          Teknologi terdepan untuk keamanan dan kemudahan Anda
+          Cutting-edge technology for your security and convenience
         </p>
         <div style={{ background: "#1a3a5c", borderRadius: "24px", padding: "44px 40px" }}>
           <h3 style={{ color: "white", textAlign: "center", fontSize: "1.35rem", fontWeight: 700, marginBottom: "10px" }}>
@@ -385,10 +384,10 @@ export default function LandingPage() {
       <section style={{ padding: "64px 48px", background: "#1a3a5c", textAlign: "center" }}>
         <div style={{ maxWidth: "600px", margin: "0 auto" }}>
           <h2 style={{ color: "white", fontSize: "1.9rem", fontWeight: 800, marginBottom: "14px" }}>
-            Siap Bergabung di SODALIS?
+            Ready to Join SODALIS?
           </h2>
           <p style={{ color: "rgba(255,255,255,0.75)", marginBottom: "32px", fontSize: "0.97rem" }}>
-            Daftar sekarang dan mulai perjalanan finansialmu sebagai mahasiswa.
+            Register now and start your financial journey as a student.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Button
@@ -396,14 +395,14 @@ export default function LandingPage() {
               onClick={() => goTo("/register")}
               data-ocid="cta.peminjam_button"
             >
-              Daftar Sebagai Peminjam
+              Register as a Borrower
             </Button>
             <Button
               style={{ borderRadius: "999px", background: "#1d6fbf", color: "white", padding: "14px 32px", fontSize: "0.97rem", fontWeight: 600 }}
               onClick={() => goTo("/register")}
               data-ocid="cta.investor_button"
             >
-              Daftar Sebagai Investor
+              Register as an Investor
             </Button>
           </div>
         </div>

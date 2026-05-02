@@ -38,41 +38,37 @@ export default function AkadModal({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="rounded-2xl max-w-md" data-ocid="akad.dialog">
         <DialogHeader>
-          <DialogTitle className="text-navy font-bold text-lg">
-            Akad Pinjaman Digital
-          </DialogTitle>
+            Digital Loan Agreement
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="bg-muted rounded-xl p-4 space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Peminjam</span>
+              <span className="text-muted-foreground">Borrower</span>
               <span className="font-semibold">{loan.borrowerName}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Jurusan</span>
+              <span className="text-muted-foreground">Major</span>
               <span className="font-medium">{loan.major}</span>
             </div>
             <Separator />
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Nominal Pinjaman</span>
+              <span className="text-muted-foreground">Loan Amount</span>
               <span className="font-semibold">{formatRupiah(loan.amount)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Tenor</span>
-              <span className="font-semibold">{Number(loan.tenor)} bulan</span>
+              <span className="font-semibold">{Number(loan.tenor)} months</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Cicilan / bulan</span>
+              <span className="text-muted-foreground">Installment / mo</span>
               <span className="font-semibold text-brand-green">
                 {formatRupiah(loan.monthlyInstallment)}
               </span>
             </div>
             <Separator />
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">
-                Total Diterima Kembali
-              </span>
+                Total Return
               <span className="font-bold text-brand-blue">
                 {formatRupiah(totalBayar)}
               </span>
@@ -91,8 +87,7 @@ export default function AkadModal({
               htmlFor="akad-agree"
               className="text-sm leading-relaxed cursor-pointer"
             >
-              Saya menyetujui akad pinjaman digital ini dan bersedia mendanai
-              pinjaman sesuai dengan ketentuan yang telah disepakati.
+              I agree to this digital loan agreement and am willing to fund the loan according to the agreed terms.
             </Label>
           </div>
         </div>
@@ -104,7 +99,7 @@ export default function AkadModal({
             className="rounded-full"
             data-ocid="akad.cancel_button"
           >
-            Batal
+            Cancel
           </Button>
           <Button
             disabled={!agreed || isLoading}
@@ -112,7 +107,7 @@ export default function AkadModal({
             className="rounded-full bg-brand-green hover:bg-brand-green/90 text-white"
             data-ocid="akad.confirm_button"
           >
-            {isLoading ? "Memproses..." : "Konfirmasi Danai"}
+            {isLoading ? "Processing..." : "Confirm Funding"}
           </Button>
         </DialogFooter>
       </DialogContent>

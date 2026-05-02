@@ -1,8 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 /**
- * Komponen utama App - routing dan provider untuk SODALIS
- * Menggunakan @tanstack/react-router
+ * Main App component - routing and providers for SODALIS
+ * Uses @tanstack/react-router
  */
 import {
   Outlet,
@@ -16,19 +16,19 @@ import { useEffect } from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 
-// Halaman
+// Pages
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
-// Layout dan halaman investor
+// Investor layout and pages
 import InvestorLayout from "./layouts/InvestorLayout";
 import InvestorBrowse from "./pages/investor/Browse";
 import InvestorDashboard from "./pages/investor/Dashboard";
 import InvestorLoanDetail from "./pages/investor/LoanDetail";
 import InvestorPortfolio from "./pages/investor/Portfolio";
 
-// Layout dan halaman peminjam
+// Borrower layout and pages
 import BorrowerLayout from "./layouts/BorrowerLayout";
 import BorrowerApply from "./pages/borrower/Apply";
 import BorrowerDashboard from "./pages/borrower/Dashboard";
@@ -37,7 +37,7 @@ import { useActor } from "./hooks/useActor";
 
 const queryClient = new QueryClient();
 
-/** Komponen pemuat seed data */
+/** Seed data loader component */
 function SeedLoader() {
   const { actor } = useActor();
   useEffect(() => {
@@ -64,7 +64,7 @@ function RootLayout() {
   );
 }
 
-/** Komponen redirect berdasarkan status login */
+/** Redirect component based on login status */
 function HomeRedirect() {
   const { user } = useAuth();
   const navigate = rootRoute.useNavigate();
@@ -99,14 +99,14 @@ function BorrowerLayoutWrapper() {
 
   useEffect(() => {
     if (!user) navigate({ to: "/login" });
-    else if (user.role !== "Peminjam") navigate({ to: "/investor/dashboard" });
+    else if (user.role !== "Borrower") navigate({ to: "/investor/dashboard" });
   }, [user, navigate]);
 
-  if (!user || user.role !== "Peminjam") return null;
+  if (!user || user.role !== "Borrower") return null;
   return <BorrowerLayout />;
 }
 
-// ===== Definisi Route =====
+// ===== Route Definitions =====
 
 const rootRoute = createRootRoute({ component: RootLayout });
 
@@ -128,7 +128,7 @@ const registerRoute = createRoute({
   component: RegisterPage,
 });
 
-// Route investor
+// Investor routes
 const investorRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/investor",
@@ -167,7 +167,7 @@ const investorPortfolioRoute = createRoute({
   component: InvestorPortfolio,
 });
 
-// Route peminjam
+// Borrower routes
 const borrowerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/borrower",
@@ -200,7 +200,7 @@ const borrowerRepaymentRoute = createRoute({
   component: BorrowerRepayment,
 });
 
-// Buat pohon route dan router
+// Create route tree and router
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,

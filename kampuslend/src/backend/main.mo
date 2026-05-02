@@ -218,7 +218,7 @@ persistent actor {
     switch (getUserByPrincipal(caller)) {
       case (?existingUser) {
         Runtime.trap(
-          "Identity ini sudah terdaftar sebagai " # existingUser.role # ". Satu identity hanya dapat memiliki satu role."
+          "This identity is already registered as " # existingUser.role # ". One identity can only have one role."
         );
       };
       case (null) {};
@@ -333,7 +333,7 @@ persistent actor {
         if (user.id != borrowerId) {
           Runtime.trap("Unauthorized: Can only create loans for yourself");
         };
-        if (not Text.equal(user.role, "Peminjam")) {
+        if (not Text.equal(user.role, "Borrower")) {
           Runtime.trap("Unauthorized: Only borrowers can create loans");
         };
       };
@@ -352,7 +352,7 @@ persistent actor {
       monthlyInstallment;
       interestRate = 2.0;
       purpose;
-      status = "Menunggu";
+      status = "Pending";
       startDate = Time.now();
       aiScore = 0;
       investorId = 0;
@@ -567,8 +567,8 @@ persistent actor {
     };
 
     var score : Nat = 50;
-    var recommendation : Text = "Pertimbangkan kembali";
-    var reason : Text = "Skor sedang";
+    var recommendation : Text = "Reconsider";
+    var reason : Text = "Average score";
 
     // Adjust score based on GPA
     if (input.gpa >= 3.5) { score += 20 } else if (input.gpa >= 3.0) {
@@ -579,17 +579,17 @@ persistent actor {
     if (input.amount > 10000000 and input.tenor < 6) {
       if (score > 10) { score -= 10 };
     };
-    if (Text.equal(input.purpose, "Pendidikan")) { score += 10 };
+    if (Text.equal(input.purpose, "Education")) { score += 10 };
 
     if (input.cleanHistory) { score += 10 };
 
     // Set recommendation and reason
     if (score >= 80) {
-      recommendation := "Disetujui";
-      reason := "Pengajuan baik";
+      recommendation := "Approved";
+      reason := "Good application";
     } else if (score >= 60) {
-      recommendation := "Dipertimbangkan";
-      reason := "Skor cukup";
+      recommendation := "Considered";
+      reason := "Sufficient score";
     };
 
     { score; recommendation; reason };
@@ -605,7 +605,7 @@ persistent actor {
 
     // Seed users
     let investors = ["Investor 1", "Investor 2", "Investor 3"];
-    let borrowers = ["Peminjam 1", "Peminjam 2", "Peminjam 3", "Peminjam 4", "Peminjam 5"];
+    let borrowers = ["Borrower 1", "Borrower 2", "Borrower 3", "Borrower 4", "Borrower 5"];
 
     for (student in investors.values()) {
       let userId = nextUserId;
@@ -636,7 +636,7 @@ persistent actor {
           principal = caller;
           name = student;
           email = (student.replace(#char ' ', "") # "@email.com");
-          role = "Peminjam";
+          role = "Borrower";
           ktm = "456";
           bankAccount = "987123456";
           gpa = 3.2;
@@ -654,14 +654,14 @@ persistent actor {
       {
         id = loanId;
         borrowerId = 4;
-        borrowerName = "Peminjam 1";
-        major = "Teknik Informatika";
+        borrowerName = "Borrower 1";
+        major = "Computer Science";
         amount = 5000000;
         tenor = 12;
         monthlyInstallment = 458333.33;
         interestRate = 2.0;
-        purpose = "Pendidikan";
-        status = "Menunggu";
+        purpose = "Education";
+        status = "Pending";
         startDate = Time.now();
         aiScore = 80;
         investorId = 1;
@@ -673,14 +673,14 @@ persistent actor {
       {
         id = loanId + 1;
         borrowerId = 5;
-        borrowerName = "Peminjam 2";
-        major = "Ekonomi";
+        borrowerName = "Borrower 2";
+        major = "Economics";
         amount = 8000000;
         tenor = 24;
         monthlyInstallment = 366666.67;
         interestRate = 2.0;
-        purpose = "Usaha";
-        status = "Aktif";
+        purpose = "Business";
+        status = "Active";
         startDate = Time.now();
         aiScore = 80;
         investorId = 1;
@@ -692,14 +692,14 @@ persistent actor {
       {
         id = loanId + 2;
         borrowerId = 6;
-        borrowerName = "Peminjam 3";
-        major = "Teknik Kimia";
+        borrowerName = "Borrower 3";
+        major = "Chemical Engineering";
         amount = 10000000;
         tenor = 6;
         monthlyInstallment = 1666666.67;
         interestRate = 2.0;
-        purpose = "Pendidikan";
-        status = "Lunas";
+        purpose = "Education";
+        status = "Paid";
         startDate = Time.now();
         aiScore = 80;
         investorId = 1;
@@ -718,7 +718,7 @@ persistent actor {
         amount = 366666;
         paymentDate = Time.now();
         remainingInstallment = 3299999.98;
-        status = "Belum";
+        status = "Unpaid";
         virtualAccount = "VA1";
       },
     );
@@ -731,7 +731,7 @@ persistent actor {
         amount = 1666666;
         paymentDate = Time.now();
         remainingInstallment = 0.0;
-        status = "Lunas";
+        status = "Paid";
         virtualAccount = "VA2";
       },
     );

@@ -6,7 +6,7 @@ import { type ReactNode, createContext, useContext, useState } from "react";
 
 export interface AuthUser {
   userId: string;
-  role: string; // "Investor" | "Peminjam"
+  role: string; // "Investor" | "Borrower"
   name: string;
 }
 

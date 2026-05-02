@@ -15,7 +15,7 @@ export default function InvestorBrowse() {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [scores, setScores] = useState<Record<string, ScoringResult>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState("Menunggu");
+  const [filter, setFilter] = useState("Pending");
 
   useEffect(() => {
     if (!actor) return;
@@ -50,14 +50,14 @@ export default function InvestorBrowse() {
   }, [actor]);
 
   const filtered =
-    filter === "Semua" ? loans : loans.filter((l) => l.status === filter);
+    filter === "All" ? loans : loans.filter((l) => l.status === filter);
 
   return (
     <div className="space-y-6" data-ocid="investor.browse.page">
       <div>
-        <h2 className="text-2xl font-bold text-foreground">Browse Peminjam</h2>
+        <h2 className="text-2xl font-bold text-foreground">Browse Borrowers</h2>
         <p className="text-muted-foreground">
-          Pilih peminjam yang ingin Anda danai
+          Choose a borrower you want to fund
         </p>
       </div>
 
@@ -65,25 +65,25 @@ export default function InvestorBrowse() {
       <Tabs value={filter} onValueChange={setFilter}>
         <TabsList className="rounded-full bg-muted p-1">
           <TabsTrigger
-            value="Menunggu"
+            value="Pending"
             className="rounded-full text-sm"
             data-ocid="browse.filter.menunggu_tab"
           >
-            Menunggu Pendanaan
+            Pending Funding
           </TabsTrigger>
           <TabsTrigger
-            value="Aktif"
+            value="Active"
             className="rounded-full text-sm"
             data-ocid="browse.filter.aktif_tab"
           >
-            Aktif
+            Active
           </TabsTrigger>
           <TabsTrigger
-            value="Semua"
+            value="All"
             className="rounded-full text-sm"
             data-ocid="browse.filter.semua_tab"
           >
-            Semua
+            All
           </TabsTrigger>
         </TabsList>
       </Tabs>
@@ -109,7 +109,7 @@ export default function InvestorBrowse() {
         <div className="text-center py-16" data-ocid="browse.empty_state">
           <p className="text-5xl mb-4">🔍</p>
           <p className="text-muted-foreground text-lg">
-            Tidak ada peminjam dengan status "{filter}"
+            No borrowers with status "{filter}"
           </p>
         </div>
       ) : (

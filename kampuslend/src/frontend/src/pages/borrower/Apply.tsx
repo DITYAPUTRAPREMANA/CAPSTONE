@@ -24,11 +24,11 @@ import { formatRupiah } from "../../utils/format";
 
 const TENORS = [3, 6, 12];
 const TUJUAN_OPTIONS = [
-  "Biaya Kuliah",
-  "Kost / Kontrakan",
-  "Kebutuhan Sehari-hari",
-  "Usaha Produktif",
-  "Lainnya",
+  "Tuition Fee",
+  "Rent",
+  "Daily Needs",
+  "Productive Business",
+  "Others",
 ];
 
 export default function BorrowerApply() {
@@ -54,7 +54,7 @@ export default function BorrowerApply() {
   const handleHitungSkor = async () => {
     if (!actor || !user) return;
     if (nominalNum <= 0 || !tujuan || !jurusan) {
-      toast.error("Isi semua data terlebih dahulu");
+      toast.error("Fill all data first");
       return;
     }
     setIsScoring(true);
@@ -69,7 +69,7 @@ export default function BorrowerApply() {
       setScoreResult(result);
       setStep("score");
     } catch {
-      toast.error("Gagal menghitung skor. Coba lagi.");
+      toast.error("Failed to calculate score. Try again.");
     } finally {
       setIsScoring(false);
     }
@@ -89,9 +89,9 @@ export default function BorrowerApply() {
         tujuan,
       );
       setStep("success");
-      toast.success("Pinjaman berhasil diajukan!");
+      toast.success("Loan successfully applied!");
     } catch {
-      toast.error("Gagal mengajukan pinjaman. Coba lagi.");
+      toast.error("Failed to apply for a loan. Try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -104,15 +104,15 @@ export default function BorrowerApply() {
           <CardContent className="py-16">
             <div className="text-6xl mb-4">✅</div>
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              Pinjaman Diajukan!
+              Loan Applied!
             </h2>
             <p className="text-muted-foreground mb-6">
-              Pinjaman Anda sebesar {formatRupiah(nominalNum)} sedang menunggu
-              persetujuan investor.
+              Your loan of {formatRupiah(nominalNum)} is waiting for
+              investor approval.
             </p>
             <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
               <span className="animate-pulse">⏳</span>
-              Menunggu Persetujuan Investor
+              Waiting for Investor Approval
             </div>
             <br />
             <Button
@@ -120,7 +120,7 @@ export default function BorrowerApply() {
               onClick={() => router.navigate({ to: "/borrower/dashboard" })}
               data-ocid="apply.dashboard_button"
             >
-              Ke Dashboard
+              Go to Dashboard
             </Button>
           </CardContent>
         </Card>
@@ -131,9 +131,9 @@ export default function BorrowerApply() {
   return (
     <div className="max-w-2xl mx-auto space-y-6" data-ocid="apply.page">
       <div>
-        <h2 className="text-2xl font-bold text-foreground">Ajukan Pinjaman</h2>
+        <h2 className="text-2xl font-bold text-foreground">Apply for Loan</h2>
         <p className="text-muted-foreground">
-          Isi formulir pinjaman dan sistem AI akan menilai kelayakan Anda
+          Fill the loan form and the AI system will assess your eligibility
         </p>
       </div>
 
@@ -141,14 +141,14 @@ export default function BorrowerApply() {
         <div className="grid md:grid-cols-2 gap-6">
           <Card className="rounded-2xl shadow-card">
             <CardHeader>
-              <CardTitle className="text-lg">Data Pinjaman</CardTitle>
+              <CardTitle className="text-lg">Loan Data</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="nominal">Nominal Pinjaman (Rp)</Label>
+                <Label htmlFor="nominal">Loan Amount (Rp)</Label>
                 <Input
                   id="nominal"
-                  placeholder="Contoh: 5000000"
+                  placeholder="Example: 5000000"
                   value={nominal}
                   onChange={(e) => setNominal(e.target.value)}
                   className="rounded-full"
@@ -167,20 +167,20 @@ export default function BorrowerApply() {
                   <SelectContent>
                     {TENORS.map((t) => (
                       <SelectItem key={t} value={String(t)}>
-                        {t} bulan
+                        {t} months
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Tujuan Pinjaman</Label>
+                <Label>Loan Purpose</Label>
                 <Select value={tujuan} onValueChange={setTujuan}>
                   <SelectTrigger
                     className="rounded-full"
                     data-ocid="apply.tujuan_select"
                   >
-                    <SelectValue placeholder="Pilih tujuan..." />
+                    <SelectValue placeholder="Select purpose..." />
                   </SelectTrigger>
                   <SelectContent>
                     {TUJUAN_OPTIONS.map((t) => (
@@ -192,10 +192,10 @@ export default function BorrowerApply() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="jurusan">Jurusan</Label>
+                <Label htmlFor="jurusan">Major</Label>
                 <Input
                   id="jurusan"
-                  placeholder="Contoh: Teknik Informatika"
+                  placeholder="Example: Computer Science"
                   value={jurusan}
                   onChange={(e) => setJurusan(e.target.value)}
                   className="rounded-full"
@@ -207,19 +207,19 @@ export default function BorrowerApply() {
 
           <Card className="rounded-2xl shadow-card">
             <CardHeader>
-              <CardTitle className="text-lg">Kalkulasi Cicilan</CardTitle>
+              <CardTitle className="text-lg">Installment Calculation</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-muted rounded-xl p-4 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Nominal</span>
+                  <span className="text-muted-foreground">Amount</span>
                   <span className="font-semibold">
                     {formatRupiah(nominalNum)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">
-                    Bunga (2%/bln × tenor)
+                    Interest (2%/mo × tenor)
                   </span>
                   <span className="font-semibold">
                     {formatRupiah(totalBunga)}
@@ -227,12 +227,12 @@ export default function BorrowerApply() {
                 </div>
                 <Separator />
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Total Bayar</span>
+                  <span className="text-muted-foreground">Total Payment</span>
                   <span className="font-bold">{formatRupiah(totalBayar)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground text-sm">
-                    Cicilan / Bulan
+                    Installment / Month
                   </span>
                   <span className="font-bold text-xl text-brand-green">
                     {formatRupiah(cicilanPerBulan)}
@@ -246,8 +246,8 @@ export default function BorrowerApply() {
                 data-ocid="apply.score_button"
               >
                 {isScoring
-                  ? "Menghitung Skor AI..."
-                  : "🤖 Hitung Skor Kelayakan"}
+                  ? "Calculating AI Score..."
+                  : "🤖 Calculate Eligibility Score"}
               </Button>
             </CardContent>
           </Card>
@@ -259,20 +259,20 @@ export default function BorrowerApply() {
           <AIScoreCard result={scoreResult} />
           <Card className="rounded-2xl shadow-card">
             <CardHeader>
-              <CardTitle>Ringkasan Pinjaman</CardTitle>
+              <CardTitle>Loan Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2 text-sm">
                 {[
-                  { label: "Nominal", value: formatRupiah(nominalNum) },
-                  { label: "Tenor", value: `${tenorNum} bulan` },
+                  { label: "Amount", value: formatRupiah(nominalNum) },
+                  { label: "Tenor", value: `${tenorNum} months` },
                   {
-                    label: "Cicilan/bln",
+                    label: "Installment/mo",
                     value: formatRupiah(cicilanPerBulan),
                     green: true,
                   },
-                  { label: "Tujuan", value: tujuan },
-                  { label: "Jurusan", value: jurusan },
+                  { label: "Purpose", value: tujuan },
+                  { label: "Major", value: jurusan },
                 ].map((item) => (
                   <div key={item.label} className="flex justify-between">
                     <span className="text-muted-foreground">{item.label}</span>
@@ -299,7 +299,7 @@ export default function BorrowerApply() {
                   disabled={isSubmitting}
                   data-ocid="apply.submit_button"
                 >
-                  {isSubmitting ? "Mengajukan..." : "Ajukan Pinjaman"}
+                  {isSubmitting ? "Applying..." : "Apply for Loan"}
                 </Button>
               </div>
             </CardContent>

@@ -13,10 +13,10 @@ const navItems = [
     label: "Dashboard",
     icon: LayoutDashboard,
   },
-  { to: "/borrower/apply" as const, label: "Ajukan Pinjaman", icon: FileText },
+  { to: "/borrower/apply" as const, label: "Apply for Loan", icon: FileText },
   {
     to: "/borrower/repayment" as const,
-    label: "Cicilan Saya",
+    label: "My Installments",
     icon: CreditCard,
   },
 ];
@@ -44,7 +44,7 @@ export default function BorrowerLayout() {
               SODALIS
             </span>
           </div>
-          <p className="text-white/50 text-xs mt-1">Peminjam Dashboard</p>
+          <p className="text-white/50 text-xs mt-1">Borrower Dashboard</p>
         </div>
 
         {/* Navigasi */}
@@ -80,7 +80,7 @@ export default function BorrowerLayout() {
               <p className="text-white text-sm font-medium truncate">
                 {user?.name}
               </p>
-              <p className="text-white/50 text-xs">Peminjam</p>
+              <p className="text-white/50 text-xs">Borrower</p>
             </div>
           </div>
           <Button
@@ -90,7 +90,7 @@ export default function BorrowerLayout() {
             data-ocid="borrower.logout_button"
           >
             <LogOut size={16} className="mr-2" />
-            Keluar
+            Logout
           </Button>
         </div>
       </aside>
@@ -100,9 +100,9 @@ export default function BorrowerLayout() {
         {/* Header */}
         <header className="bg-white border-b border-border px-8 py-4 flex items-center justify-between flex-shrink-0">
           <div>
-            <h1 className="font-bold text-foreground">Halo, {user?.name} 👋</h1>
+            <h1 className="font-bold text-foreground">Hello, {user?.name} 👋</h1>
             <p className="text-xs text-muted-foreground">
-              SODALIS Peminjam Portal
+              SODALIS Borrower Portal
             </p>
           </div>
         </header>

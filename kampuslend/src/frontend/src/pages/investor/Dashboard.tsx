@@ -29,7 +29,7 @@ export default function InvestorDashboard() {
       .finally(() => setIsLoading(false));
   }, [actor, user]);
 
-  const activeLoans = loans.filter((l) => l.status === "Aktif");
+  const activeLoans = loans.filter((l) => l.status === "Active");
   const totalDanaAktif = activeLoans.reduce(
     (sum, l) => sum + Number(l.amount),
     0,
@@ -41,13 +41,13 @@ export default function InvestorDashboard() {
 
   const stats = [
     {
-      label: "Total Dana Aktif",
+      label: "Total Active Funds",
       value: formatRupiah(totalDanaAktif),
       icon: "💰",
       color: "text-brand-green",
     },
     {
-      label: "Pinjaman Aktif",
+      label: "Active Loans",
       value: String(activeLoans.length),
       icon: "📁",
       color: "text-brand-blue",
@@ -64,9 +64,9 @@ export default function InvestorDashboard() {
     <div className="space-y-8" data-ocid="investor.dashboard.page">
       <div>
         <h2 className="text-2xl font-bold text-foreground">
-          Dashboard Investor
+          Investor Dashboard
         </h2>
-        <p className="text-muted-foreground">Pantau portofolio pinjaman Anda</p>
+        <p className="text-muted-foreground">Monitor your loan portfolio</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -94,7 +94,7 @@ export default function InvestorDashboard() {
       <Card className="rounded-2xl shadow-card">
         <CardHeader>
           <CardTitle className="text-lg font-bold text-foreground">
-            Aksi Cepat
+            Quick Actions
           </CardTitle>
         </CardHeader>
         <CardContent className="flex gap-4">
@@ -103,7 +103,7 @@ export default function InvestorDashboard() {
             onClick={() => router.navigate({ to: "/investor/browse" })}
             data-ocid="investor.browse_button"
           >
-            Browse Peminjam
+            Browse Borrowers
           </Button>
           <Button
             variant="outline"
@@ -111,7 +111,7 @@ export default function InvestorDashboard() {
             onClick={() => router.navigate({ to: "/investor/portfolio" })}
             data-ocid="investor.portfolio_button"
           >
-            Lihat Portofolio
+            View Portfolio
           </Button>
         </CardContent>
       </Card>
@@ -119,7 +119,7 @@ export default function InvestorDashboard() {
       <Card className="rounded-2xl shadow-card">
         <CardHeader>
           <CardTitle className="text-lg font-bold text-foreground">
-            Pinjaman Aktif
+            Active Loans
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -138,12 +138,12 @@ export default function InvestorDashboard() {
               data-ocid="investor.dashboard.empty_state"
             >
               <p className="text-4xl mb-3">📊</p>
-              <p className="text-muted-foreground">Belum ada pinjaman aktif.</p>
+              <p className="text-muted-foreground">No active loans yet.</p>
               <Button
                 className="mt-4 rounded-full bg-brand-blue hover:bg-brand-blue/90 text-white"
                 onClick={() => router.navigate({ to: "/investor/browse" })}
               >
-                Mulai Mendanai
+                Start Funding
               </Button>
             </div>
           ) : (
@@ -157,7 +157,7 @@ export default function InvestorDashboard() {
                   <div className="flex-1">
                     <p className="font-semibold text-sm">{loan.borrowerName}</p>
                     <p className="text-xs text-muted-foreground">
-                      {loan.major} • {Number(loan.tenor)} bulan
+                      {loan.major} • {Number(loan.tenor)} months
                     </p>
                   </div>
                   <div className="text-right mr-4">
@@ -165,7 +165,7 @@ export default function InvestorDashboard() {
                       {formatRupiah(loan.amount)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Cicilan: {formatRupiah(loan.monthlyInstallment)}
+                      Installment: {formatRupiah(loan.monthlyInstallment)}
                     </p>
                   </div>
                   <StatusBadge status={loan.status} />

@@ -39,7 +39,7 @@ export default function VirtualAccountModal({
   const handleCopy = () => {
     navigator.clipboard.writeText(vaNumber).then(() => {
       setCopiedVA(true);
-      toast.success("Nomor VA berhasil disalin!");
+      toast.success("VA Number successfully copied!");
       setTimeout(() => setCopiedVA(false), 2000);
     });
   };
@@ -49,7 +49,7 @@ export default function VirtualAccountModal({
       <DialogContent className="rounded-2xl max-w-md" data-ocid="va.dialog">
         <DialogHeader>
           <DialogTitle className="text-navy font-bold">
-            Virtual Account Pembayaran
+            Payment Virtual Account
           </DialogTitle>
         </DialogHeader>
 
@@ -57,7 +57,7 @@ export default function VirtualAccountModal({
           {/* Nomor VA */}
           <div className="bg-muted rounded-xl p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">
-              Nomor Virtual Account
+              Virtual Account Number
             </p>
             <p className="text-2xl font-bold tracking-widest text-navy">
               {vaNumber}
@@ -69,14 +69,14 @@ export default function VirtualAccountModal({
               className="mt-2 rounded-full text-xs"
               data-ocid="va.copy_button"
             >
-              {copiedVA ? "✓ Tersalin" : "Salin Nomor VA"}
+              {copiedVA ? "✓ Copied" : "Copy VA Number"}
             </Button>
           </div>
 
           {/* Jumlah transfer */}
           <div className="flex justify-between items-center bg-green-50 rounded-xl p-3">
             <span className="text-sm text-muted-foreground">
-              Jumlah Transfer
+              Transfer Amount
             </span>
             <span className="font-bold text-green-700 text-lg">
               {formatRupiah(amount)}
@@ -86,7 +86,7 @@ export default function VirtualAccountModal({
           {/* Bank yang tersedia */}
           <div>
             <p className="text-xs text-muted-foreground mb-2 font-medium">
-              Tersedia di bank:
+              Available at banks:
             </p>
             <div className="flex gap-2 flex-wrap">
               {BANKS.map((bank) => (
@@ -105,13 +105,13 @@ export default function VirtualAccountModal({
 
           {/* Langkah-langkah */}
           <div>
-            <p className="text-sm font-semibold mb-2">Cara Transfer:</p>
+            <p className="text-sm font-semibold mb-2">How to Transfer:</p>
             <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Buka aplikasi mobile banking atau ATM bank Anda</li>
-              <li>Pilih menu Transfer / Virtual Account</li>
-              <li>Masukkan nomor VA di atas</li>
-              <li>Masukkan nominal transfer sesuai jumlah</li>
-              <li>Konfirmasi dan selesaikan pembayaran</li>
+              <li>Open your mobile banking app or ATM</li>
+              <li>Select Transfer / Virtual Account menu</li>
+              <li>Enter the VA number above</li>
+              <li>Enter the transfer amount</li>
+              <li>Confirm and complete the payment</li>
             </ol>
           </div>
         </div>
@@ -121,7 +121,7 @@ export default function VirtualAccountModal({
           className="w-full rounded-full bg-navy text-white hover:bg-navy/90"
           data-ocid="va.close_button"
         >
-          Tutup
+          Close
         </Button>
       </DialogContent>
     </Dialog>

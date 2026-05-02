@@ -13,8 +13,8 @@ const navItems = [
     label: "Dashboard",
     icon: LayoutDashboard,
   },
-  { to: "/investor/browse" as const, label: "Browse Peminjam", icon: Search },
-  { to: "/investor/portfolio" as const, label: "Portofolio", icon: Briefcase },
+  { to: "/investor/browse" as const, label: "Browse Borrowers", icon: Search },
+  { to: "/investor/portfolio" as const, label: "Portfolio", icon: Briefcase },
 ];
 
 export default function InvestorLayout() {
@@ -87,7 +87,7 @@ export default function InvestorLayout() {
             data-ocid="investor.logout_button"
           >
             <LogOut size={16} className="mr-2" />
-            Keluar
+            Logout
           </Button>
         </div>
       </aside>
@@ -98,7 +98,7 @@ export default function InvestorLayout() {
         <header className="bg-white border-b border-border px-8 py-4 flex items-center justify-between flex-shrink-0">
           <div>
             <h1 className="font-bold text-foreground">
-              Selamat Datang, {user?.name} 👋
+              Welcome, {user?.name} 👋
             </h1>
             <p className="text-xs text-muted-foreground">
               SODALIS Investor Portal
