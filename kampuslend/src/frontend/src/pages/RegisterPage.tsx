@@ -399,16 +399,7 @@ if (ktmFile && ktmFile.size > 5 * 1024 * 1024) {
           </Button>
         </div>
       </form>
-      <p className="text-center text-xs text-muted-foreground mt-3">
-        Already have an account?{" "}
-        <Link
-          to="/login"
-          className="font-semibold hover:underline"
-          style={{ color: "#1a6bbf" }}
-        >
-          Sign In
-        </Link>
-      </p>
+
     </CardContent>
   </Card>
 )}

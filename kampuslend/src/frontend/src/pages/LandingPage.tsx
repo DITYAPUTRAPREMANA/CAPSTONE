@@ -188,15 +188,6 @@ export default function LandingPage() {
         <div className="flex items-center gap-3">
           <Button
             className="sodalis-nav-btn"
-            variant="outline"
-            style={{ borderRadius: "999px", border: "1.5px solid #1a3a5c", color: "#1a3a5c", background: "transparent", fontSize: "0.88rem" }}
-            onClick={() => goTo("/login")}
-            data-ocid="nav.login_button"
-          >
-            Login
-          </Button>
-          <Button
-            className="sodalis-nav-btn"
             style={{ borderRadius: "999px", background: "#1d6fbf", color: "white", fontSize: "0.88rem" }}
             onClick={() => goTo("/register")}
             data-ocid="nav.register_button"
@@ -237,15 +228,6 @@ export default function LandingPage() {
                 data-ocid="hero.daftar_button"
               >
                 Mulai Sekarang
-              </Button>
-              <Button
-                className="sodalis-btn"
-                variant="outline"
-                style={{ borderRadius: "999px", border: "1.5px solid #1a3a5c", color: "#1a3a5c", background: "transparent", padding: "14px 32px", fontSize: "0.97rem", fontWeight: 600 }}
-                onClick={() => goTo("/login")}
-                data-ocid="hero.login_button"
-              >
-                Sudah Punya Akun
               </Button>
             </div>
           </div>

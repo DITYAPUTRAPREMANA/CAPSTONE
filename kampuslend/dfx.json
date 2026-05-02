@@ -1,5 +1,11 @@
 {
   "version": 1,
+  "defaults": {
+    "build": {
+      "packager": "mops",
+      "args": ""
+    }
+  },
   "canisters": {
     "backend": {
       "type": "motoko",

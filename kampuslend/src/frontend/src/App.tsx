@@ -19,7 +19,6 @@ import { useInternetIdentity } from "./hooks/useInternetIdentity";
 
 // Halaman
 import LandingPage from "./pages/LandingPage";
-import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
 // Layout dan halaman investor
@@ -97,7 +96,7 @@ function InvestorLayoutWrapper() {
 
   useEffect(() => {
     if (isLoading) return;
-    if (!user) navigate({ to: identity ? "/register" : "/login" });
+    if (!user) navigate({ to: "/register" });
     else if (user.role !== "Investor") navigate({ to: "/borrower/dashboard" });
   }, [user, isLoading, identity, navigate]);
 
@@ -113,7 +112,7 @@ function BorrowerLayoutWrapper() {
 
   useEffect(() => {
     if (isLoading) return;
-    if (!user) navigate({ to: identity ? "/register" : "/login" });
+    if (!user) navigate({ to: "/register" });
     else if (user.role !== "Peminjam") navigate({ to: "/investor/dashboard" });
   }, [user, isLoading, identity, navigate]);
 
@@ -129,12 +128,6 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: HomeRedirect,
-});
-
-const loginRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/login",
-  component: LoginPage,
 });
 
 const registerRoute = createRoute({
@@ -218,7 +211,6 @@ const borrowerRepaymentRoute = createRoute({
 // Buat pohon route dan router
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  loginRoute,
   registerRoute,
   investorRoute.addChildren([
     investorIndexRoute,

@@ -227,7 +227,7 @@ persistent actor {
     // Register should write directly to backend canister storage (blockchain state).
     // If caller is authenticated, initialize access control to keep user role state in sync.
     if (not caller.isAnonymous()) {
-      ignore AccessControl.initialize(accessControlState, caller, "", "");
+      AccessControl.initialize(accessControlState, caller, "", "");
     };
 
     // Persist user record immediately in canister state.
@@ -576,7 +576,9 @@ persistent actor {
     };
 
     // Adjust score based on amount and tenor
-    if (input.amount > 10000000 and input.tenor < 6) { if (score > 10) { score -= 10 } };
+    if (input.amount > 10000000 and input.tenor < 6) {
+      if (score > 10) { score -= 10 };
+    };
     if (Text.equal(input.purpose, "Pendidikan")) { score += 10 };
 
     if (input.cleanHistory) { score += 10 };
