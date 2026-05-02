@@ -14,11 +14,11 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { useActor } from "./hooks/useActor";
-import { useInternetIdentity } from "./hooks/useInternetIdentity";
+
 
 // Halaman
 import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
 // Layout dan halaman investor
@@ -33,6 +33,7 @@ import BorrowerLayout from "./layouts/BorrowerLayout";
 import BorrowerApply from "./pages/borrower/Apply";
 import BorrowerDashboard from "./pages/borrower/Dashboard";
 import BorrowerRepayment from "./pages/borrower/Repayment";
+import { useActor } from "./hooks/useActor";
 
 const queryClient = new QueryClient();
 
@@ -46,7 +47,7 @@ function SeedLoader() {
       actor
         .addSeedData()
         .then(() => localStorage.setItem("sodalis_seeded", "true"))
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [actor]);
   return null;
@@ -65,56 +66,41 @@ function RootLayout() {
 
 /** Komponen redirect berdasarkan status login */
 function HomeRedirect() {
-  const { user, isLoading } = useAuth();
-  const { identity } = useInternetIdentity();
+  const { user } = useAuth();
   const navigate = rootRoute.useNavigate();
 
   useEffect(() => {
     if (user) {
-      navigate({
-        to:
-          user.role === "Investor"
-            ? "/investor/dashboard"
-            : "/borrower/dashboard",
-      });
-      return;
+      if (user.role === "Investor") navigate({ to: "/investor/dashboard" });
+      else navigate({ to: "/borrower/dashboard" });
     }
-    if (!isLoading && identity) {
-      navigate({ to: "/register" });
-    }
-  }, [user, isLoading, identity, navigate]);
+  }, [user, navigate]);
 
-  if (user || (identity && !isLoading)) return null;
+  if (user) return null;
   return <LandingPage />;
 }
 
-/** Wrapper layout investor dengan pengecekan auth */
 function InvestorLayoutWrapper() {
-  const { user, isLoading } = useAuth();
-  const { identity } = useInternetIdentity();
+  const { user } = useAuth();
   const navigate = rootRoute.useNavigate();
 
   useEffect(() => {
-    if (isLoading) return;
-    if (!user) navigate({ to: "/register" });
+    if (!user) navigate({ to: "/login" });
     else if (user.role !== "Investor") navigate({ to: "/borrower/dashboard" });
-  }, [user, isLoading, identity, navigate]);
+  }, [user, navigate]);
 
   if (!user || user.role !== "Investor") return null;
   return <InvestorLayout />;
 }
 
-/** Wrapper layout peminjam dengan pengecekan auth */
 function BorrowerLayoutWrapper() {
-  const { user, isLoading } = useAuth();
-  const { identity } = useInternetIdentity();
+  const { user } = useAuth();
   const navigate = rootRoute.useNavigate();
 
   useEffect(() => {
-    if (isLoading) return;
-    if (!user) navigate({ to: "/register" });
+    if (!user) navigate({ to: "/login" });
     else if (user.role !== "Peminjam") navigate({ to: "/investor/dashboard" });
-  }, [user, isLoading, identity, navigate]);
+  }, [user, navigate]);
 
   if (!user || user.role !== "Peminjam") return null;
   return <BorrowerLayout />;
@@ -128,6 +114,12 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: HomeRedirect,
+});
+
+const loginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/login",
+  component: LoginPage,
 });
 
 const registerRoute = createRoute({
@@ -211,6 +203,7 @@ const borrowerRepaymentRoute = createRoute({
 // Buat pohon route dan router
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  loginRoute,
   registerRoute,
   investorRoute.addChildren([
     investorIndexRoute,
