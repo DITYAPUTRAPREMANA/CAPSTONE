@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "node scripts/generate-env.js && vite",
+    "dev": "node scripts/generate-env.js && vite",
     "build:skip-bindings": "node scripts/generate-env.js && vite build && pnpm copy:env",
     "build": "node scripts/generate-env.js && vite build && pnpm copy:env",
     "copy:env": "node scripts/generate-env.js && cp env.json dist/",
