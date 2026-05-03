@@ -116,6 +116,7 @@ export interface _SERVICE {
   'setApproval' : ActorMethod<[Principal, ApprovalStatus], undefined>,
   'updateLoanStatus' : ActorMethod<[bigint, string], undefined>,
   'verifyUser' : ActorMethod<[bigint], undefined>,
+  'verifyEmail' : ActorMethod<[bigint, string], boolean>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

@@ -35,10 +35,10 @@ export default function BorrowerDashboard() {
   return (
     <div className="space-y-8" data-ocid="borrower.dashboard.page">
       <div>
-        <h2 className="text-2xl font-bold text-foreground">
+        <h2 className="text-2xl font-bold" style={{ color: "#1a3a5c" }}>
           Borrower Dashboard
         </h2>
-        <p className="text-muted-foreground">Monitor your loan status</p>
+        <p style={{ color: "#7a9ab5" }}>Monitor your loan status</p>
       </div>
 
       {isLoading ? (
@@ -47,7 +47,7 @@ export default function BorrowerDashboard() {
           data-ocid="borrower.dashboard.loading_state"
         />
       ) : activeLoan ? (
-        <Card className="rounded-2xl shadow-card border-l-4 border-l-brand-green">
+        <Card className="rounded-2xl border-l-4" style={{ boxShadow: "0 4px 12px rgba(15, 52, 116, 0.08)", borderLeftColor: "#1d6fbf", border: "none", borderLeft: "4px solid #1d6fbf" }}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">Active Loan</CardTitle>
@@ -56,32 +56,33 @@ export default function BorrowerDashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-muted rounded-xl p-3">
-                <p className="text-xs text-muted-foreground">Amount</p>
-                <p className="font-bold text-brand-green">
+              <div className="rounded-xl p-3" style={{ backgroundColor: "#f3f8ff" }}>
+                <p className="text-xs" style={{ color: "#7a9ab5" }}>Amount</p>
+                <p className="font-bold" style={{ color: "#1d6fbf" }}>
                   {formatRupiah(activeLoan.amount)}
                 </p>
               </div>
-              <div className="bg-muted rounded-xl p-3">
-                <p className="text-xs text-muted-foreground">Tenor</p>
+              <div className="rounded-xl p-3" style={{ backgroundColor: "#f3f8ff" }}>
+                <p className="text-xs" style={{ color: "#7a9ab5" }}>Tenor</p>
                 <p className="text-bold">{Number(activeLoan.tenor)} months</p>
               </div>
-              <div className="bg-muted rounded-xl p-3">
-                <p className="text-xs text-muted-foreground">Installment/mo</p>
-                <p className="font-bold text-amber-600">
+              <div className="rounded-xl p-3" style={{ backgroundColor: "#f3f8ff" }}>
+                <p className="text-xs" style={{ color: "#7a9ab5" }}>Installment/mo</p>
+                <p className="font-bold" style={{ color: "#1a3a5c" }}>
                   {formatRupiah(activeLoan.monthlyInstallment)}
                 </p>
               </div>
-              <div className="bg-muted rounded-xl p-3">
-                <p className="text-xs text-muted-foreground">Start</p>
+              <div className="rounded-xl p-3" style={{ backgroundColor: "#f3f8ff" }}>
+                <p className="text-xs" style={{ color: "#7a9ab5" }}>Start</p>
                 <p className="font-bold">{formatDate(activeLoan.startDate)}</p>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm" style={{ color: "#4a5568" }}>
               Purpose: {activeLoan.purpose}
             </p>
             <Button
-              className="rounded-full bg-amber-500 hover:bg-amber-600 text-white"
+              className="rounded-full text-white transition-all hover:brightness-110"
+              style={{ backgroundColor: "#1d6fbf" }}
               onClick={() => router.navigate({ to: "/borrower/repayment" })}
               data-ocid="borrower.repayment_button"
             >
@@ -90,7 +91,7 @@ export default function BorrowerDashboard() {
           </CardContent>
         </Card>
       ) : pendingLoan ? (
-        <Card className="rounded-2xl shadow-card border-l-4 border-l-amber-500">
+        <Card className="rounded-2xl" style={{ boxShadow: "0 4px 12px rgba(15, 52, 116, 0.08)", borderLeft: "4px solid #f59e0b", borderTop: "none", borderRight: "none", borderBottom: "none" }}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">Applied Loan</CardTitle>
@@ -109,17 +110,19 @@ export default function BorrowerDashboard() {
         </Card>
       ) : (
         <Card
-          className="rounded-2xl shadow-card"
+          className="rounded-2xl"
+          style={{ boxShadow: "0 4px 12px rgba(15, 52, 116, 0.08)", border: "none" }}
           data-ocid="borrower.dashboard.empty_state"
         >
           <CardContent className="py-12 text-center">
             <p className="text-5xl mb-4">📜</p>
-            <h3 className="font-bold text-lg mb-2">No Active Loans Yet</h3>
-            <p className="text-muted-foreground mb-6">
+            <h3 className="font-bold text-lg mb-2" style={{ color: "#1a3a5c" }}>No Active Loans Yet</h3>
+            <p className="mb-6" style={{ color: "#7a9ab5" }}>
               Apply for your first loan and get funds for college needs.
             </p>
             <Button
-              className="rounded-full bg-amber-500 hover:bg-amber-600 text-white px-8"
+              className="rounded-full text-white px-8 transition-all hover:brightness-110"
+              style={{ backgroundColor: "#1d6fbf" }}
               onClick={() => router.navigate({ to: "/borrower/apply" })}
               data-ocid="borrower.apply_button"
             >
@@ -130,23 +133,24 @@ export default function BorrowerDashboard() {
       )}
 
       {loans.length > 0 && (
-        <Card className="rounded-2xl shadow-card">
+        <Card className="rounded-2xl" style={{ boxShadow: "0 4px 12px rgba(15, 52, 116, 0.08)", border: "none" }}>
           <CardHeader>
-            <CardTitle className="text-lg">Loan History</CardTitle>
+            <CardTitle className="text-lg" style={{ color: "#1a3a5c" }}>Loan History</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {loans.map((loan, i) => (
                 <div
                   key={String(loan.id)}
-                  className="flex items-center justify-between p-3 bg-muted rounded-xl"
+                  className="flex items-center justify-between p-3 rounded-xl"
+                  style={{ backgroundColor: "#f3f8ff" }}
                   data-ocid={`borrower.dashboard.item.${i + 1}`}
                 >
                   <div>
-                    <p className="font-semibold text-sm">
+                    <p className="font-semibold text-sm" style={{ color: "#1a3a5c" }}>
                       {formatRupiah(loan.amount)}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs" style={{ color: "#7a9ab5" }}>
                       {Number(loan.tenor)} months • {loan.purpose}
                     </p>
                   </div>

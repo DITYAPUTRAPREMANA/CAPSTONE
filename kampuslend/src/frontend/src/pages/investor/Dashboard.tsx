@@ -63,19 +63,19 @@ export default function InvestorDashboard() {
   return (
     <div className="space-y-8" data-ocid="investor.dashboard.page">
       <div>
-        <h2 className="text-2xl font-bold text-foreground">
+        <h2 className="text-2xl font-bold" style={{ color: "#1a3a5c" }}>
           Investor Dashboard
         </h2>
-        <p className="text-muted-foreground">Monitor your loan portfolio</p>
+        <p style={{ color: "#7a9ab5" }}>Monitor your loan portfolio</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((s) => (
-          <Card key={s.label} className="rounded-2xl shadow-card">
+          <Card key={s.label} className="rounded-2xl" style={{ boxShadow: "0 4px 12px rgba(15, 52, 116, 0.08)", border: "none" }}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">{s.label}</p>
+                  <p className="text-sm" style={{ color: "#7a9ab5" }}>{s.label}</p>
                   {isLoading ? (
                     <Skeleton className="h-7 w-32 mt-1" />
                   ) : (
@@ -91,15 +91,16 @@ export default function InvestorDashboard() {
         ))}
       </div>
 
-      <Card className="rounded-2xl shadow-card">
+      <Card className="rounded-2xl" style={{ boxShadow: "0 4px 12px rgba(15, 52, 116, 0.08)", border: "none" }}>
         <CardHeader>
-          <CardTitle className="text-lg font-bold text-foreground">
+          <CardTitle className="text-lg font-bold" style={{ color: "#1a3a5c" }}>
             Quick Actions
           </CardTitle>
         </CardHeader>
         <CardContent className="flex gap-4">
           <Button
-            className="rounded-full bg-brand-blue hover:bg-brand-blue/90 text-white"
+            className="rounded-full text-white transition-all hover:brightness-110"
+            style={{ backgroundColor: "#1d6fbf" }}
             onClick={() => router.navigate({ to: "/investor/browse" })}
             data-ocid="investor.browse_button"
           >
@@ -107,7 +108,8 @@ export default function InvestorDashboard() {
           </Button>
           <Button
             variant="outline"
-            className="rounded-full border-navy text-navy hover:bg-navy hover:text-white"
+            className="rounded-full transition-all"
+            style={{ color: "#1d6fbf", borderColor: "#1d6fbf", backgroundColor: "transparent" }}
             onClick={() => router.navigate({ to: "/investor/portfolio" })}
             data-ocid="investor.portfolio_button"
           >
@@ -116,9 +118,9 @@ export default function InvestorDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl shadow-card">
+      <Card className="rounded-2xl" style={{ boxShadow: "0 4px 12px rgba(15, 52, 116, 0.08)", border: "none" }}>
         <CardHeader>
-          <CardTitle className="text-lg font-bold text-foreground">
+          <CardTitle className="text-lg font-bold" style={{ color: "#1a3a5c" }}>
             Active Loans
           </CardTitle>
         </CardHeader>
@@ -138,9 +140,10 @@ export default function InvestorDashboard() {
               data-ocid="investor.dashboard.empty_state"
             >
               <p className="text-4xl mb-3">📊</p>
-              <p className="text-muted-foreground">No active loans yet.</p>
+              <p style={{ color: "#7a9ab5" }}>No active loans yet.</p>
               <Button
-                className="mt-4 rounded-full bg-brand-blue hover:bg-brand-blue/90 text-white"
+                className="mt-4 rounded-full text-white transition-all hover:brightness-110"
+                style={{ backgroundColor: "#1d6fbf" }}
                 onClick={() => router.navigate({ to: "/investor/browse" })}
               >
                 Start Funding
@@ -151,20 +154,21 @@ export default function InvestorDashboard() {
               {activeLoans.slice(0, 5).map((loan, i) => (
                 <div
                   key={String(loan.id)}
-                  className="flex items-center justify-between p-4 bg-muted rounded-xl"
+                  className="flex items-center justify-between p-4 rounded-xl"
+                  style={{ backgroundColor: "#f3f8ff" }}
                   data-ocid={`investor.dashboard.item.${i + 1}`}
                 >
                   <div className="flex-1">
-                    <p className="font-semibold text-sm">{loan.borrowerName}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="font-semibold text-sm" style={{ color: "#1a3a5c" }}>{loan.borrowerName}</p>
+                    <p className="text-xs" style={{ color: "#7a9ab5" }}>
                       {loan.major} • {Number(loan.tenor)} months
                     </p>
                   </div>
                   <div className="text-right mr-4">
-                    <p className="font-bold text-sm">
+                    <p className="font-bold text-sm" style={{ color: "#1d6fbf" }}>
                       {formatRupiah(loan.amount)}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs" style={{ color: "#7a9ab5" }}>
                       Installment: {formatRupiah(loan.monthlyInstallment)}
                     </p>
                   </div>

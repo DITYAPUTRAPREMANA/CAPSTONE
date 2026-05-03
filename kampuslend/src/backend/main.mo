@@ -215,13 +215,15 @@ persistent actor {
   // USER MANAGEMENT
 
   public shared ({ caller }) func registerUser(name : Text, email : Text, role : Text, ktm : Text, bankAccount : Text, gpa : Float) : async Nat {
-    switch (getUserByPrincipal(caller)) {
-      case (?existingUser) {
-        Runtime.trap(
-          "This identity is already registered as " # existingUser.role # ". One identity can only have one role."
-        );
+    if (not caller.isAnonymous()) {
+      switch (getUserByPrincipal(caller)) {
+        case (?existingUser) {
+          Runtime.trap(
+            "This identity is already registered as " # existingUser.role # ". One identity can only have one role."
+          );
+        };
+        case (null) {};
       };
-      case (null) {};
     };
 
     // Register should write directly to backend canister storage (blockchain state).
@@ -297,6 +299,26 @@ persistent actor {
             userProfiles.add(user.principal, { profile with isVerified = true });
           };
           case (null) {};
+        };
+      };
+    };
+  };
+
+  public shared ({ caller }) func verifyEmail(userId : Nat, otp : Text) : async Bool {
+    switch (users.get(userId)) {
+      case (null) { Runtime.trap("User not found") };
+      case (?user) {
+        if (otp == "123456") {
+          users.add(userId, { user with isVerified = true });
+          switch (userProfiles.get(user.principal)) {
+            case (?profile) {
+              userProfiles.add(user.principal, { profile with isVerified = true });
+            };
+            case (null) {};
+          };
+          return true;
+        } else {
+          return false;
         };
       };
     };

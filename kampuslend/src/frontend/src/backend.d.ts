@@ -107,4 +107,5 @@ export interface backendInterface {
     setApproval(user: Principal, status: ApprovalStatus): Promise<void>;
     updateLoanStatus(loanId: bigint, status: string): Promise<void>;
     verifyUser(userId: bigint): Promise<void>;
+    verifyEmail(userId: bigint, otp: string): Promise<boolean>;
 }

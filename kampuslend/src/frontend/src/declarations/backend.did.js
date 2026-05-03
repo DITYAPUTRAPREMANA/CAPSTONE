@@ -126,6 +126,7 @@ export const idlService = IDL.Service({
   'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
   'updateLoanStatus' : IDL.Func([IDL.Nat, IDL.Text], [], []),
   'verifyUser' : IDL.Func([IDL.Nat], [], []),
+  'verifyEmail' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Bool], []),
 });
 
 export const idlInitArgs = [];
@@ -249,6 +250,7 @@ export const idlFactory = ({ IDL }) => {
     'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
     'updateLoanStatus' : IDL.Func([IDL.Nat, IDL.Text], [], []),
     'verifyUser' : IDL.Func([IDL.Nat], [], []),
+    'verifyEmail' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Bool], []),
   });
 };
 

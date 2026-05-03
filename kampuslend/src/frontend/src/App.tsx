@@ -20,6 +20,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import OtpVerificationPage from "./pages/OtpVerificationPage";
 
 // Investor layout and pages
 import InvestorLayout from "./layouts/InvestorLayout";
@@ -128,6 +129,17 @@ const registerRoute = createRoute({
   component: RegisterPage,
 });
 
+const verifyOtpRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/verify-otp",
+  component: OtpVerificationPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    userId: String(search.userId ?? ""),
+    role: String(search.role ?? ""),
+    name: String(search.name ?? ""),
+  }),
+});
+
 // Investor routes
 const investorRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -205,6 +217,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   registerRoute,
+  verifyOtpRoute,
   investorRoute.addChildren([
     investorIndexRoute,
     investorDashboardRoute,

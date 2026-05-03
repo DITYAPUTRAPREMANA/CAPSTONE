@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Link, Outlet, useRouter } from "@tanstack/react-router";
 import { Briefcase, LayoutDashboard, LogOut, Search } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import logoSvg from "@/components/icon/logo.svg";
 
 const navItems = [
   {
@@ -30,15 +31,15 @@ export default function InvestorLayout() {
   const currentPath = router.state.location.pathname;
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "#e8eef3", fontFamily: "'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif" }}>
       {/* Sidebar */}
-      <aside className="w-64 bg-navy flex flex-col flex-shrink-0 h-full">
+      <aside className="w-64 flex flex-col flex-shrink-0 h-full" style={{ backgroundColor: "#1a3a5c" }}>
         {/* Logo */}
-        <div className="px-6 py-5 border-b border-sidebar-border">
+        <div className="px-6 py-5 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">🎓</span>
+            <img src={logoSvg} alt="Sodalis logo" style={{ width: 34, height: 34, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
             <span className="font-bold text-xl text-white tracking-tight">
-              SODALIS
+              Sodalis.
             </span>
           </div>
           <p className="text-white/50 text-xs mt-1">Investor Dashboard</p>
@@ -55,9 +56,10 @@ export default function InvestorLayout() {
                 to={to}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-brand-green text-white"
-                    : "text-white/70 hover:text-white hover:bg-sidebar-accent"
+                    ? "text-white"
+                    : "text-white/70 hover:text-white hover:bg-white/5"
                 }`}
+                style={{ backgroundColor: isActive ? "#1d6fbf" : "transparent" }}
                 data-ocid={"investor.nav_link"}
               >
                 <Icon size={18} />
@@ -68,9 +70,9 @@ export default function InvestorLayout() {
         </nav>
 
         {/* User info + Logout */}
-        <div className="px-4 py-4 border-t border-sidebar-border">
+        <div className="px-4 py-4 border-t border-white/10">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-full bg-brand-green flex items-center justify-center text-white text-sm font-bold">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: "#1d6fbf" }}>
               {user?.name?.slice(0, 1).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
@@ -82,7 +84,7 @@ export default function InvestorLayout() {
           </div>
           <Button
             variant="ghost"
-            className="w-full justify-start text-white/70 hover:text-white hover:bg-sidebar-accent rounded-xl px-3 text-sm"
+            className="w-full justify-start text-white/70 hover:text-white hover:bg-white/5 rounded-xl px-3 text-sm transition-colors"
             onClick={handleLogout}
             data-ocid="investor.logout_button"
           >
@@ -95,12 +97,12 @@ export default function InvestorLayout() {
       {/* Konten utama */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-border px-8 py-4 flex items-center justify-between flex-shrink-0">
+        <header className="bg-white px-8 py-4 flex items-center justify-between flex-shrink-0" style={{ borderBottom: "1px solid #d0dbe5" }}>
           <div>
-            <h1 className="font-bold text-foreground">
+            <h1 className="font-bold text-xl" style={{ color: "#1a3a5c" }}>
               Welcome, {user?.name} 👋
             </h1>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs" style={{ color: "#7a9ab5" }}>
               SODALIS Investor Portal
             </p>
           </div>

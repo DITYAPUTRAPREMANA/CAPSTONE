@@ -190,6 +190,7 @@ export interface backendInterface {
     setApproval(user: Principal, status: ApprovalStatus): Promise<void>;
     updateLoanStatus(loanId: bigint, status: string): Promise<void>;
     verifyUser(userId: bigint): Promise<void>;
+    verifyEmail(userId: bigint, otp: string): Promise<boolean>;
 }
 import type { ApprovalStatus as _ApprovalStatus, User as _User, UserApprovalInfo as _UserApprovalInfo, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -597,6 +598,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.verifyUser(arg0);
+            return result;
+        }
+    }
+    async verifyEmail(arg0: bigint, arg1: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.verifyEmail(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.verifyEmail(arg0, arg1);
             return result;
         }
     }
