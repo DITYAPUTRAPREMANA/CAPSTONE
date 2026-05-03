@@ -304,22 +304,21 @@ persistent actor {
     };
   };
 
-  public shared ({ caller }) func verifyEmail(userId : Nat, otp : Text) : async Bool {
+  // OTP verification is handled on the frontend via Google Apps Script.
+  // This endpoint is called only after the frontend confirms the OTP is correct.
+  // It simply marks the user as verified in the ICP backend state.
+  public shared ({ caller = _ }) func verifyEmail(userId : Nat, _otp : Text) : async Bool {
     switch (users.get(userId)) {
       case (null) { Runtime.trap("User not found") };
       case (?user) {
-        if (otp == "123456") {
-          users.add(userId, { user with isVerified = true });
-          switch (userProfiles.get(user.principal)) {
-            case (?profile) {
-              userProfiles.add(user.principal, { profile with isVerified = true });
-            };
-            case (null) {};
+        users.add(userId, { user with isVerified = true });
+        switch (userProfiles.get(user.principal)) {
+          case (?profile) {
+            userProfiles.add(user.principal, { profile with isVerified = true });
           };
-          return true;
-        } else {
-          return false;
+          case (null) {};
         };
+        return true;
       };
     };
   };

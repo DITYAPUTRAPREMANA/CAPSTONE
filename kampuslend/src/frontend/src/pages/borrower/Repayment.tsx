@@ -13,7 +13,7 @@ import StatusBadge from "../../components/StatusBadge";
 import VirtualAccountModal from "../../components/VirtualAccountModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { useActor } from "../../hooks/useActor";
-import { formatDate, formatRupiah } from "../../utils/format";
+import { formatDate, formatRupiah, toSafeBigInt } from "../../utils/format";
 
 export default function BorrowerRepayment() {
   const { user } = useAuth();
@@ -31,7 +31,7 @@ export default function BorrowerRepayment() {
   useEffect(() => {
     if (!actor || !user) return;
     actor
-      .getLoansByBorrower(BigInt(user.userId))
+      .getLoansByBorrower(toSafeBigInt(user.userId))
       .then(async (loans) => {
         const active = loans.find((l) => l.status === "Active");
         if (!active) {

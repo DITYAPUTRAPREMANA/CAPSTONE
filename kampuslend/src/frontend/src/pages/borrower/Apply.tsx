@@ -20,7 +20,7 @@ import type { ScoringResult } from "../../backend";
 import AIScoreCard from "../../components/AIScoreCard";
 import { useAuth } from "../../contexts/AuthContext";
 import { useActor } from "../../hooks/useActor";
-import { formatRupiah } from "../../utils/format";
+import { formatRupiah, toSafeBigInt } from "../../utils/format";
 
 const TENORS = [3, 6, 12];
 const TUJUAN_OPTIONS = [
@@ -80,7 +80,7 @@ export default function BorrowerApply() {
     setIsSubmitting(true);
     try {
       await actor.createLoan(
-        BigInt(user.userId),
+        toSafeBigInt(user.userId),
         user.name,
         jurusan,
         BigInt(nominalNum),

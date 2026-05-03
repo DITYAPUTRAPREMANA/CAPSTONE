@@ -38,3 +38,17 @@ export function formatShort(amount: number | bigint): string {
   if (num >= 1_000) return `Rp ${(num / 1_000).toFixed(0)}rb`;
   return formatRupiah(num);
 }
+
+/**
+ * Safely convert a userId string (potentially from localStorage/URL params)
+ * to BigInt. Strips any non-digit characters and quotes before conversion.
+ * Prevents "Cannot convert X to a BigInt" runtime errors.
+ */
+export function toSafeBigInt(value: string | number | bigint): bigint {
+  if (typeof value === "bigint") return value;
+  if (typeof value === "number") return BigInt(Math.floor(value));
+  // Strip quotes, whitespace, and any non-digit characters
+  const cleaned = String(value).replace(/[^\d]/g, "");
+  if (!cleaned) throw new Error(`Cannot convert "${value}" to a safe BigInt`);
+  return BigInt(cleaned);
+}

@@ -14,7 +14,7 @@ import StatusBadge from "../../components/StatusBadge";
 import VirtualAccountModal from "../../components/VirtualAccountModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { useActor } from "../../hooks/useActor";
-import { formatRupiah } from "../../utils/format";
+import { formatRupiah, toSafeBigInt } from "../../utils/format";
 
 export default function InvestorLoanDetail() {
   // Ambil parameter id dari URL
@@ -34,7 +34,7 @@ export default function InvestorLoanDetail() {
 
   useEffect(() => {
     if (!actor || !id) return;
-    const loanId = BigInt(id);
+    const loanId = toSafeBigInt(id);
     actor
       .getLoan(loanId)
       .then((loanData) => {
@@ -56,7 +56,7 @@ export default function InvestorLoanDetail() {
     if (!actor || !loan || !user) return;
     setIsApproving(true);
     try {
-      await actor.approveLoan(loan.id, BigInt(user.userId));
+      await actor.approveLoan(loan.id, toSafeBigInt(user.userId));
       const va = await actor.createVirtualAccount(loan.id);
       setVaNumber(va);
       setShowAkad(false);

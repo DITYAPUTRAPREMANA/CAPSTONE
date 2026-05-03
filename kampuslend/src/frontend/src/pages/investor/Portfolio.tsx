@@ -10,7 +10,7 @@ import type { Loan } from "../../backend";
 import StatusBadge from "../../components/StatusBadge";
 import { useAuth } from "../../contexts/AuthContext";
 import { useActor } from "../../hooks/useActor";
-import { formatRupiah } from "../../utils/format";
+import { formatRupiah, toSafeBigInt } from "../../utils/format";
 
 export default function InvestorPortfolio() {
   const { user } = useAuth();
@@ -22,7 +22,7 @@ export default function InvestorPortfolio() {
   useEffect(() => {
     if (!actor || !user) return;
     actor
-      .getLoansByInvestor(BigInt(user.userId))
+      .getLoansByInvestor(toSafeBigInt(user.userId))
       .then(async (data) => {
         setLoans(data);
         // Ambil sisa cicilan semua pinjaman aktif secara paralel
