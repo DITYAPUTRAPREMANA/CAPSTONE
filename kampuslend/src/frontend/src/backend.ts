@@ -55,7 +55,7 @@ export class ExternalBlob {
     _blob?: Uint8Array<ArrayBuffer> | null;
     directURL: string;
     onProgress?: (percentage: number) => void = undefined;
-    private constructor(directURL: string, blob: Uint8Array<ArrayBuffer> | null){
+    private constructor(directURL: string, blob: Uint8Array<ArrayBuffer> | null) {
         if (blob) {
             this._blob = blob;
         }
@@ -177,6 +177,7 @@ export interface backendInterface {
     getLoansByInvestor(investorId: bigint): Promise<Array<Loan>>;
     getPaymentsByLoan(loanId: bigint): Promise<Array<Payment>>;
     getUser(id: bigint): Promise<User>;
+    getUserById(id: bigint): Promise<User | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getUsersByRole(role: string): Promise<Array<User>>;
     isCallerAdmin(): Promise<boolean>;
@@ -194,7 +195,7 @@ export interface backendInterface {
 }
 import type { ApprovalStatus as _ApprovalStatus, User as _User, UserApprovalInfo as _UserApprovalInfo, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
-    constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
+    constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never) { }
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
         if (this.processError) {
             try {
@@ -405,18 +406,32 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getUser(arg0: bigint): Promise<User> {
+    async getUser(arg0: bigint): Promise<User | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getUser(arg0);
-                return result;
+                return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getUser(arg0);
-            return result;
+            return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getUserById(arg0: bigint): Promise<User | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getUserById(arg0);
+                return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getUserById(arg0);
+            return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
         }
     }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
@@ -662,7 +677,7 @@ function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uin
     return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
 }
 function from_candid_vec_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_UserApprovalInfo>): Array<UserApprovalInfo> {
-    return value.map((x)=>from_candid_UserApprovalInfo_n8(_uploadFile, _downloadFile, x));
+    return value.map((x) => from_candid_UserApprovalInfo_n8(_uploadFile, _downloadFile, x));
 }
 function to_candid_ApprovalStatus_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ApprovalStatus): _ApprovalStatus {
     return to_candid_variant_n13(_uploadFile, _downloadFile, value);

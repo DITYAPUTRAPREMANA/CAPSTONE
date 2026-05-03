@@ -10,113 +10,114 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export type ApprovalStatus = { 'pending' : null } |
-  { 'approved' : null } |
-  { 'rejected' : null };
+export type ApprovalStatus = { 'pending': null } |
+{ 'approved': null } |
+{ 'rejected': null };
 export interface Loan {
-  'id' : bigint,
-  'major' : string,
-  'status' : string,
-  'tenor' : bigint,
-  'borrowerId' : bigint,
-  'investorId' : bigint,
-  'interestRate' : number,
-  'monthlyInstallment' : number,
-  'aiScore' : bigint,
-  'amount' : bigint,
-  'purpose' : string,
-  'borrowerName' : string,
-  'startDate' : Time,
+  'id': bigint,
+  'major': string,
+  'status': string,
+  'tenor': bigint,
+  'borrowerId': bigint,
+  'investorId': bigint,
+  'interestRate': number,
+  'monthlyInstallment': number,
+  'aiScore': bigint,
+  'amount': bigint,
+  'purpose': string,
+  'borrowerName': string,
+  'startDate': Time,
 }
 export interface Payment {
-  'id' : bigint,
-  'status' : string,
-  'loanId' : bigint,
-  'virtualAccount' : string,
-  'remainingInstallment' : number,
-  'paymentDate' : Time,
-  'amount' : bigint,
+  'id': bigint,
+  'status': string,
+  'loanId': bigint,
+  'virtualAccount': string,
+  'remainingInstallment': number,
+  'paymentDate': Time,
+  'amount': bigint,
 }
 export interface ScoringInput {
-  'gpa' : number,
-  'tenor' : bigint,
-  'cleanHistory' : boolean,
-  'amount' : bigint,
-  'purpose' : string,
+  'gpa': number,
+  'tenor': bigint,
+  'cleanHistory': boolean,
+  'amount': bigint,
+  'purpose': string,
 }
 export interface ScoringResult {
-  'score' : bigint,
-  'recommendation' : string,
-  'reason' : string,
+  'score': bigint,
+  'recommendation': string,
+  'reason': string,
 }
 export type Time = bigint;
 export interface User {
-  'id' : bigint,
-  'gpa' : number,
-  'ktm' : string,
-  'principal' : Principal,
-  'bankAccount' : string,
-  'name' : string,
-  'role' : string,
-  'email' : string,
-  'isVerified' : boolean,
+  'id': bigint,
+  'gpa': number,
+  'ktm': string,
+  'principal': Principal,
+  'bankAccount': string,
+  'name': string,
+  'role': string,
+  'email': string,
+  'isVerified': boolean,
 }
 export interface UserApprovalInfo {
-  'status' : ApprovalStatus,
-  'principal' : Principal,
+  'status': ApprovalStatus,
+  'principal': Principal,
 }
 export interface UserProfile {
-  'gpa' : number,
-  'ktm' : string,
-  'bankAccount' : string,
-  'name' : string,
-  'role' : string,
-  'email' : string,
-  'isVerified' : boolean,
+  'gpa': number,
+  'ktm': string,
+  'bankAccount': string,
+  'name': string,
+  'role': string,
+  'email': string,
+  'isVerified': boolean,
 }
-export type UserRole = { 'admin' : null } |
-  { 'user' : null } |
-  { 'guest' : null };
+export type UserRole = { 'admin': null } |
+{ 'user': null } |
+{ 'guest': null };
 export interface _SERVICE {
-  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
-  'addSeedData' : ActorMethod<[], undefined>,
-  'approveLoan' : ActorMethod<[bigint, bigint], undefined>,
-  'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'createLoan' : ActorMethod<
+  '_initializeAccessControlWithSecret': ActorMethod<[string], undefined>,
+  'addSeedData': ActorMethod<[], undefined>,
+  'approveLoan': ActorMethod<[bigint, bigint], undefined>,
+  'assignCallerUserRole': ActorMethod<[Principal, UserRole], undefined>,
+  'createLoan': ActorMethod<
     [bigint, string, string, bigint, bigint, number, string],
     bigint
   >,
-  'createVirtualAccount' : ActorMethod<[bigint], string>,
-  'getAllLoans' : ActorMethod<[], Array<Loan>>,
-  'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
-  'getCallerUserRole' : ActorMethod<[], UserRole>,
-  'getCicilanSisa' : ActorMethod<[bigint], number>,
-  'getCurrentUser' : ActorMethod<[], [] | [User]>,
-  'getLoan' : ActorMethod<[bigint], Loan>,
-  'getLoansByBorrower' : ActorMethod<[bigint], Array<Loan>>,
-  'getLoansByInvestor' : ActorMethod<[bigint], Array<Loan>>,
-  'getPaymentsByLoan' : ActorMethod<[bigint], Array<Payment>>,
-  'getUser' : ActorMethod<[bigint], User>,
-  'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
-  'getUsersByRole' : ActorMethod<[string], Array<User>>,
-  'isCallerAdmin' : ActorMethod<[], boolean>,
-  'isCallerApproved' : ActorMethod<[], boolean>,
-  'listApprovals' : ActorMethod<[], Array<UserApprovalInfo>>,
-  'recordPayment' : ActorMethod<
+  'createVirtualAccount': ActorMethod<[bigint], string>,
+  'getAllLoans': ActorMethod<[], Array<Loan>>,
+  'getCallerUserProfile': ActorMethod<[], [] | [UserProfile]>,
+  'getCallerUserRole': ActorMethod<[], UserRole>,
+  'getCicilanSisa': ActorMethod<[bigint], number>,
+  'getCurrentUser': ActorMethod<[], [] | [User]>,
+  'getLoan': ActorMethod<[bigint], Loan>,
+  'getLoansByBorrower': ActorMethod<[bigint], Array<Loan>>,
+  'getLoansByInvestor': ActorMethod<[bigint], Array<Loan>>,
+  'getPaymentsByLoan': ActorMethod<[bigint], Array<Payment>>,
+  'getUser': ActorMethod<[bigint], [] | [User]>,
+  'getUserById': ActorMethod<[bigint], [] | [User]>,
+  'getUserProfile': ActorMethod<[Principal], [] | [UserProfile]>,
+  'getUsersByRole': ActorMethod<[string], Array<User>>,
+  'isCallerAdmin': ActorMethod<[], boolean>,
+  'isCallerApproved': ActorMethod<[], boolean>,
+  'listApprovals': ActorMethod<[], Array<UserApprovalInfo>>,
+  'recordPayment': ActorMethod<
     [bigint, bigint, number, string, string],
     bigint
   >,
-  'registerUser' : ActorMethod<
+  'registerUser': ActorMethod<
     [string, string, string, string, string, number],
     bigint
   >,
-  'requestApproval' : ActorMethod<[], undefined>,
-  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'scoreApplicant' : ActorMethod<[ScoringInput], ScoringResult>,
-  'setApproval' : ActorMethod<[Principal, ApprovalStatus], undefined>,
-  'updateLoanStatus' : ActorMethod<[bigint, string], undefined>,
-  'verifyUser' : ActorMethod<[bigint], undefined>,
-  'verifyEmail' : ActorMethod<[bigint, string], boolean>,
+  'requestApproval': ActorMethod<[], undefined>,
+  'saveCallerUserProfile': ActorMethod<[UserProfile], undefined>,
+  'scoreApplicant': ActorMethod<[ScoringInput], ScoringResult>,
+  'setApproval': ActorMethod<[Principal, ApprovalStatus], undefined>,
+  'updateLoanStatus': ActorMethod<[bigint, string], undefined>,
+  'verifyUser': ActorMethod<[bigint], undefined>,
+  'verifyEmail': ActorMethod<[bigint, string], boolean>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

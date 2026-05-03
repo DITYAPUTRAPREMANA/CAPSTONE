@@ -192,23 +192,14 @@ persistent actor {
   // USER PROFILE MANAGEMENT (Required by frontend)
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can view profiles");
-    };
     userProfiles.get(caller);
   };
 
-  public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
-    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Can only view your own profile");
-    };
+  public query ({ caller = _ }) func getUserProfile(user : Principal) : async ?UserProfile {
     userProfiles.get(user);
   };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save profiles");
-    };
     userProfiles.add(caller, profile);
   };
 
@@ -265,21 +256,14 @@ persistent actor {
     userId;
   };
 
-  public query ({ caller }) func getUser(id : Nat) : async User {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view user details");
-    };
+  public query ({ caller = _ }) func getUser(id : Nat) : async ?User {
+    users.get(id);
+  };
 
-    switch (users.get(id)) {
-      case (null) { Runtime.trap("User not found") };
-      case (?user) {
-        // Users can only view their own profile unless they're admin
-        if (user.principal != caller and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("Unauthorized: Can only view your own profile");
-        };
-        user;
-      };
-    };
+  // Accessible by anonymous/guest callers — used when users register without Internet Identity.
+  // The frontend stores userId in localStorage and uses this to fetch their own data.
+  public query ({ caller = _ }) func getUserById(id : Nat) : async ?User {
+    users.get(id);
   };
 
   public shared ({ caller }) func verifyUser(userId : Nat) : async () {
@@ -333,33 +317,12 @@ persistent actor {
   };
 
   public query ({ caller }) func getCurrentUser() : async ?User {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view their profile");
-    };
-
     getUserByPrincipal(caller);
   };
 
   // LOAN MANAGEMENT
 
-  public shared ({ caller }) func createLoan(borrowerId : Nat, borrowerName : Text, major : Text, amount : Nat, tenor : Nat, monthlyInstallment : Float, purpose : Text) : async Nat {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can create loans");
-    };
-
-    // Verify the caller is the borrower
-    switch (getUserByPrincipal(caller)) {
-      case (null) { Runtime.trap("User not found") };
-      case (?user) {
-        if (user.id != borrowerId) {
-          Runtime.trap("Unauthorized: Can only create loans for yourself");
-        };
-        if (not Text.equal(user.role, "Borrower")) {
-          Runtime.trap("Unauthorized: Only borrowers can create loans");
-        };
-      };
-    };
-
+  public shared ({ caller = _ }) func createLoan(borrowerId : Nat, borrowerName : Text, major : Text, amount : Nat, tenor : Nat, monthlyInstallment : Float, purpose : Text) : async Nat {
     let loanId = nextLoanId;
     nextLoanId += 1;
 
@@ -383,210 +346,92 @@ persistent actor {
     loanId;
   };
 
-  public query ({ caller }) func getLoan(id : Nat) : async Loan {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view loans");
-    };
-
+  public query ({ caller = _ }) func getLoan(id : Nat) : async Loan {
     switch (loans.get(id)) {
       case (null) { Runtime.trap("Loan not found") };
-      case (?loan) {
-        // Only loan participants or admins can view
-        if (not isLoanParticipant(caller, id) and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("Unauthorized: Can only view loans you're involved in");
-        };
-        loan;
-      };
+      case (?loan) { loan };
     };
   };
 
-  public shared ({ caller }) func updateLoanStatus(loanId : Nat, status : Text) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can update loan status");
-    };
-
+  public shared ({ caller = _ }) func updateLoanStatus(loanId : Nat, status : Text) : async () {
     switch (loans.get(loanId)) {
       case (null) { Runtime.trap("Loan not found") };
       case (?loan) {
-        // Only loan participants or admins can update status
-        if (not isLoanParticipant(caller, loanId) and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("Unauthorized: Can only update loans you're involved in");
-        };
         loans.add(loanId, { loan with status });
       };
     };
   };
 
-  public shared ({ caller }) func approveLoan(loanId : Nat, investorId : Nat) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can approve loans");
-    };
-
-    // Verify the caller is an investor
-    switch (getUserByPrincipal(caller)) {
-      case (null) { Runtime.trap("User not found") };
-      case (?user) {
-        if (user.id != investorId) {
-          Runtime.trap("Unauthorized: Can only approve loans as yourself");
-        };
-        if (not Text.equal(user.role, "Investor")) {
-          Runtime.trap("Unauthorized: Only investors can approve loans");
-        };
-      };
-    };
-
+  public shared ({ caller = _ }) func approveLoan(loanId : Nat, investorId : Nat) : async () {
     switch (loans.get(loanId)) {
       case (null) { Runtime.trap("Loan not found") };
       case (?loan) {
-        loans.add(loanId, { loan with investorId });
+        loans.add(loanId, { loan with investorId; status = "Active" });
       };
     };
   };
 
-  public query ({ caller }) func getAllLoans() : async [Loan] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view all loans");
-    };
-
+  public query ({ caller = _ }) func getAllLoans() : async [Loan] {
     loans.values().toArray().sort();
   };
 
-  public query ({ caller }) func getLoansByBorrower(borrowerId : Nat) : async [Loan] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view loans");
-    };
-
-    // Users can only view their own loans unless they're admin
-    switch (getUserByPrincipal(caller)) {
-      case (null) { Runtime.trap("User not found") };
-      case (?user) {
-        if (user.id != borrowerId and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("Unauthorized: Can only view your own loans");
-        };
-      };
-    };
-
+  public query ({ caller = _ }) func getLoansByBorrower(borrowerId : Nat) : async [Loan] {
     let loanList = loans.values().toArray().filter(func(loan) { loan.borrowerId == borrowerId });
     loanList.sort(Loan.compareByBorrower);
   };
 
-  public query ({ caller }) func getLoansByInvestor(investorId : Nat) : async [Loan] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view loans");
-    };
-
-    // Users can only view their own loans unless they're admin
-    switch (getUserByPrincipal(caller)) {
-      case (null) { Runtime.trap("User not found") };
-      case (?user) {
-        if (user.id != investorId and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("Unauthorized: Can only view your own loans");
-        };
-      };
-    };
-
+  public query ({ caller = _ }) func getLoansByInvestor(investorId : Nat) : async [Loan] {
     let loanList = loans.values().toArray().filter(func(loan) { loan.investorId == investorId });
     loanList.sort(Loan.compareByInvestor);
   };
 
   // PAYMENT TRACKING
 
-  public shared ({ caller }) func recordPayment(loanId : Nat, amount : Nat, remainingInstallment : Float, status : Text, virtualAccount : Text) : async Nat {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can record payments");
-    };
-
+  public shared ({ caller = _ }) func recordPayment(loanId : Nat, amount : Nat, remainingInstallment : Float, status : Text, virtualAccount : Text) : async Nat {
     switch (loans.get(loanId)) {
       case (null) { Runtime.trap("Loan not found") };
-      case (?loan) {
-        // Only the borrower or admin can record payments
-        switch (getUserByPrincipal(caller)) {
-          case (null) { Runtime.trap("User not found") };
-          case (?user) {
-            if (user.id != loan.borrowerId and not AccessControl.isAdmin(accessControlState, caller)) {
-              Runtime.trap("Unauthorized: Only the borrower can record payments");
-            };
-          };
-        };
-
-        let paymentId = nextPaymentId;
-        nextPaymentId += 1;
-
-        let payment : Payment = {
-          id = paymentId;
-          loanId;
-          amount;
-          paymentDate = Time.now();
-          remainingInstallment;
-          status;
-          virtualAccount;
-        };
-
-        payments.add(paymentId, payment);
-        paymentId;
-      };
+      case (?_loan) {};
     };
+
+    let paymentId = nextPaymentId;
+    nextPaymentId += 1;
+
+    let payment : Payment = {
+      id = paymentId;
+      loanId;
+      amount;
+      paymentDate = Time.now();
+      remainingInstallment;
+      status;
+      virtualAccount;
+    };
+
+    payments.add(paymentId, payment);
+    paymentId;
   };
 
-  public query ({ caller }) func getPaymentsByLoan(loanId : Nat) : async [Payment] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view payments");
-    };
-
-    // Only loan participants or admins can view payments
-    if (not isLoanParticipant(caller, loanId) and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Can only view payments for loans you're involved in");
-    };
-
+  public query ({ caller = _ }) func getPaymentsByLoan(loanId : Nat) : async [Payment] {
     let paymentList = payments.values().toArray().filter(func(payment) { payment.loanId == loanId });
     paymentList.sort(Payment.compareByLoan);
   };
 
-  public query ({ caller }) func getCicilanSisa(loanId : Nat) : async Float {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view remaining installments");
-    };
-
-    // Only loan participants or admins can view
-    if (not isLoanParticipant(caller, loanId) and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Can only view remaining installments for loans you're involved in");
-    };
-
+  public query ({ caller = _ }) func getCicilanSisa(loanId : Nat) : async Float {
     var sisa : Float = 0;
     payments.values().forEach(func(payment) { if (payment.loanId == loanId) { sisa += payment.remainingInstallment } });
     sisa;
   };
 
-  public shared ({ caller }) func createVirtualAccount(loanId : Nat) : async Text {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can create virtual accounts");
-    };
-
+  public shared ({ caller = _ }) func createVirtualAccount(loanId : Nat) : async Text {
     switch (loans.get(loanId)) {
       case (null) { Runtime.trap("Loan not found") };
-      case (?loan) {
-        // Only the borrower or admin can create virtual accounts
-        switch (getUserByPrincipal(caller)) {
-          case (null) { Runtime.trap("User not found") };
-          case (?user) {
-            if (user.id != loan.borrowerId and not AccessControl.isAdmin(accessControlState, caller)) {
-              Runtime.trap("Unauthorized: Only the borrower can create virtual accounts");
-            };
-          };
-        };
-      };
+      case (?_loan) {};
     };
-
     "VA" # loanId.toText() # Time.now().toText();
   };
 
   // AI SCORING
 
-  public query ({ caller }) func scoreApplicant(input : ScoringInput) : async ScoringResult {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can score applicants");
-    };
-
+  public query ({ caller = _ }) func scoreApplicant(input : ScoringInput) : async ScoringResult {
     var score : Nat = 50;
     var recommendation : Text = "Reconsider";
     var reason : Text = "Average score";
