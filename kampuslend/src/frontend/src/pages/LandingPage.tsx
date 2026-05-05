@@ -87,6 +87,27 @@ export default function LandingPage() {
           box-shadow: 0 4px 8px rgba(0,0,0,0.18);
         }
 
+        .sodalis-nav-link {
+          transition: color 0.2s ease, transform 0.2s ease;
+          display: inline-block;
+        }
+        .sodalis-nav-link:hover {
+          color: #1d6fbf !important;
+          transform: translateY(-1px);
+        }
+        .sodalis-nav-link::after {
+          content: '';
+          display: block;
+          width: 0;
+          height: 2px;
+          background: #1d6fbf;
+          transition: width 0.25s ease;
+          border-radius: 1px;
+        }
+        .sodalis-nav-link:hover::after {
+          width: 100%;
+        }
+
         .sodalis-step-card {
           transition: transform 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease;
           border-radius: 12px;
@@ -178,10 +199,10 @@ export default function LandingPage() {
           <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "#1a3a5c" }}>Sodalis.</span>
         </div>
         <div className="hidden md:flex items-center gap-6 text-sm">
-          <a href="#cara-kerja" style={{ color: "#1a3a5c", fontWeight: 500, textDecoration: "none", fontSize: "0.9rem" }}>
+          <a href="#cara-kerja" className="sodalis-nav-link" style={{ color: "#1a3a5c", fontWeight: 500, textDecoration: "none", fontSize: "0.9rem" }}>
             How it Works
           </a>
-          <a href="#fitur" style={{ color: "#1a3a5c", fontWeight: 500, textDecoration: "none", fontSize: "0.9rem" }}>
+          <a href="#fitur" className="sodalis-nav-link" style={{ color: "#1a3a5c", fontWeight: 500, textDecoration: "none", fontSize: "0.9rem" }}>
             Features
           </a>
         </div>
@@ -380,33 +401,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section style={{ padding: "64px 48px", background: "#1a3a5c", textAlign: "center" }}>
-        <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-          <h2 style={{ color: "white", fontSize: "1.9rem", fontWeight: 800, marginBottom: "14px" }}>
-            Ready to Join SODALIS?
-          </h2>
-          <p style={{ color: "rgba(255,255,255,0.75)", marginBottom: "32px", fontSize: "0.97rem" }}>
-            Register now and start your financial journey as a student.
-          </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Button
-              style={{ borderRadius: "999px", background: "#22c55e", color: "white", padding: "14px 32px", fontSize: "0.97rem", fontWeight: 600 }}
-              onClick={() => goTo("/register")}
-              data-ocid="cta.peminjam_button"
-            >
-              Register as a Borrower
-            </Button>
-            <Button
-              style={{ borderRadius: "999px", background: "#1d6fbf", color: "white", padding: "14px 32px", fontSize: "0.97rem", fontWeight: 600 }}
-              onClick={() => goTo("/register")}
-              data-ocid="cta.investor_button"
-            >
-              Register as an Investor
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* Footer */}
+      <footer style={{ padding: "24px 48px", background: "#1a3a5c", textAlign: "center" }}>
+        <p style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.88rem", margin: 0 }}>
+          Copyright 2026 © Sodalis.
+        </p>
+      </footer>
     </div>
   );
 }
