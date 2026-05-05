@@ -69,6 +69,7 @@
     --sidebar-ring: 0.44 0.12 142;
   }
 
+
   * {
     @apply border-border;
   }
@@ -77,4 +78,21 @@
     @apply bg-background text-foreground font-sans;
     font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
   }
+}
+
+/* ===== Page Transition Animations ===== */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.page-transition {
+  animation: page-enter 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
 }

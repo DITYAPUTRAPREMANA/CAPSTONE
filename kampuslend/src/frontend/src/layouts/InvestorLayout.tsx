@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
  * Layout utama untuk halaman Investor
  * Sidebar navy dengan navigasi dan header
  */
-import { Link, Outlet, useRouter } from "@tanstack/react-router";
+import { Link, Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { Briefcase, LayoutDashboard, LogOut, Search } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import PageTransition from "../components/PageTransition";
 import logoSvg from "@/components/icon/logo.svg";
 
 const navItems = [
@@ -27,8 +28,8 @@ export default function InvestorLayout() {
     router.navigate({ to: "/" });
   };
 
-  // Dapatkan path saat ini untuk highlight aktif
-  const currentPath = router.state.location.pathname;
+  // Dapatkan path saat ini secara reaktif untuk highlight aktif
+  const currentPath = useRouterState({ select: (s) => s.location.pathname });
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "#e8eef3", fontFamily: "'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif" }}>
@@ -54,11 +55,10 @@ export default function InvestorLayout() {
               <Link
                 key={to}
                 to={to}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                  isActive
-                    ? "text-white"
-                    : "text-white/70 hover:text-white hover:bg-white/5"
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${isActive
+                  ? "text-white"
+                  : "text-white/70 hover:text-white hover:bg-white/5"
+                  }`}
                 style={{ backgroundColor: isActive ? "#1d6fbf" : "transparent" }}
                 data-ocid={"investor.nav_link"}
               >
@@ -110,7 +110,9 @@ export default function InvestorLayout() {
 
         {/* Isi halaman */}
         <div className="flex-1 overflow-y-auto p-8">
-          <Outlet />
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
         </div>
       </main>
     </div>

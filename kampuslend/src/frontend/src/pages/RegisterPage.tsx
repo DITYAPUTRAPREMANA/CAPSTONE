@@ -39,24 +39,6 @@ export default function RegisterPage() {
     }
   }, [isActorError, actorError]);
 
-  // Generate a 6-digit OTP and send it via Google Apps Script (Gmail)
-  const sendOtpEmail = async (to: string, name: string, otp: string): Promise<void> => {
-    const gatewayUrl = import.meta.env.VITE_OTP_GATEWAY_URL;
-    if (!gatewayUrl || gatewayUrl.includes("YOUR_SCRIPT_ID")) {
-      // If Apps Script URL is not configured, skip email but still proceed
-      console.warn("OTP Gateway URL not configured. Skipping email send.");
-      return;
-    }
-    // Use no-cors + text/plain so it's a "simple" request (no CORS preflight needed)
-    // Apps Script doPost() reads e.postData.contents as raw text, JSON.parse still works
-    await fetch(gatewayUrl, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ to, name, otp }),
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!actor) return;
@@ -74,24 +56,9 @@ export default function RegisterPage() {
       const gpaNum = role === "Borrower" ? Number.parseFloat(gpa) || 0 : 0;
       const userId = await actor.registerUser(nama, email, role, ktm, rekening, gpaNum);
 
-      // Generate 6-digit OTP
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const otpExpiry = Date.now() + 10 * 60 * 1000; // expires in 10 minutes
+      toast.success("Account created! Please verify your email.");
 
-      // Store OTP session securely in sessionStorage
-      sessionStorage.setItem(
-        "sodalis_otp_session",
-        JSON.stringify({ otp, expiry: otpExpiry, userId: String(userId) }),
-      );
-
-      // Send OTP via Google Apps Script (non-blocking, fire-and-forget)
-      sendOtpEmail(email, nama, otp).catch((err) => {
-        console.warn("Failed to send OTP email:", err);
-      });
-
-      toast.success("Account created! Check your email for the verification code.");
-
-      // Redirect to OTP verification page
+      // Redirect to OTP verification page — OTP will be sent there via button
       const params = new URLSearchParams({
         userId: String(userId),
         role: role,

@@ -176,7 +176,7 @@ export interface backendInterface {
     getLoansByBorrower(borrowerId: bigint): Promise<Array<Loan>>;
     getLoansByInvestor(investorId: bigint): Promise<Array<Loan>>;
     getPaymentsByLoan(loanId: bigint): Promise<Array<Payment>>;
-    getUser(id: bigint): Promise<User>;
+    getUser(id: bigint): Promise<User | null>;
     getUserById(id: bigint): Promise<User | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getUsersByRole(role: string): Promise<Array<User>>;

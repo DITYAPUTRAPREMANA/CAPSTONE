@@ -14,6 +14,7 @@ import StatusBadge from "../../components/StatusBadge";
 import VirtualAccountModal from "../../components/VirtualAccountModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { useActor } from "../../hooks/useActor";
+import { getAIScore } from "../../utils/aiService";
 import { formatRupiah, toSafeBigInt } from "../../utils/format";
 
 export default function InvestorLoanDetail() {
@@ -37,18 +38,22 @@ export default function InvestorLoanDetail() {
     const loanId = toSafeBigInt(id);
     actor
       .getLoan(loanId)
-      .then((loanData) => {
+      .then(async (loanData) => {
         setLoan(loanData);
-        return actor.scoreApplicant({
-          gpa: 3.0,
-          tenor: loanData.tenor,
-          cleanHistory: true,
-          amount: loanData.amount,
-          purpose: loanData.purpose,
+        // Hitung skor AI via AI service (eksternal atau on-chain fallback)
+        const result = await getAIScore({
+          actor,
+          input: {
+            gpa: 3.0,
+            tenor: loanData.tenor,
+            cleanHistory: true,
+            amount: loanData.amount,
+            purpose: loanData.purpose,
+          },
         });
+        setScore(result);
       })
-      .then(setScore)
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setIsLoading(false));
   }, [actor, id]);
 

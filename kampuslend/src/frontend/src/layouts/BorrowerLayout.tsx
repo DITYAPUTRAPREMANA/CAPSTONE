@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
  * Layout utama untuk halaman Peminjam
  * Sidebar biru tua dengan navigasi dan header
  */
-import { Link, Outlet, useRouter } from "@tanstack/react-router";
+import { Link, Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { CreditCard, FileText, LayoutDashboard, LogOut } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import logoSvg from "@/components/icon/logo.svg";
@@ -31,7 +31,8 @@ export default function BorrowerLayout() {
     router.navigate({ to: "/" });
   };
 
-  const currentPath = router.state.location.pathname;
+  // Dapatkan path saat ini secara reaktif untuk highlight aktif
+  const currentPath = useRouterState({ select: (s) => s.location.pathname });
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "#e8eef3", fontFamily: "'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif" }}>
