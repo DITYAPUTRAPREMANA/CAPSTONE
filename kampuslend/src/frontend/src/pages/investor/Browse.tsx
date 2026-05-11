@@ -45,31 +45,33 @@ export default function InvestorBrowse() {
       </div>
 
       {/* Filter tabs */}
-      <Tabs value={filter} onValueChange={setFilter}>
-        <TabsList className="rounded-full bg-muted p-1">
-          <TabsTrigger
-            value="Pending"
-            className="rounded-full text-sm"
-            data-ocid="browse.filter.menunggu_tab"
-          >
-            Pending Funding
-          </TabsTrigger>
-          <TabsTrigger
-            value="Active"
-            className="rounded-full text-sm"
-            data-ocid="browse.filter.aktif_tab"
-          >
-            Active
-          </TabsTrigger>
-          <TabsTrigger
-            value="All"
-            className="rounded-full text-sm"
-            data-ocid="browse.filter.semua_tab"
-          >
-            All
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <div className="overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
+        <Tabs value={filter} onValueChange={setFilter} className="w-full">
+          <TabsList className="rounded-full bg-muted p-1 w-max sm:w-auto">
+            <TabsTrigger
+              value="Pending"
+              className="rounded-full text-sm px-4"
+              data-ocid="browse.filter.menunggu_tab"
+            >
+              Pending Funding
+            </TabsTrigger>
+            <TabsTrigger
+              value="Active"
+              className="rounded-full text-sm px-4"
+              data-ocid="browse.filter.aktif_tab"
+            >
+              Active
+            </TabsTrigger>
+            <TabsTrigger
+              value="All"
+              className="rounded-full text-sm px-4"
+              data-ocid="browse.filter.semua_tab"
+            >
+              All
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
       {/* Grid kartu peminjam */}
       {isLoading ? (

@@ -128,9 +128,9 @@ export default function InvestorDashboard() {
             Quick Actions
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex gap-4">
+        <CardContent className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Button
-            className="rounded-full text-white transition-all hover:brightness-110"
+            className="w-full sm:w-auto rounded-xl text-white transition-all hover:brightness-110 h-11 sm:h-10"
             style={{ backgroundColor: "#1d6fbf" }}
             onClick={() => router.navigate({ to: "/investor/browse" })}
             data-ocid="investor.browse_button"
@@ -139,7 +139,7 @@ export default function InvestorDashboard() {
           </Button>
           <Button
             variant="outline"
-            className="rounded-full transition-all"
+            className="w-full sm:w-auto rounded-xl transition-all h-11 sm:h-10"
             style={{ color: "#1d6fbf", borderColor: "#1d6fbf", backgroundColor: "transparent" }}
             onClick={() => router.navigate({ to: "/investor/portfolio" })}
             data-ocid="investor.portfolio_button"
@@ -252,33 +252,35 @@ export default function InvestorDashboard() {
           ) : (
             <div className="space-y-3">
               {activeLoans.slice(0, 5).map((loan, i) => (
-                <div
-                  key={String(loan.id)}
-                  className="flex items-center justify-between p-4 rounded-xl cursor-pointer hover:brightness-95 transition-all"
-                  style={{ backgroundColor: "#f3f8ff" }}
-                  data-ocid={`investor.dashboard.item.${i + 1}`}
-                  onClick={() =>
-                    router.navigate({ to: `/investor/loan/${Number(loan.id)}` })
-                  }
-                >
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm" style={{ color: "#1a3a5c" }}>
-                      {loan.borrowerName}
-                    </p>
-                    <p className="text-xs" style={{ color: "#7a9ab5" }}>
-                      {loan.major} • {Number(loan.tenor)} months
-                    </p>
+                  <div
+                    key={String(loan.id)}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl cursor-pointer hover:brightness-95 transition-all gap-3 sm:gap-0"
+                    style={{ backgroundColor: "#f3f8ff" }}
+                    data-ocid={`investor.dashboard.item.${i + 1}`}
+                    onClick={() =>
+                      router.navigate({ to: `/investor/loan/${Number(loan.id)}` })
+                    }
+                  >
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm" style={{ color: "#1a3a5c" }}>
+                        {loan.borrowerName}
+                      </p>
+                      <p className="text-xs" style={{ color: "#7a9ab5" }}>
+                        {loan.major} • {Number(loan.tenor)} months
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between sm:justify-end sm:gap-6">
+                      <div className="text-left sm:text-right">
+                        <p className="font-bold text-sm" style={{ color: "#1d6fbf" }}>
+                          {formatRupiah(loan.amount)}
+                        </p>
+                        <p className="text-[10px] sm:text-xs" style={{ color: "#7a9ab5" }}>
+                          {formatRupiah(loan.monthlyInstallment)}/mo
+                        </p>
+                      </div>
+                      <StatusBadge status={loan.status} />
+                    </div>
                   </div>
-                  <div className="text-right mr-4">
-                    <p className="font-bold text-sm" style={{ color: "#1d6fbf" }}>
-                      {formatRupiah(loan.amount)}
-                    </p>
-                    <p className="text-xs" style={{ color: "#7a9ab5" }}>
-                      Installment: {formatRupiah(loan.monthlyInstallment)}
-                    </p>
-                  </div>
-                  <StatusBadge status={loan.status} />
-                </div>
               ))}
               {activeLoans.length > 5 && (
                 <button

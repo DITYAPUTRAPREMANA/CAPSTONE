@@ -39,7 +39,7 @@ export default function InvestorPortfolio() {
         }
         setCicilanSisa(sisaMap);
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setIsLoading(false));
   }, [actor, user]);
 
@@ -96,26 +96,26 @@ export default function InvestorPortfolio() {
                       <StatusBadge status={loan.status} />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4 text-sm mb-3">
-                      <div>
-                        <p className="text-xs text-muted-foreground">Amount</p>
-                        <p className="font-semibold">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-sm mb-3">
+                      <div className="bg-muted/30 p-2 rounded-lg sm:bg-transparent sm:p-0">
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Amount</p>
+                        <p className="font-bold text-[#1d6fbf]">
                           {formatRupiah(loan.amount)}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">
+                      <div className="bg-muted/30 p-2 rounded-lg sm:bg-transparent sm:p-0">
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                           Installment/mo
                         </p>
-                        <p className="font-semibold">
+                        <p className="font-bold">
                           {formatRupiah(loan.monthlyInstallment)}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">
-                          Remaining Installment
+                      <div className="bg-muted/30 p-2 rounded-lg sm:bg-transparent sm:p-0">
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                          Remaining
                         </p>
-                        <p className="font-semibold text-amber-600">
+                        <p className="font-bold text-amber-600">
                           {sisa} months
                         </p>
                       </div>
