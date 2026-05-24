@@ -115,6 +115,8 @@ export interface Loan {
     interestRate: number;
     monthlyInstallment: number;
     aiScore: bigint;
+    aiRecommendation: string;
+    aiReason: string;
     amount: bigint;
     purpose: string;
     borrowerName: string;
@@ -165,7 +167,7 @@ export interface backendInterface {
     addSeedData(): Promise<void>;
     approveLoan(loanId: bigint, investorId: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createLoan(borrowerId: bigint, borrowerName: string, major: string, amount: bigint, tenor: bigint, monthlyInstallment: number, purpose: string): Promise<bigint>;
+    createLoan(borrowerId: bigint, borrowerName: string, major: string, amount: bigint, tenor: bigint, monthlyInstallment: number, purpose: string, aiScore: bigint, aiRecommendation: string, aiReason: string): Promise<bigint>;
     createVirtualAccount(loanId: bigint): Promise<string>;
     getAllLoans(): Promise<Array<Loan>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
@@ -252,17 +254,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async createLoan(arg0: bigint, arg1: string, arg2: string, arg3: bigint, arg4: bigint, arg5: number, arg6: string): Promise<bigint> {
+    async createLoan(arg0: bigint, arg1: string, arg2: string, arg3: bigint, arg4: bigint, arg5: number, arg6: string, arg7: bigint, arg8: string, arg9: string): Promise<bigint> {
         if (this.processError) {
             try {
-                const result = await this.actor.createLoan(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+                const result = await this.actor.createLoan(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.createLoan(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+            const result = await this.actor.createLoan(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
             return result;
         }
     }

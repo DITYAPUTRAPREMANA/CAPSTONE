@@ -43,6 +43,7 @@ export default defineConfig({
     environment(["II_URL"]),
     environment(["STORAGE_GATEWAY_URL"]),
     environment(["VITE_OTP_GATEWAY_URL"]),
+    environment(["VITE_AI_SCORING_URL"]),
     react(),
   ],
   resolve: {

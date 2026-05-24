@@ -11,8 +11,8 @@ import BorrowerCard from "../../components/BorrowerCard";
 import StatusBadge from "../../components/StatusBadge";
 import { useAuth } from "../../contexts/AuthContext";
 import { useActor } from "../../hooks/useActor";
-import { getAIScoresBatch } from "../../utils/aiService";
 import { formatRupiah, toSafeBigInt } from "../../utils/format";
+
 
 export default function InvestorDashboard() {
   const { user } = useAuth();
@@ -38,16 +38,25 @@ export default function InvestorDashboard() {
       .finally(() => setIsLoadingMy(false));
   }, [actor, user]);
 
-  // Fetch semua pinjaman, filter Pending, hitung AI score
+  // Fetch semua pinjaman, filter Pending, baca AI score dari on-chain data
   useEffect(() => {
     if (!actor) return;
     actor
       .getAllLoans()
-      .then(async (allLoans) => {
+      .then((allLoans) => {
         const pending = allLoans.filter((l) => l.status === "Pending");
         setPendingLoans(pending);
-        // Hitung skor AI via AI service (eksternal atau on-chain fallback)
-        const scoreMap = await getAIScoresBatch(actor, pending);
+        // Bangun scoreMap langsung dari data on-chain tanpa memanggil API eksternal
+        const scoreMap: Record<string, ScoringResult> = {};
+        for (const loan of pending) {
+          if (loan.aiRecommendation) {
+            scoreMap[String(loan.id)] = {
+              score: loan.aiScore,
+              recommendation: loan.aiRecommendation,
+              reason: loan.aiReason,
+            };
+          }
+        }
         setPendingScores(scoreMap);
       })
       .catch(() => setPendingLoans([]))

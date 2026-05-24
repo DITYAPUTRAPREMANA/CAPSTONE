@@ -2,84 +2,115 @@
  * AI Scoring Service — KampusLend
  *
  * File ini adalah titik integrasi tunggal untuk model AI penilaian risiko peminjam.
- * Saat model AI eksternal selesai, cukup implementasikan `callExternalAI()` di bawah
- * dan ubah env var VITE_AI_SCORING_URL di file .env / env.json.
  *
  * Flow:
- *   1. Jika VITE_AI_SCORING_URL diset → panggil REST API eksternal (model AI baru)
+ *   1. Jika VITE_AI_SCORING_URL diset → panggil REST API eksternal (POST /predict)
  *   2. Jika tidak diset → fallback ke on-chain scoreApplicant() di Motoko canister
+ *
+ * Spec response API aktual (POST /predict):
+ * {
+ *   "Status Kelayakan": "Layak" | "Tidak Layak",
+ *   "Credit Score": number,   // Skala FICO: 300–850
+ *   "Keterangan": string      // Penjelasan analisis kelayakan
+ * }
+ *
+ * Pemetaan ke ScoringResult internal:
+ *   score          = ((Credit Score - 300) / 550) * 100  → dinormalisasi ke 0–100
+ *   recommendation = "Approved" | "Considered" | "Reconsider"
+ *   reason         = "Keterangan"
  */
 
 import type { backendInterface, ScoringInput, ScoringResult } from "../backend";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Konfigurasi — ubah hanya bagian ini saat AI API sudah siap
+// Konfigurasi
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * URL endpoint AI model eksternal.
  * Set via environment variable: VITE_AI_SCORING_URL
- *
- * Contoh: https://ai.kampuslend.id/api/v1/score
- *
- * Spec request yang diharapkan (POST JSON):
- * {
- *   "gpa": number,           // IPK peminjam (0.0–4.0)
- *   "tenor": number,         // Tenor pinjaman dalam bulan
- *   "cleanHistory": boolean, // Riwayat pembayaran bersih
- *   "amount": number,        // Jumlah pinjaman dalam IDR
- *   "purpose": string        // Tujuan pinjaman
- * }
- *
- * Spec response yang diharapkan (JSON):
- * {
- *   "score": number,           // Skor risiko 0–100
- *   "recommendation": string,  // "Approved" | "Considered" | "Rejected"
- *   "reason": string           // Penjelasan singkat keputusan AI
- * }
+ * Contoh: https://headstone-silo-overlying.ngrok-free.dev/predict
  */
 const AI_SCORING_URL = import.meta.env.VITE_AI_SCORING_URL as string | undefined;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tipe data model AI eksternal
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Data lengkap yang dikirim ke endpoint POST /predict */
+export interface ExternalModelInput {
+  Home_Ownership: string;             // Kepemilikan rumah (RENT / OWN / OTHER)
+  Loan_Purpose: string;               // Tujuan pinjaman
+  Payment_History: number;            // Riwayat pembayaran (0 = tidak ada / buruk, 1 = baik)
+  Previous_Loan: string;              // Riwayat pinjaman sebelumnya (YES / NO)
+  Parental_Income_IDR_Monthly: number; // Pendapatan bulanan orang tua (IDR)
+  Loan_Amount_IDR: number;            // Jumlah nominal pinjaman (IDR)
+  Working_Student: string;            // Mahasiswa bekerja (YES / NO)
+  Course_Credits: number;             // Jumlah SKS
+  Liability: number;                  // Jumlah tanggungan keluarga
+  Attendance: number;                 // Persentase kehadiran kuliah (0–100)
+  Grade_Average: number;              // Rata-rata nilai / IPK (0.0–4.0)
+  Parent_Job: string;                 // Pekerjaan orang tua
+  Residence_Type: string;             // Tipe tempat tinggal (URBAN / RURAL)
+}
+
+/** Struktur respons JSON dari API model */
+interface ExternalModelResponse {
+  "Status Kelayakan": string;
+  "Credit Score": number;
+  "Keterangan": string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Helper: normalisasi skor FICO (300–850) ke skala 0–100
+// ─────────────────────────────────────────────────────────────────────────────
+
+function normalizeCreditScore(ficoScore: number): number {
+  const min = 300;
+  const max = 850;
+  const clamped = Math.max(min, Math.min(max, ficoScore));
+  return Math.round(((clamped - min) / (max - min)) * 100);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Helper: petakan status kelayakan & skor ke rekomendasi terstandardisasi
+// ─────────────────────────────────────────────────────────────────────────────
+
+function mapRecommendation(statusKelayakan: string, normalizedScore: number): string {
+  if (statusKelayakan === "Layak") {
+    return normalizedScore >= 70 ? "Approved" : "Considered";
+  }
+  return "Reconsider";
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Internal: panggil REST API AI model eksternal
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * @TODO Implementasikan saat AI API sudah siap.
- * Sesuaikan body request dan mapping response dengan spec API yang disepakati tim ML.
- */
-async function callExternalAI(input: ScoringInput): Promise<ScoringResult> {
+async function callExternalAI(extInput: ExternalModelInput): Promise<ScoringResult> {
   const response = await fetch(AI_SCORING_URL!, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // @TODO: Tambahkan API key jika diperlukan:
-      // "Authorization": `Bearer ${import.meta.env.VITE_AI_API_KEY}`,
+      // Header wajib untuk bypass ngrok browser warning
+      "ngrok-skip-browser-warning": "true",
     },
-    body: JSON.stringify({
-      gpa: input.gpa,
-      tenor: Number(input.tenor),
-      cleanHistory: input.cleanHistory,
-      amount: Number(input.amount),
-      purpose: input.purpose,
-    }),
+    body: JSON.stringify(extInput),
   });
 
   if (!response.ok) {
     throw new Error(`AI API returned ${response.status}: ${response.statusText}`);
   }
 
-  // @TODO: Sesuaikan mapping field ini dengan response aktual dari tim ML
-  const data = (await response.json()) as {
-    score: number;
-    recommendation: string;
-    reason: string;
-  };
+  const data = (await response.json()) as ExternalModelResponse;
+
+  const normalizedScore = normalizeCreditScore(data["Credit Score"]);
+  const recommendation = mapRecommendation(data["Status Kelayakan"], normalizedScore);
 
   return {
-    score: BigInt(Math.round(data.score)),
-    recommendation: data.recommendation,
-    reason: data.reason,
+    score: BigInt(normalizedScore),
+    recommendation,
+    reason: data["Keterangan"],
   };
 }
 
@@ -90,25 +121,27 @@ async function callExternalAI(input: ScoringInput): Promise<ScoringResult> {
 export interface AIScoringParams {
   /** Backend actor (on-chain fallback) */
   actor: backendInterface;
-  /** Data input untuk scoring */
+  /** Data input untuk on-chain fallback */
   input: ScoringInput;
+  /** Data input lengkap untuk model AI eksternal */
+  externalInput?: ExternalModelInput;
 }
 
 /**
  * Hitung skor AI untuk seorang peminjam.
  *
- * - Jika VITE_AI_SCORING_URL dikonfigurasi → panggil AI model eksternal
+ * - Jika VITE_AI_SCORING_URL dikonfigurasi DAN externalInput tersedia → panggil AI model eksternal
  * - Jika tidak → fallback ke on-chain scoreApplicant() di canister Motoko
  *
- * @returns ScoringResult dengan score (0-100), recommendation, dan reason
+ * @returns ScoringResult dengan score (0–100), recommendation, dan reason
  */
 export async function getAIScore({
   actor,
   input,
+  externalInput,
 }: AIScoringParams): Promise<ScoringResult> {
-  if (AI_SCORING_URL) {
-    // Gunakan AI model eksternal
-    return callExternalAI(input);
+  if (AI_SCORING_URL && externalInput) {
+    return callExternalAI(externalInput);
   }
 
   // Fallback: on-chain Motoko scoreApplicant
@@ -117,10 +150,11 @@ export async function getAIScore({
 
 /**
  * Hitung skor AI untuk banyak pinjaman sekaligus (paralel).
+ * Digunakan saat investor membuka Dashboard / Browse (legacy fallback).
  * Returns map dari loan ID (string) ke ScoringResult.
  *
- * Error per-pinjaman diabaikan (tidak melempar) agar satu kegagalan
- * tidak membatalkan seluruh batch.
+ * Catatan: Setelah integrasi AI on-chain, fungsi ini hanya sebagai fallback
+ * apabila aiRecommendation di loan kosong/belum tersedia.
  */
 export async function getAIScoresBatch(
   actor: backendInterface,

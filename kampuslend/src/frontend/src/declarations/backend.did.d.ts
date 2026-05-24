@@ -23,6 +23,8 @@ export interface Loan {
   'interestRate': number,
   'monthlyInstallment': number,
   'aiScore': bigint,
+  'aiRecommendation': string,
+  'aiReason': string,
   'amount': bigint,
   'purpose': string,
   'borrowerName': string,
@@ -83,7 +85,7 @@ export interface _SERVICE {
   'approveLoan': ActorMethod<[bigint, bigint], undefined>,
   'assignCallerUserRole': ActorMethod<[Principal, UserRole], undefined>,
   'createLoan': ActorMethod<
-    [bigint, string, string, bigint, bigint, number, string],
+    [bigint, string, string, bigint, bigint, number, string, bigint, string, string],
     bigint
   >,
   'createVirtualAccount': ActorMethod<[bigint], string>,

@@ -97,6 +97,8 @@ persistent actor {
     status : Text;
     startDate : Time.Time;
     aiScore : Nat;
+    aiRecommendation : Text;
+    aiReason : Text;
     investorId : Nat;
   };
 
@@ -322,7 +324,7 @@ persistent actor {
 
   // LOAN MANAGEMENT
 
-  public shared ({ caller = _ }) func createLoan(borrowerId : Nat, borrowerName : Text, major : Text, amount : Nat, tenor : Nat, monthlyInstallment : Float, purpose : Text) : async Nat {
+  public shared ({ caller = _ }) func createLoan(borrowerId : Nat, borrowerName : Text, major : Text, amount : Nat, tenor : Nat, monthlyInstallment : Float, purpose : Text, aiScore : Nat, aiRecommendation : Text, aiReason : Text) : async Nat {
     let loanId = nextLoanId;
     nextLoanId += 1;
 
@@ -338,7 +340,9 @@ persistent actor {
       purpose;
       status = "Pending";
       startDate = Time.now();
-      aiScore = 0;
+      aiScore;
+      aiRecommendation;
+      aiReason;
       investorId = 0;
     };
 
@@ -530,6 +534,8 @@ persistent actor {
         status = "Pending";
         startDate = Time.now();
         aiScore = 80;
+        aiRecommendation = "Approved";
+        aiReason = "Good academic standing and clean payment history.";
         investorId = 1;
       },
     );
@@ -548,7 +554,9 @@ persistent actor {
         purpose = "Business";
         status = "Active";
         startDate = Time.now();
-        aiScore = 80;
+        aiScore = 65;
+        aiRecommendation = "Considered";
+        aiReason = "Moderate risk profile. Sufficient academic score.";
         investorId = 1;
       },
     );
@@ -568,6 +576,8 @@ persistent actor {
         status = "Paid";
         startDate = Time.now();
         aiScore = 80;
+        aiRecommendation = "Approved";
+        aiReason = "Excellent academic record and stable financial background.";
         investorId = 1;
       },
     );

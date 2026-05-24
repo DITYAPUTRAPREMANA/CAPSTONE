@@ -46,7 +46,7 @@ export default function BorrowerRepayment() {
         setPayments(pmts);
         setCicilanSisa(sisa);
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setIsLoading(false));
   }, [actor, user]);
 
