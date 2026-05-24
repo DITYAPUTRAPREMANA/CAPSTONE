@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 import { useRouter } from "@tanstack/react-router";
 /**
  * Dashboard utama Investor - ringkasan portofolio + daftar peminjam baru dengan analisis AI
@@ -21,6 +22,7 @@ export default function InvestorDashboard() {
 
   // Pinjaman yang sudah diinvestasikan oleh investor ini
   const [myLoans, setMyLoans] = useState<Loan[]>([]);
+  const [repaymentProgress, setRepaymentProgress] = useState<Record<string, number>>({});
   const [isLoadingMy, setIsLoadingMy] = useState(true);
 
   // Pinjaman peminjam baru yang belum ada investor (status Pending)
@@ -28,12 +30,28 @@ export default function InvestorDashboard() {
   const [pendingScores, setPendingScores] = useState<Record<string, ScoringResult>>({});
   const [isLoadingPending, setIsLoadingPending] = useState(true);
 
-  // Fetch pinjaman investor sendiri
+  // Fetch pinjaman investor sendiri + sisa cicilan masing-masing
   useEffect(() => {
     if (!actor || !user) return;
+    setIsLoadingMy(true);
     actor
       .getLoansByInvestor(toSafeBigInt(user.userId))
-      .then(setMyLoans)
+      .then(async (loansData) => {
+        setMyLoans(loansData);
+        // Ambil sisa cicilan untuk masing-masing loan
+        const progressMap: Record<string, number> = {};
+        await Promise.all(
+          loansData.map(async (l) => {
+            try {
+              const sisa = await actor.getCicilanSisa(l.id);
+              progressMap[String(l.id)] = Number(sisa);
+            } catch {
+              progressMap[String(l.id)] = Number(l.tenor);
+            }
+          })
+        );
+        setRepaymentProgress(progressMap);
+      })
       .catch(() => setMyLoans([]))
       .finally(() => setIsLoadingMy(false));
   }, [actor, user]);
@@ -276,6 +294,25 @@ export default function InvestorDashboard() {
                       {loan.major} • {Number(loan.tenor)} months
                     </p>
                   </div>
+
+                  {/* Progres Pembayaran */}
+                  <div className="w-full sm:w-64 flex flex-col gap-1 sm:px-6">
+                    <div className="flex justify-between text-[11px] font-semibold" style={{ color: "#1a3a5c" }}>
+                      <span>Payment Progress</span>
+                      <span style={{ color: "#1d6fbf" }}>
+                        {Number(loan.tenor) - (repaymentProgress[String(loan.id)] ?? Number(loan.tenor))} / {Number(loan.tenor)} months
+                      </span>
+                    </div>
+                    <Progress
+                      value={
+                        ((Number(loan.tenor) - (repaymentProgress[String(loan.id)] ?? Number(loan.tenor))) /
+                          Number(loan.tenor)) *
+                        100
+                      }
+                      className="h-1.5"
+                    />
+                  </div>
+
                   <div className="flex items-center justify-between sm:justify-end sm:gap-6">
                     <div className="text-left sm:text-right">
                       <p className="font-bold text-sm" style={{ color: "#1d6fbf" }}>
