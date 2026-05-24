@@ -533,7 +533,7 @@ persistent actor {
         purpose = "Education";
         status = "Pending";
         startDate = Time.now();
-        aiScore = 80;
+        aiScore = 745;
         aiRecommendation = "Approved";
         aiReason = "Good academic standing and clean payment history.";
         investorId = 1;
@@ -554,7 +554,7 @@ persistent actor {
         purpose = "Business";
         status = "Active";
         startDate = Time.now();
-        aiScore = 65;
+        aiScore = 580;
         aiRecommendation = "Considered";
         aiReason = "Moderate risk profile. Sufficient academic score.";
         investorId = 1;
@@ -575,7 +575,7 @@ persistent actor {
         purpose = "Education";
         status = "Paid";
         startDate = Time.now();
-        aiScore = 80;
+        aiScore = 745;
         aiRecommendation = "Approved";
         aiReason = "Excellent academic record and stable financial background.";
         investorId = 1;

@@ -46,16 +46,14 @@ export default function InvestorDashboard() {
       .then((allLoans) => {
         const pending = allLoans.filter((l) => l.status === "Pending");
         setPendingLoans(pending);
-        // Bangun scoreMap langsung dari data on-chain tanpa memanggil API eksternal
+        // Baca AI score langsung dari on-chain untuk semua loan
         const scoreMap: Record<string, ScoringResult> = {};
         for (const loan of pending) {
-          if (loan.aiRecommendation) {
-            scoreMap[String(loan.id)] = {
-              score: loan.aiScore,
-              recommendation: loan.aiRecommendation,
-              reason: loan.aiReason,
-            };
-          }
+          scoreMap[String(loan.id)] = {
+            score: loan.aiScore,
+            recommendation: loan.aiRecommendation || "Pending",
+            reason: loan.aiReason || "-",
+          };
         }
         setPendingScores(scoreMap);
       })
@@ -261,35 +259,35 @@ export default function InvestorDashboard() {
           ) : (
             <div className="space-y-3">
               {activeLoans.slice(0, 5).map((loan, i) => (
-                  <div
-                    key={String(loan.id)}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl cursor-pointer hover:brightness-95 transition-all gap-3 sm:gap-0"
-                    style={{ backgroundColor: "#f3f8ff" }}
-                    data-ocid={`investor.dashboard.item.${i + 1}`}
-                    onClick={() =>
-                      router.navigate({ to: `/investor/loan/${Number(loan.id)}` })
-                    }
-                  >
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm" style={{ color: "#1a3a5c" }}>
-                        {loan.borrowerName}
-                      </p>
-                      <p className="text-xs" style={{ color: "#7a9ab5" }}>
-                        {loan.major} • {Number(loan.tenor)} months
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between sm:justify-end sm:gap-6">
-                      <div className="text-left sm:text-right">
-                        <p className="font-bold text-sm" style={{ color: "#1d6fbf" }}>
-                          {formatRupiah(loan.amount)}
-                        </p>
-                        <p className="text-[10px] sm:text-xs" style={{ color: "#7a9ab5" }}>
-                          {formatRupiah(loan.monthlyInstallment)}/mo
-                        </p>
-                      </div>
-                      <StatusBadge status={loan.status} />
-                    </div>
+                <div
+                  key={String(loan.id)}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl cursor-pointer hover:brightness-95 transition-all gap-3 sm:gap-0"
+                  style={{ backgroundColor: "#f3f8ff" }}
+                  data-ocid={`investor.dashboard.item.${i + 1}`}
+                  onClick={() =>
+                    router.navigate({ to: `/investor/loan/${Number(loan.id)}` })
+                  }
+                >
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm" style={{ color: "#1a3a5c" }}>
+                      {loan.borrowerName}
+                    </p>
+                    <p className="text-xs" style={{ color: "#7a9ab5" }}>
+                      {loan.major} • {Number(loan.tenor)} months
+                    </p>
                   </div>
+                  <div className="flex items-center justify-between sm:justify-end sm:gap-6">
+                    <div className="text-left sm:text-right">
+                      <p className="font-bold text-sm" style={{ color: "#1d6fbf" }}>
+                        {formatRupiah(loan.amount)}
+                      </p>
+                      <p className="text-[10px] sm:text-xs" style={{ color: "#7a9ab5" }}>
+                        {formatRupiah(loan.monthlyInstallment)}/mo
+                      </p>
+                    </div>
+                    <StatusBadge status={loan.status} />
+                  </div>
+                </div>
               ))}
               {activeLoans.length > 5 && (
                 <button

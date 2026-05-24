@@ -62,23 +62,20 @@ interface ExternalModelResponse {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Helper: normalisasi skor FICO (300–850) ke skala 0–100
+// Helper: gunakan Credit Score FICO langsung dari model (300–850)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function normalizeCreditScore(ficoScore: number): number {
-  const min = 300;
-  const max = 850;
-  const clamped = Math.max(min, Math.min(max, ficoScore));
-  return Math.round(((clamped - min) / (max - min)) * 100);
+function roundCreditScore(ficoScore: number): number {
+  return Math.round(ficoScore);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Helper: petakan status kelayakan & skor ke rekomendasi terstandardisasi
+// Helper: petakan status kelayakan ke rekomendasi berdasarkan skor FICO
 // ─────────────────────────────────────────────────────────────────────────────
 
-function mapRecommendation(statusKelayakan: string, normalizedScore: number): string {
+function mapRecommendation(statusKelayakan: string, ficoScore: number): string {
   if (statusKelayakan === "Layak") {
-    return normalizedScore >= 70 ? "Approved" : "Considered";
+    return ficoScore >= 650 ? "Approved" : "Considered";
   }
   return "Reconsider";
 }
@@ -104,11 +101,12 @@ async function callExternalAI(extInput: ExternalModelInput): Promise<ScoringResu
 
   const data = (await response.json()) as ExternalModelResponse;
 
-  const normalizedScore = normalizeCreditScore(data["Credit Score"]);
-  const recommendation = mapRecommendation(data["Status Kelayakan"], normalizedScore);
+  // Gunakan Credit Score FICO langsung dari model (300–850), bukan di-normalisasi
+  const ficoScore = roundCreditScore(data["Credit Score"]);
+  const recommendation = mapRecommendation(data["Status Kelayakan"], ficoScore);
 
   return {
-    score: BigInt(normalizedScore),
+    score: BigInt(ficoScore),
     recommendation,
     reason: data["Keterangan"],
   };

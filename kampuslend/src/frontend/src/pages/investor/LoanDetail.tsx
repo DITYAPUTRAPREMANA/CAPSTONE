@@ -39,16 +39,14 @@ export default function InvestorLoanDetail() {
       .getLoan(loanId)
       .then((loanData) => {
         setLoan(loanData);
-        // Baca hasil AI dari data on-chain (sudah disimpan saat peminjam apply)
-        if (loanData.aiRecommendation) {
-          setScore({
-            score: loanData.aiScore,
-            recommendation: loanData.aiRecommendation,
-            reason: loanData.aiReason,
-          });
-        }
+        // Selalu baca AI score dari on-chain tanpa kondisi
+        setScore({
+          score: loanData.aiScore,
+          recommendation: loanData.aiRecommendation || "Pending",
+          reason: loanData.aiReason || "-",
+        });
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setIsLoading(false));
   }, [actor, id]);
 

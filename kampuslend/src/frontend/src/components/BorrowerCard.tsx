@@ -30,7 +30,8 @@ export default function BorrowerCard({
   index,
 }: BorrowerCardProps) {
   const router = useRouter();
-  const score = aiScore ? Number(aiScore.score) : 0;
+  const score = aiScore ? Number(aiScore.score) : 0; // FICO: 300–850
+  const scorePercent = score > 0 ? Math.min(100, Math.max(0, ((score - 300) / 550) * 100)) : 0;
   const isLayak = aiScore?.recommendation === "Approved" || aiScore?.recommendation === "Considered";
 
   return (
@@ -82,9 +83,9 @@ export default function BorrowerCard({
         {aiScore ? (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-muted-foreground">AI Score</span>
+              <span className="text-xs text-muted-foreground">FICO Score</span>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold">{score}/100</span>
+                <span className="text-sm font-bold">{score}</span>
                 <span
                   className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isLayak ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
                 >
@@ -92,7 +93,7 @@ export default function BorrowerCard({
                 </span>
               </div>
             </div>
-            <Progress value={score} className="h-2" />
+            <Progress value={scorePercent} className="h-2" />
           </div>
         ) : (
           <div className="mb-4 h-8 flex items-center">
