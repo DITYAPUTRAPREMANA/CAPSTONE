@@ -2,6 +2,7 @@ import Time "mo:core/Time";
 import Text "mo:core/Text";
 import Nat "mo:core/Nat";
 import Int "mo:core/Int";
+import Float "mo:core/Float";
 import Array "mo:core/Array";
 import Map "mo:core/Map";
 import Order "mo:core/Order";
@@ -420,9 +421,20 @@ persistent actor {
   };
 
   public query ({ caller = _ }) func getCicilanSisa(loanId : Nat) : async Float {
-    var sisa : Float = 0;
-    payments.values().forEach(func(payment) { if (payment.loanId == loanId) { sisa += payment.remainingInstallment } });
-    sisa;
+    switch (loans.get(loanId)) {
+      case (null) { 0 };
+      case (?loan) {
+        var sisa : Float = Float.fromInt(Int.fromNat(loan.tenor));
+        for (payment in payments.values()) {
+          if (payment.loanId == loanId) {
+            if (payment.remainingInstallment < sisa) {
+              sisa := payment.remainingInstallment;
+            };
+          };
+        };
+        sisa;
+      };
+    };
   };
 
   public shared ({ caller = _ }) func createVirtualAccount(loanId : Nat) : async Text {

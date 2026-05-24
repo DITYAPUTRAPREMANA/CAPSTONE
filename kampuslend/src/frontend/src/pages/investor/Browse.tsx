@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import type { Loan, ScoringResult } from "../../backend";
 import BorrowerCard from "../../components/BorrowerCard";
 import { useActor } from "../../hooks/useActor";
-import { getAIScoresBatch } from "../../utils/aiService";
 
 export default function InvestorBrowse() {
   const { actor } = useActor();
@@ -22,13 +21,20 @@ export default function InvestorBrowse() {
     if (!actor) return;
     actor
       .getAllLoans()
-      .then(async (allLoans) => {
+      .then((allLoans) => {
         setLoans(allLoans);
-        // Hitung skor AI untuk semua pinjaman via AI service (eksternal atau on-chain)
-        const scoreMap = await getAIScoresBatch(actor, allLoans);
+        // Baca AI score langsung dari on-chain untuk semua loan
+        const scoreMap: Record<string, ScoringResult> = {};
+        for (const loan of allLoans) {
+          scoreMap[String(loan.id)] = {
+            score: loan.aiScore,
+            recommendation: loan.aiRecommendation || "Pending",
+            reason: loan.aiReason || "-",
+          };
+        }
         setScores(scoreMap);
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setIsLoading(false));
   }, [actor]);
 

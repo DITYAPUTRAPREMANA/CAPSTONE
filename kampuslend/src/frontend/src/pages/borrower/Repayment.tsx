@@ -208,6 +208,24 @@ export default function BorrowerRepayment() {
           vaNumber={vaNumber}
           amount={loan.monthlyInstallment}
           onClose={() => setShowVA(false)}
+          onPay={async () => {
+            if (!actor || !loan) return;
+            const nextSisa = Math.max(0, cicilanSisa - 1);
+            await actor.recordPayment(
+              loan.id,
+              toSafeBigInt(Math.round(loan.monthlyInstallment)),
+              nextSisa,
+              "Paid",
+              vaNumber
+            );
+            // Refresh data
+            const [pmts, sisa] = await Promise.all([
+              actor.getPaymentsByLoan(loan.id),
+              actor.getCicilanSisa(loan.id),
+            ]);
+            setPayments(pmts);
+            setCicilanSisa(sisa);
+          }}
         />
       )}
     </div>

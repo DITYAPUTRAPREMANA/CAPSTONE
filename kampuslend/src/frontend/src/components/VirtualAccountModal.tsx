@@ -18,6 +18,7 @@ interface VirtualAccountModalProps {
   vaNumber: string;
   amount: number;
   onClose: () => void;
+  onPay?: () => Promise<void>;
 }
 
 const BANKS = [
@@ -33,8 +34,10 @@ export default function VirtualAccountModal({
   vaNumber,
   amount,
   onClose,
+  onPay,
 }: VirtualAccountModalProps) {
   const [copiedVA, setCopiedVA] = useState(false);
+  const [isPaying, setIsPaying] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(vaNumber).then(() => {
@@ -115,6 +118,28 @@ export default function VirtualAccountModal({
             </ol>
           </div>
         </div>
+
+        {onPay && (
+          <Button
+            onClick={async () => {
+              setIsPaying(true);
+              try {
+                await onPay();
+                toast.success("Payment simulated successfully!");
+                onClose();
+              } catch {
+                toast.error("Failed to simulate payment.");
+              } finally {
+                setIsPaying(false);
+              }
+            }}
+            disabled={isPaying}
+            className="w-full rounded-full bg-green-600 text-white hover:bg-green-700 mb-2"
+            data-ocid="va.simulate_payment_button"
+          >
+            {isPaying ? "Simulating Payment..." : "⚡ Simulate Payment Success (Demo)"}
+          </Button>
+        )}
 
         <Button
           onClick={onClose}
