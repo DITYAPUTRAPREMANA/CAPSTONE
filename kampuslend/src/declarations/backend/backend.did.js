@@ -1,0 +1,136 @@
+export const idlFactory = ({ IDL }) => {
+  const UserRole = IDL.Variant({
+    'admin' : IDL.Null,
+    'user' : IDL.Null,
+    'guest' : IDL.Null,
+  });
+  const Time = IDL.Int;
+  const Loan = IDL.Record({
+    'id' : IDL.Nat,
+    'major' : IDL.Text,
+    'aiRecommendation' : IDL.Text,
+    'status' : IDL.Text,
+    'tenor' : IDL.Nat,
+    'borrowerId' : IDL.Nat,
+    'investorId' : IDL.Nat,
+    'interestRate' : IDL.Float64,
+    'monthlyInstallment' : IDL.Float64,
+    'aiScore' : IDL.Nat,
+    'amount' : IDL.Nat,
+    'purpose' : IDL.Text,
+    'aiReason' : IDL.Text,
+    'borrowerName' : IDL.Text,
+    'startDate' : Time,
+  });
+  const UserProfile = IDL.Record({
+    'gpa' : IDL.Float64,
+    'ktm' : IDL.Text,
+    'bankAccount' : IDL.Text,
+    'name' : IDL.Text,
+    'role' : IDL.Text,
+    'email' : IDL.Text,
+    'isVerified' : IDL.Bool,
+  });
+  const User = IDL.Record({
+    'id' : IDL.Nat,
+    'gpa' : IDL.Float64,
+    'ktm' : IDL.Text,
+    'principal' : IDL.Principal,
+    'bankAccount' : IDL.Text,
+    'name' : IDL.Text,
+    'role' : IDL.Text,
+    'email' : IDL.Text,
+    'isVerified' : IDL.Bool,
+  });
+  const Payment = IDL.Record({
+    'id' : IDL.Nat,
+    'status' : IDL.Text,
+    'loanId' : IDL.Nat,
+    'virtualAccount' : IDL.Text,
+    'remainingInstallment' : IDL.Float64,
+    'paymentDate' : Time,
+    'amount' : IDL.Nat,
+  });
+  const ApprovalStatus = IDL.Variant({
+    'pending' : IDL.Null,
+    'approved' : IDL.Null,
+    'rejected' : IDL.Null,
+  });
+  const UserApprovalInfo = IDL.Record({
+    'status' : ApprovalStatus,
+    'principal' : IDL.Principal,
+  });
+  const ScoringInput = IDL.Record({
+    'gpa' : IDL.Float64,
+    'tenor' : IDL.Nat,
+    'cleanHistory' : IDL.Bool,
+    'amount' : IDL.Nat,
+    'purpose' : IDL.Text,
+  });
+  const ScoringResult = IDL.Record({
+    'score' : IDL.Nat,
+    'recommendation' : IDL.Text,
+    'reason' : IDL.Text,
+  });
+  return IDL.Service({
+    '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'addSeedData' : IDL.Func([], [], []),
+    'approveLoan' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
+    'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'createLoan' : IDL.Func(
+        [
+          IDL.Nat,
+          IDL.Text,
+          IDL.Text,
+          IDL.Nat,
+          IDL.Nat,
+          IDL.Float64,
+          IDL.Text,
+          IDL.Nat,
+          IDL.Text,
+          IDL.Text,
+        ],
+        [IDL.Nat],
+        [],
+      ),
+    'createVirtualAccount' : IDL.Func([IDL.Nat], [IDL.Text], []),
+    'getAllLoans' : IDL.Func([], [IDL.Vec(Loan)], ['query']),
+    'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
+    'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getCicilanSisa' : IDL.Func([IDL.Nat], [IDL.Float64], ['query']),
+    'getCurrentUser' : IDL.Func([], [IDL.Opt(User)], ['query']),
+    'getLoan' : IDL.Func([IDL.Nat], [Loan], ['query']),
+    'getLoansByBorrower' : IDL.Func([IDL.Nat], [IDL.Vec(Loan)], ['query']),
+    'getLoansByInvestor' : IDL.Func([IDL.Nat], [IDL.Vec(Loan)], ['query']),
+    'getPaymentsByLoan' : IDL.Func([IDL.Nat], [IDL.Vec(Payment)], ['query']),
+    'getUser' : IDL.Func([IDL.Nat], [IDL.Opt(User)], ['query']),
+    'getUserById' : IDL.Func([IDL.Nat], [IDL.Opt(User)], ['query']),
+    'getUserProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(UserProfile)],
+        ['query'],
+      ),
+    'getUsersByRole' : IDL.Func([IDL.Text], [IDL.Vec(User)], ['query']),
+    'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'isCallerApproved' : IDL.Func([], [IDL.Bool], ['query']),
+    'listApprovals' : IDL.Func([], [IDL.Vec(UserApprovalInfo)], ['query']),
+    'recordPayment' : IDL.Func(
+        [IDL.Nat, IDL.Nat, IDL.Float64, IDL.Text, IDL.Text],
+        [IDL.Nat],
+        [],
+      ),
+    'registerUser' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Float64],
+        [IDL.Nat],
+        [],
+      ),
+    'requestApproval' : IDL.Func([], [], []),
+    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'scoreApplicant' : IDL.Func([ScoringInput], [ScoringResult], ['query']),
+    'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
+    'updateLoanStatus' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+    'verifyEmail' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Bool], []),
+    'verifyUser' : IDL.Func([IDL.Nat], [], []),
+  });
+};
+export const init = ({ IDL }) => { return []; };

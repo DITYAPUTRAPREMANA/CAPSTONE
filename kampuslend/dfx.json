@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "defaults": {
+    "build": {
+      "packager": "mops",
+      "args": ""
+    }
+  },
+  "canisters": {
+    "backend": {
+      "type": "motoko",
+      "main": "src/backend/main.mo"
+    },
+    "frontend": {
+      "type": "assets",
+      "source": ["src/frontend/dist"]
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000"
+    }
+  }
+}
