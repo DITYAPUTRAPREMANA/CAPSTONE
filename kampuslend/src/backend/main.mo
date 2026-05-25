@@ -154,7 +154,7 @@ persistent actor {
     users.values().toArray().find(func(user) { user.principal == principal });
   };
 
-  func isLoanParticipant(caller : Principal, loanId : Nat) : Bool {
+  func _isLoanParticipant(caller : Principal, loanId : Nat) : Bool {
     switch (loans.get(loanId)) {
       case (null) { false };
       case (?loan) {
