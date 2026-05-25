@@ -247,7 +247,7 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
       vite:
-        specifier: ^5.4.1
+        specifier: ^5.4.21
         version: 5.4.21(@types/node@20.19.24)
       vite-plugin-environment:
         specifier: ^1.1.3

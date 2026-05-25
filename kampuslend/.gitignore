@@ -1,4 +1,39 @@
-.dfx/
+# Dependencies
 node_modules/
+**/node_modules/
+
+# Build output
 dist/
+**/dist/
+
+# DFX local state
+.dfx/
+
+# Logs
 *.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# pnpm
+.pnpm-store/
+
+# Generated files
+src/frontend/src/declarations/
+src/declarations/
