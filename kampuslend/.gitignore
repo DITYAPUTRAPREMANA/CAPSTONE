@@ -37,3 +37,5 @@ Thumbs.db
 # Generated files
 src/frontend/src/declarations/
 src/declarations/
+.vercel
+.env*

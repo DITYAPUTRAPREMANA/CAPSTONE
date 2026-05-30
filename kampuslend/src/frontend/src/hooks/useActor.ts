@@ -1,29 +1,45 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { Ed25519KeyIdentity } from "@dfinity/identity";
 import type { backendInterface } from "../backend";
 import { createActorWithConfig } from "../config";
 import { getSecretParameter } from "../utils/urlParams";
 import { useInternetIdentity } from "./useInternetIdentity";
 
 const ACTOR_QUERY_KEY = "actor";
+
+function getOrCreateSessionIdentity() {
+  if (typeof window === "undefined") return undefined;
+  const key = "sodalis_session_identity";
+  const stored = localStorage.getItem(key);
+  if (stored) {
+    try {
+      return Ed25519KeyIdentity.fromJSON(stored);
+    } catch (e) {
+      console.error("Failed to parse stored identity:", e);
+    }
+  }
+  const newIdentity = Ed25519KeyIdentity.generate();
+  localStorage.setItem(key, JSON.stringify(newIdentity.toJSON()));
+  return newIdentity;
+}
+
 export function useActor() {
   const { identity } = useInternetIdentity();
   const queryClient = useQueryClient();
+
+  const activeIdentity = identity || getOrCreateSessionIdentity();
+
   const actorQuery = useQuery<backendInterface, Error>({
-    queryKey: [ACTOR_QUERY_KEY, identity?.getPrincipal().toString()],
+    queryKey: [ACTOR_QUERY_KEY, activeIdentity?.getPrincipal().toString()],
     queryFn: async () => {
-      const isAuthenticated = !!identity;
-
-      if (!isAuthenticated) {
-        // Return anonymous actor if not authenticated
-        return await createActorWithConfig();
-      }
-
-      const actorOptions = {
-        agentOptions: {
-          identity,
-        },
-      };
+      const actorOptions = activeIdentity
+        ? {
+          agentOptions: {
+            identity: activeIdentity,
+          },
+        }
+        : {};
 
       const actor = await createActorWithConfig(actorOptions);
       const adminToken = getSecretParameter("adminToken") || "";
@@ -59,3 +75,4 @@ export function useActor() {
     error: actorQuery.error,
   };
 }
+
