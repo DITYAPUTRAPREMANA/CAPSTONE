@@ -14,6 +14,7 @@ const STORAGE_KEY = "sodalis_user";
 
 interface AuthContextType {
   user: AuthUser | null;
+  isLoading: boolean;
   login: (user: AuthUser) => void;
   logout: () => void;
 }
@@ -21,11 +22,16 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<AuthUser | null>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? (JSON.parse(stored) as AuthUser) : null;
+      const parsed = stored ? (JSON.parse(stored) as AuthUser) : null;
+      // Mark loading as done after synchronous read
+      setTimeout(() => setIsLoading(false), 0);
+      return parsed;
     } catch {
+      setTimeout(() => setIsLoading(false), 0);
       return null;
     }
   });
@@ -41,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -67,16 +67,18 @@ function RootLayout() {
 
 /** Redirect component based on login status */
 function HomeRedirect() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const navigate = rootRoute.useNavigate();
 
   useEffect(() => {
-    if (user) {
+    if (!isLoading && user) {
       if (user.role === "Investor") navigate({ to: "/investor/dashboard" });
       else navigate({ to: "/borrower/dashboard" });
     }
-  }, [user, navigate]);
+  }, [user, isLoading, navigate]);
 
+  // Always show landing page first while auth state is loading
+  if (isLoading) return <LandingPage />;
   if (user) return null;
   return <LandingPage />;
 }

@@ -1,11 +1,8 @@
 /* LandingPage.css */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-tailwind base
-tailwind components
-tailwind utilities
 
-.landing-page {
+tailwind base tailwind components tailwind utilities .landing-page {
   min-height: 100vh;
   background-color: #f0f2f5;
   font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
@@ -41,8 +38,8 @@ tailwind utilities
 
 /* Button Styles */
 .sodalis-btn {
-  transition: transform 0.23s cubic-bezier(0.22,1,0.36,1),
-    box-shadow 0.23s cubic-bezier(0.22,1,0.36,1),
+  transition: transform 0.23s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.23s cubic-bezier(0.22, 1, 0.36, 1),
     filter 0.23s ease;
 }
 
@@ -64,13 +61,14 @@ tailwind utilities
 .sodalis-nav-btn:hover,
 .sodalis-nav-btn:focus-visible {
   transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  background-color: rgba(29, 111, 191, 0.18);
+  box-shadow: 0 6px 14px rgba(0, 85, 150, 0.15);
+  background-color: #e8f4ff;
+  border-color: #005596;
 }
 
 .sodalis-nav-btn:active {
   transform: translateY(0) scale(0.99);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.18);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
 }
 
 /* Step Card Styles */
@@ -157,15 +155,15 @@ tailwind utilities
   position: sticky;
   top: 0;
   z-index: 50;
-  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
   transform: translateY(0);
   transition: all 0.3s ease;
 }
 
 .navbar.scrolled {
-  background: white;  
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
 }
 
 /* Hide when scrolling down */
@@ -332,7 +330,7 @@ tailwind utilities
 .stat-card {
   border-radius: 16px;
   background: white;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
   border: none;
 }
 
@@ -587,7 +585,7 @@ tailwind utilities
 }
 
 .cta-subtitle {
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
   margin-bottom: 32px;
   font-size: 0.97rem;
 }
@@ -614,13 +612,16 @@ tailwind utilities
 }
 
 @media (max-width: 768px) {
+
   /* Navbar */
   .navbar {
     padding: 14px 20px !important;
   }
+
   .navbar .nav-buttons {
     gap: 2px !important;
   }
+
   .navbar button {
     font-size: 0.8rem !important;
     padding: 8px 16px !important;
@@ -644,19 +645,23 @@ tailwind utilities
     background-position: bottom right !important;
     background-repeat: no-repeat !important;
   }
+
   .hero-text h1 {
     font-size: 2.2rem !important;
     line-height: 1.2 !important;
   }
+
   .hero-text p {
     font-size: 0.9rem !important;
     line-height: 1.6 !important;
   }
+
   .hero-buttons {
     flex-direction: column !important;
     align-items: center !important;
     gap: 12px !important;
   }
+
   .hero-buttons button {
     width: 100% !important;
     max-width: 280px !important;
@@ -666,6 +671,7 @@ tailwind utilities
   .stats-section {
     padding: 0 20px 40px !important;
   }
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 12px !important;
@@ -675,12 +681,15 @@ tailwind utilities
   .features-section {
     padding: 40px 20px !important;
   }
+
   .features-title {
     font-size: 1.5rem !important;
   }
+
   .features-container {
     padding: 32px 24px !important;
   }
+
   .features-grid {
     grid-template-columns: repeat(1, 1fr) !important;
     gap: 20px !important;
@@ -691,13 +700,16 @@ tailwind utilities
     padding: 60px 20px !important;
     min-height: auto !important;
   }
+
   .how-it-works-title {
     font-size: 1.7rem !important;
   }
+
   .how-it-works-subtitle {
     font-size: 0.9rem !important;
     margin-bottom: 40px !important;
   }
+
   .sodalis-work-grid {
     margin-top: 24px !important;
   }
@@ -706,14 +718,17 @@ tailwind utilities
   .faq-section {
     padding: 40px 20px 60px !important;
   }
+
   .faq-title {
     font-size: 1.5rem !important;
     margin-bottom: 32px !important;
   }
+
   .faq-content {
     grid-template-columns: 1fr !important;
     gap: 32px !important;
   }
+
   .faq-illustration {
     display: none !important;
   }
@@ -722,16 +737,20 @@ tailwind utilities
   .cta-section {
     padding: 48px 20px !important;
   }
+
   .cta-title {
     font-size: 1.6rem !important;
   }
+
   .cta-subtitle {
     font-size: 0.9rem !important;
   }
+
   .cta-buttons {
     flex-direction: column !important;
     gap: 12px !important;
   }
+
   .cta-buttons button {
     width: 100% !important;
     max-width: 280px !important;
@@ -739,10 +758,12 @@ tailwind utilities
 }
 
 @media (max-width: 480px) {
+
   /* Extra small screens */
   .hero-text h1 {
     font-size: 1.9rem !important;
   }
+
   .stats-grid {
     grid-template-columns: repeat(1, 1fr) !important;
   }
