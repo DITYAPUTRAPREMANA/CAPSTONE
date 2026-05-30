@@ -47,7 +47,7 @@ module {
     };
   };
 
-  public func assignRole(state : AccessControlState, caller : Principal, user : Principal, role : UserRole) {
+  public func assignRole(state : AccessControlState, _ : Principal, user : Principal, role : UserRole) {
     state.userRoles.add(user, role);
   };
 

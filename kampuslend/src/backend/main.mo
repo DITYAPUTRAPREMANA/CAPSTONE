@@ -388,7 +388,7 @@ persistent actor {
   public query ({ caller = _ }) func loginUser(email : Text, password : Text) : async ?User {
     var foundUser : ?User = null;
     for (user in users.values()) {
-      if (Text.equal(Text.lowercase(user.email), Text.lowercase(email)) and Text.equal(user.password, password)) {
+      if (Text.equal(user.email, email) and Text.equal(user.password, password)) {
         foundUser := ?user;
       };
     };

@@ -60,7 +60,7 @@ export default function RegisterPage() {
     }
     try {
       const gpaNum = role === "Borrower" ? Number.parseFloat(gpa) || 0 : 0;
-      const userId = await actor.registerUser(nama, email, role, ktm, rekening, gpaNum, password);
+      const userId = await actor.registerUser(nama, email.toLowerCase(), role, ktm, rekening, gpaNum, password);
 
       toast.success("Account created! Please verify your email.");
 
