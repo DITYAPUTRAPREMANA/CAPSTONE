@@ -48,7 +48,7 @@ export default function LoginPage() {
       .then(([investors, borrowers]) => {
         setDemoUsers([...investors, ...borrowers]);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [actor]);
 
   const handleLogin = async (e: React.FormEvent) => {
