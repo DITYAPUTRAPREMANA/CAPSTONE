@@ -24,7 +24,7 @@ function getBackendCanisterId() {
   }
 
   try {
-    const value = execSync("dfx canister id backend", { encoding: "utf8" }).trim();
+    const value = execSync("dfx canister id backend", { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
     if (value) {
       return value;
     }
