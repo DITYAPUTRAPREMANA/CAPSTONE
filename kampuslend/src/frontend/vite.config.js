@@ -42,8 +42,10 @@ export default defineConfig({
     environment("all", { prefix: "DFX_" }),
     environment(["II_URL"]),
     environment(["STORAGE_GATEWAY_URL"]),
-    environment(["VITE_OTP_GATEWAY_URL"]),
-    environment(["VITE_AI_SCORING_URL"]),
+    environment({
+      VITE_OTP_GATEWAY_URL: "https://script.google.com/macros/s/AKfycbz_lH2w6qHaxUeRECOFKlYbG-tXyjw-xFtr9vFVIaav38b9qELiBpSDJH65-4LODewu/exec",
+      VITE_AI_SCORING_URL: "https://headstone-silo-overlying.ngrok-free.dev/predict",
+    }),
     react(),
   ],
   resolve: {
