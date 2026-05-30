@@ -84,6 +84,7 @@ persistent actor {
     bankAccount : Text;
     gpa : Float;
     isVerified : Bool;
+    password : Text;
   };
 
   type Loan = {
@@ -136,6 +137,7 @@ persistent actor {
     bankAccount : Text;
     gpa : Float;
     isVerified : Bool;
+    password : Text;
   };
 
   // STATE
@@ -169,6 +171,42 @@ persistent actor {
     };
   };
 
+  // TODO(security): Memory-hard hashing (Argon2/bcrypt) is omitted due to Motoko cycle and library constraints.
+  func censorUser(caller : Principal, user : User) : User {
+    if (AccessControl.isAdmin(accessControlState, caller)) {
+      user;
+    } else if (not caller.isAnonymous() and user.principal == caller) {
+      {
+        user with
+        password = "";
+      };
+    } else {
+      {
+        user with
+        email = "";
+        password = "";
+      };
+    };
+  };
+
+  // TODO(security): Memory-hard hashing (Argon2/bcrypt) is omitted due to Motoko cycle and library constraints.
+  func censorUserProfile(caller : Principal, principal : Principal, profile : UserProfile) : UserProfile {
+    if (AccessControl.isAdmin(accessControlState, caller)) {
+      profile;
+    } else if (not caller.isAnonymous() and principal == caller) {
+      {
+        profile with
+        password = "";
+      };
+    } else {
+      {
+        profile with
+        email = "";
+        password = "";
+      };
+    };
+  };
+
   // User Approval Query
   public query ({ caller }) func isCallerApproved() : async Bool {
     UserApproval.isApproved(userApproval, caller) or AccessControl.hasPermission(accessControlState, caller, #admin);
@@ -196,11 +234,17 @@ persistent actor {
   // USER PROFILE MANAGEMENT (Required by frontend)
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
-    userProfiles.get(caller);
+    switch (userProfiles.get(caller)) {
+      case (null) { null };
+      case (?profile) { ?censorUserProfile(caller, caller, profile) };
+    };
   };
 
-  public query ({ caller = _ }) func getUserProfile(user : Principal) : async ?UserProfile {
-    userProfiles.get(user);
+  public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    switch (userProfiles.get(user)) {
+      case (null) { null };
+      case (?profile) { ?censorUserProfile(caller, user, profile) };
+    };
   };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
@@ -209,7 +253,7 @@ persistent actor {
 
   // USER MANAGEMENT
 
-  public shared ({ caller }) func registerUser(name : Text, email : Text, role : Text, ktm : Text, bankAccount : Text, gpa : Float) : async Nat {
+  public shared ({ caller }) func registerUser(name : Text, email : Text, role : Text, ktm : Text, bankAccount : Text, gpa : Float, password : Text) : async Nat {
     if (not caller.isAnonymous()) {
       switch (getUserByPrincipal(caller)) {
         case (?existingUser) {
@@ -241,6 +285,7 @@ persistent actor {
       bankAccount;
       gpa;
       isVerified = false;
+      password;
     };
 
     users.add(userId, newUser);
@@ -254,20 +299,27 @@ persistent actor {
       bankAccount;
       gpa;
       isVerified = false;
+      password;
     };
     userProfiles.add(caller, profile);
 
     userId;
   };
 
-  public query ({ caller = _ }) func getUser(id : Nat) : async ?User {
-    users.get(id);
+  public query ({ caller }) func getUser(id : Nat) : async ?User {
+    switch (users.get(id)) {
+      case (null) { null };
+      case (?user) { ?censorUser(caller, user) };
+    };
   };
 
   // Accessible by anonymous/guest callers — used when users register without Internet Identity.
   // The frontend stores userId in localStorage and uses this to fetch their own data.
-  public query ({ caller = _ }) func getUserById(id : Nat) : async ?User {
-    users.get(id);
+  public query ({ caller }) func getUserById(id : Nat) : async ?User {
+    switch (users.get(id)) {
+      case (null) { null };
+      case (?user) { ?censorUser(caller, user) };
+    };
   };
 
   public shared ({ caller }) func verifyUser(userId : Nat) : async () {
@@ -317,11 +369,48 @@ persistent actor {
       Runtime.trap("Unauthorized: Only users can view users by role");
     };
 
-    users.values().toArray().filter(func(user) { Text.equal(user.role, role) });
+    let filtered = users.values().toArray().filter(func(user) { Text.equal(user.role, role) });
+    Array.tabulate<User>(
+      filtered.size(),
+      func(i) {
+        censorUser(caller, filtered[i]);
+      },
+    );
   };
 
   public query ({ caller }) func getCurrentUser() : async ?User {
-    getUserByPrincipal(caller);
+    switch (getUserByPrincipal(caller)) {
+      case (null) { null };
+      case (?user) { ?censorUser(caller, user) };
+    };
+  };
+
+  public query ({ caller = _ }) func loginUser(email : Text, password : Text) : async ?User {
+    var foundUser : ?User = null;
+    for (user in users.values()) {
+      if (Text.equal(Text.lowercase(user.email), Text.lowercase(email)) and Text.equal(user.password, password)) {
+        foundUser := ?user;
+      };
+    };
+    switch (foundUser) {
+      case (null) { null };
+      case (?user) {
+        ?censorUser(user.principal, user);
+      };
+    };
+  };
+
+  public query ({ caller = _ }) func loginUserById(id : Nat, password : Text) : async ?User {
+    switch (users.get(id)) {
+      case (null) { null };
+      case (?user) {
+        if (Text.equal(user.password, password)) {
+          ?censorUser(user.principal, user);
+        } else {
+          null;
+        };
+      };
+    };
   };
 
   // LOAN MANAGEMENT
@@ -413,6 +502,16 @@ persistent actor {
     };
 
     payments.add(paymentId, payment);
+
+    if (remainingInstallment == 0.0) {
+      switch (loans.get(loanId)) {
+        case (?loan) {
+          loans.add(loanId, { loan with status = "Paid" });
+        };
+        case (null) {};
+      };
+    };
+
     paymentId;
   };
 
@@ -505,6 +604,7 @@ persistent actor {
           bankAccount = "987654322";
           gpa = 0.0;
           isVerified = true;
+          password = "password123";
         },
       );
     };
@@ -524,6 +624,7 @@ persistent actor {
           bankAccount = "987123456";
           gpa = 3.2;
           isVerified = true;
+          password = "password123";
         },
       );
     };

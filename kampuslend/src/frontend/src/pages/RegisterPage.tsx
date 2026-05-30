@@ -22,6 +22,7 @@ export default function RegisterPage() {
   const [ktm, setKtm] = useState("");
   const [rekening, setRekening] = useState("");
   const [gpa, setGpa] = useState("");
+  const [password, setPassword] = useState("");
   const [ktmFile, setKtmFile] = useState<File | null>(null);
 
   const handleRoleSelect = (selectedRole: "Investor" | "Borrower") => {
@@ -52,9 +53,14 @@ export default function RegisterPage() {
       setIsLoading(false);
       return;
     }
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters long.");
+      setIsLoading(false);
+      return;
+    }
     try {
       const gpaNum = role === "Borrower" ? Number.parseFloat(gpa) || 0 : 0;
-      const userId = await actor.registerUser(nama, email, role, ktm, rekening, gpaNum);
+      const userId = await actor.registerUser(nama, email, role, ktm, rekening, gpaNum, password);
 
       toast.success("Account created! Please verify your email.");
 
@@ -239,6 +245,20 @@ export default function RegisterPage() {
                       required
                       className="rounded-lg text-sm"
                       data-ocid="register.email_input"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="reg-password" className="text-sm font-medium" style={{ color: "#1a3a5c" }}>Password</Label>
+                    <Input
+                      id="reg-password"
+                      type="password"
+                      placeholder="Create your login password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="rounded-lg text-sm"
+                      data-ocid="register.password_input"
                     />
                   </div>
 

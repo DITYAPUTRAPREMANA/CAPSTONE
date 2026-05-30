@@ -104,6 +104,7 @@ export interface User {
     role: string;
     email: string;
     isVerified: boolean;
+    password: string;
 }
 export interface Loan {
     id: bigint;
@@ -151,6 +152,7 @@ export interface UserProfile {
     role: string;
     email: string;
     isVerified: boolean;
+    password: string;
 }
 export enum ApprovalStatus {
     pending = "pending",
@@ -185,8 +187,10 @@ export interface backendInterface {
     isCallerAdmin(): Promise<boolean>;
     isCallerApproved(): Promise<boolean>;
     listApprovals(): Promise<Array<UserApprovalInfo>>;
+    loginUser(email: string, password: string): Promise<User | null>;
+    loginUserById(id: bigint, password: string): Promise<User | null>;
     recordPayment(loanId: bigint, amount: bigint, remainingInstallment: number, status: string, virtualAccount: string): Promise<bigint>;
-    registerUser(name: string, email: string, role: string, ktm: string, bankAccount: string, gpa: number): Promise<bigint>;
+    registerUser(name: string, email: string, role: string, ktm: string, bankAccount: string, gpa: number, password: string): Promise<bigint>;
     requestApproval(): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     scoreApplicant(input: ScoringInput): Promise<ScoringResult>;
@@ -520,17 +524,45 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async registerUser(arg0: string, arg1: string, arg2: string, arg3: string, arg4: string, arg5: number): Promise<bigint> {
+    async loginUser(arg0: string, arg1: string): Promise<User | null> {
         if (this.processError) {
             try {
-                const result = await this.actor.registerUser(arg0, arg1, arg2, arg3, arg4, arg5);
+                const result = await this.actor.loginUser(arg0, arg1);
+                return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.loginUser(arg0, arg1);
+            return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async loginUserById(arg0: bigint, arg1: string): Promise<User | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.loginUserById(arg0, arg1);
+                return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.loginUserById(arg0, arg1);
+            return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async registerUser(arg0: string, arg1: string, arg2: string, arg3: string, arg4: string, arg5: number, arg6: string): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.registerUser(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.registerUser(arg0, arg1, arg2, arg3, arg4, arg5);
+            const result = await this.actor.registerUser(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
             return result;
         }
     }

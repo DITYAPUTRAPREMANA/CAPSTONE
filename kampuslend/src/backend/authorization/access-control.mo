@@ -52,10 +52,29 @@ module {
   };
 
   public func hasPermission(state : AccessControlState, caller : Principal, requiredRole : UserRole) : Bool {
-    true;
+    let role = getUserRole(state, caller);
+    switch (requiredRole) {
+      case (#admin) {
+        switch (role) {
+          case (#admin) { true };
+          case (_) { false };
+        };
+      };
+      case (#user) {
+        switch (role) {
+          case (#admin) { true };
+          case (#user) { true };
+          case (_) { false };
+        };
+      };
+      case (#guest) { true };
+    };
   };
 
   public func isAdmin(state : AccessControlState, caller : Principal) : Bool {
-    true;
+    switch (getUserRole(state, caller)) {
+      case (#admin) { true };
+      case (_) { false };
+    };
   };
 };

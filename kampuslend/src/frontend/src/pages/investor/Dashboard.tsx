@@ -7,7 +7,7 @@ import { useRouter } from "@tanstack/react-router";
  * Dashboard utama Investor - ringkasan portofolio + daftar peminjam baru dengan analisis AI
  */
 import { useEffect, useState } from "react";
-import type { Loan, ScoringResult } from "../../backend";
+import type { Loan, ScoringResult, Payment } from "../../backend";
 import BorrowerCard from "../../components/BorrowerCard";
 import StatusBadge from "../../components/StatusBadge";
 import { useAuth } from "../../contexts/AuthContext";
@@ -23,6 +23,7 @@ export default function InvestorDashboard() {
   // Pinjaman yang sudah diinvestasikan oleh investor ini
   const [myLoans, setMyLoans] = useState<Loan[]>([]);
   const [repaymentProgress, setRepaymentProgress] = useState<Record<string, number>>({});
+  const [myPaymentsMap, setMyPaymentsMap] = useState<Record<string, Payment[]>>({});
   const [isLoadingMy, setIsLoadingMy] = useState(true);
 
   // Pinjaman peminjam baru yang belum ada investor (status Pending)
@@ -30,7 +31,7 @@ export default function InvestorDashboard() {
   const [pendingScores, setPendingScores] = useState<Record<string, ScoringResult>>({});
   const [isLoadingPending, setIsLoadingPending] = useState(true);
 
-  // Fetch pinjaman investor sendiri + sisa cicilan masing-masing
+  // Fetch pinjaman investor sendiri + sisa cicilan + payments masing-masing
   useEffect(() => {
     if (!actor || !user) return;
     setIsLoadingMy(true);
@@ -38,21 +39,31 @@ export default function InvestorDashboard() {
       .getLoansByInvestor(toSafeBigInt(user.userId))
       .then(async (loansData) => {
         setMyLoans(loansData);
-        // Ambil sisa cicilan untuk masing-masing loan
+        // Ambil sisa cicilan dan payments untuk masing-masing loan
         const progressMap: Record<string, number> = {};
+        const paymentsMap: Record<string, Payment[]> = {};
         await Promise.all(
           loansData.map(async (l) => {
             try {
-              const sisa = await actor.getCicilanSisa(l.id);
+              const [sisa, pmts] = await Promise.all([
+                actor.getCicilanSisa(l.id),
+                actor.getPaymentsByLoan(l.id),
+              ]);
               progressMap[String(l.id)] = Number(sisa);
+              paymentsMap[String(l.id)] = pmts;
             } catch {
               progressMap[String(l.id)] = Number(l.tenor);
+              paymentsMap[String(l.id)] = [];
             }
           })
         );
         setRepaymentProgress(progressMap);
+        setMyPaymentsMap(paymentsMap);
       })
-      .catch(() => setMyLoans([]))
+      .catch(() => {
+        setMyLoans([]);
+        setMyPaymentsMap({});
+      })
       .finally(() => setIsLoadingMy(false));
   }, [actor, user]);
 
@@ -80,11 +91,12 @@ export default function InvestorDashboard() {
   }, [actor]);
 
   const activeLoans = myLoans.filter((l) => l.status === "Active");
+  const fundedLoans = myLoans.filter((l) => l.status === "Active" || l.status === "Paid");
   const totalDanaAktif = activeLoans.reduce((sum, l) => sum + Number(l.amount), 0);
-  const totalReturn = activeLoans.reduce(
-    (sum, l) => sum + l.monthlyInstallment * Number(l.tenor),
-    0,
-  );
+  const totalReturn = myLoans.reduce((sum, l) => {
+    const pmts = myPaymentsMap[String(l.id)] || [];
+    return sum + pmts.reduce((s, p) => s + Number(p.amount), 0);
+  }, 0);
 
   const stats = [
     {
@@ -259,13 +271,13 @@ export default function InvestorDashboard() {
                 <Skeleton key={i} className="h-14 w-full rounded-xl" />
               ))}
             </div>
-          ) : activeLoans.length === 0 ? (
+          ) : fundedLoans.length === 0 ? (
             <div
               className="text-center py-10"
               data-ocid="investor.dashboard.empty_state"
             >
               <p className="text-4xl mb-3">📊</p>
-              <p style={{ color: "#7a9ab5" }}>No active loans yet.</p>
+              <p style={{ color: "#7a9ab5" }}>No funded loans yet.</p>
               <Button
                 className="mt-4 rounded-full text-white transition-all hover:brightness-110"
                 style={{ backgroundColor: "#1d6fbf" }}
@@ -276,7 +288,7 @@ export default function InvestorDashboard() {
             </div>
           ) : (
             <div className="space-y-3">
-              {activeLoans.slice(0, 5).map((loan, i) => (
+              {fundedLoans.slice(0, 5).map((loan, i) => (
                 <div
                   key={String(loan.id)}
                   className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl cursor-pointer hover:brightness-95 transition-all gap-3 sm:gap-0"
@@ -300,11 +312,12 @@ export default function InvestorDashboard() {
                     <div className="flex justify-between text-[11px] font-semibold" style={{ color: "#1a3a5c" }}>
                       <span>Payment Progress</span>
                       <span style={{ color: "#1d6fbf" }}>
-                        {Number(loan.tenor) - (repaymentProgress[String(loan.id)] ?? Number(loan.tenor))} / {Number(loan.tenor)} months
+                        {loan.status === "Paid" ? Number(loan.tenor) : Number(loan.tenor) - (repaymentProgress[String(loan.id)] ?? Number(loan.tenor))} / {Number(loan.tenor)} months
                       </span>
                     </div>
                     <Progress
                       value={
+                        loan.status === "Paid" ? 100 :
                         ((Number(loan.tenor) - (repaymentProgress[String(loan.id)] ?? Number(loan.tenor))) /
                           Number(loan.tenor)) *
                         100
@@ -326,14 +339,14 @@ export default function InvestorDashboard() {
                   </div>
                 </div>
               ))}
-              {activeLoans.length > 5 && (
+              {fundedLoans.length > 5 && (
                 <button
                   type="button"
                   className="w-full text-center text-sm py-2 rounded-xl transition-all hover:brightness-95"
                   style={{ color: "#1d6fbf", backgroundColor: "#e8f0fb" }}
                   onClick={() => router.navigate({ to: "/investor/portfolio" })}
                 >
-                  View all {activeLoans.length} loans →
+                  View all {fundedLoans.length} loans →
                 </button>
               )}
             </div>

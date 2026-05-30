@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
  * Daftar semua pinjaman yang telah didanai investor
  */
 import { useEffect, useState } from "react";
-import type { Loan } from "../../backend";
+import type { Loan, Payment } from "../../backend";
 import StatusBadge from "../../components/StatusBadge";
 import { useAuth } from "../../contexts/AuthContext";
 import { useActor } from "../../hooks/useActor";
@@ -17,31 +17,52 @@ export default function InvestorPortfolio() {
   const { actor } = useActor();
   const [loans, setLoans] = useState<Loan[]>([]);
   const [cicilanSisa, setCicilanSisa] = useState<Record<string, number>>({});
+  const [paymentsMap, setPaymentsMap] = useState<Record<string, Payment[]>>({});
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!actor || !user) return;
+    setIsLoading(true);
     actor
       .getLoansByInvestor(toSafeBigInt(user.userId))
       .then(async (data) => {
         setLoans(data);
-        // Ambil sisa cicilan semua pinjaman aktif secara paralel
-        const sisaPromises = data
-          .filter((l) => l.status === "Active")
-          .map(async (l) => {
-            const sisa = await actor.getCicilanSisa(l.id);
-            return { id: String(l.id), sisa };
-          });
-        const results = await Promise.all(sisaPromises);
+
+        // Ambil sisa cicilan dan payments semua pinjaman secara paralel
         const sisaMap: Record<string, number> = {};
-        for (const r of results) {
-          sisaMap[r.id] = r.sisa;
-        }
+        const pmtsMap: Record<string, Payment[]> = {};
+
+        await Promise.all(
+          data.map(async (l) => {
+            try {
+              const [sisa, pmts] = await Promise.all([
+                l.status === "Paid" ? Promise.resolve(0) : actor.getCicilanSisa(l.id),
+                actor.getPaymentsByLoan(l.id),
+              ]);
+              sisaMap[String(l.id)] = Number(sisa);
+              pmtsMap[String(l.id)] = pmts;
+            } catch {
+              sisaMap[String(l.id)] = l.status === "Paid" ? 0 : Number(l.tenor);
+              pmtsMap[String(l.id)] = [];
+            }
+          })
+        );
+
         setCicilanSisa(sisaMap);
+        setPaymentsMap(pmtsMap);
       })
-      .catch(() => { })
+      .catch(() => {
+        setLoans([]);
+        setPaymentsMap({});
+      })
       .finally(() => setIsLoading(false));
   }, [actor, user]);
+
+  const totalInvested = loans.reduce((sum, l) => sum + Number(l.amount), 0);
+  const totalReturnReceived = Object.values(paymentsMap).reduce((sum, pmts) => {
+    return sum + pmts.reduce((s, p) => s + Number(p.amount), 0);
+  }, 0);
+  const paidLoansCount = loans.filter((l) => l.status === "Paid").length;
 
   return (
     <div className="space-y-6" data-ocid="investor.portfolio.page">
@@ -50,6 +71,46 @@ export default function InvestorPortfolio() {
         <p className="text-muted-foreground">
           All loans you have funded
         </p>
+      </div>
+
+      {/* Portfolio Summary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="rounded-2xl border-none shadow-sm" style={{ backgroundColor: "rgba(0, 85, 150, 0.05)" }}>
+          <CardContent className="p-6">
+            <p className="text-sm font-semibold" style={{ color: "#7a9ab5" }}>Total Invested</p>
+            {isLoading ? (
+              <Skeleton className="h-8 w-32 mt-1" />
+            ) : (
+              <p className="text-2xl font-bold mt-1 text-[#1d6fbf]">
+                {formatRupiah(totalInvested)}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="rounded-2xl border-none shadow-sm" style={{ backgroundColor: "rgba(16, 185, 129, 0.05)" }}>
+          <CardContent className="p-6">
+            <p className="text-sm font-semibold" style={{ color: "#7a9ab5" }}>Total Return Received</p>
+            {isLoading ? (
+              <Skeleton className="h-8 w-32 mt-1" />
+            ) : (
+              <p className="text-2xl font-bold mt-1 text-emerald-600">
+                {formatRupiah(totalReturnReceived)}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="rounded-2xl border-none shadow-sm" style={{ backgroundColor: "rgba(245, 158, 11, 0.05)" }}>
+          <CardContent className="p-6">
+            <p className="text-sm font-semibold" style={{ color: "#7a9ab5" }}>Paid Off Loans</p>
+            {isLoading ? (
+              <Skeleton className="h-8 w-32 mt-1" />
+            ) : (
+              <p className="text-2xl font-bold mt-1 text-amber-600">
+                {paidLoansCount} / {loans.length} Loans
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       <Card className="rounded-2xl shadow-card">
@@ -76,9 +137,8 @@ export default function InvestorPortfolio() {
           ) : (
             <div className="space-y-4">
               {loans.map((loan, i) => {
-                const sisa = cicilanSisa[String(loan.id)] ?? Number(loan.tenor);
-                const progress =
-                  ((Number(loan.tenor) - sisa) / Number(loan.tenor)) * 100;
+                const sisa = loan.status === "Paid" ? 0 : (cicilanSisa[String(loan.id)] ?? Number(loan.tenor));
+                const progress = ((Number(loan.tenor) - sisa) / Number(loan.tenor)) * 100;
 
                 return (
                   <div

@@ -23,6 +23,7 @@ export default function LoginPage() {
   const { actor } = useActor();
 
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [selectedDemo, setSelectedDemo] = useState("");
   const [demoUsers, setDemoUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,18 +60,23 @@ export default function LoginPage() {
 
     setIsLoading(true);
     try {
-      let foundUser: User | undefined;
+      let foundUser: User | null = null;
 
       if (selectedDemo) {
-        foundUser = demoUsers.find((u) => String(u.id) === selectedDemo);
+        const demoUserId = BigInt(selectedDemo);
+        foundUser = await actor.loginUserById(demoUserId, "password123");
       } else {
-        foundUser = demoUsers.find(
-          (u) => u.email.toLowerCase() === email.toLowerCase(),
-        );
+        if (!email || !password) {
+          toast.error("Please enter email and password.");
+          setIsLoading(false);
+          return;
+        }
+        foundUser = await actor.loginUser(email, password);
       }
 
       if (!foundUser) {
-        toast.error("User not found. Use the demo account below.");
+        toast.error("Invalid email or password.");
+        setIsLoading(false);
         return;
       }
 
@@ -166,7 +172,11 @@ export default function LoginPage() {
                     id="password"
                     type="password"
                     placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required={!selectedDemo}
                     className="rounded-lg text-sm"
+                    data-ocid="login.password_input"
                   />
                 </div>
 

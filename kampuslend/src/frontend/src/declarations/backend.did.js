@@ -39,6 +39,7 @@ export const UserProfile = IDL.Record({
   'role': IDL.Text,
   'email': IDL.Text,
   'isVerified': IDL.Bool,
+  'password': IDL.Text,
 });
 export const User = IDL.Record({
   'id': IDL.Nat,
@@ -50,6 +51,7 @@ export const User = IDL.Record({
   'role': IDL.Text,
   'email': IDL.Text,
   'isVerified': IDL.Bool,
+  'password': IDL.Text,
 });
 export const Payment = IDL.Record({
   'id': IDL.Nat,
@@ -118,8 +120,10 @@ export const idlService = IDL.Service({
     [IDL.Nat],
     [],
   ),
+  'loginUser': IDL.Func([IDL.Text, IDL.Text], [IDL.Opt(User)], ['query']),
+  'loginUserById': IDL.Func([IDL.Nat, IDL.Text], [IDL.Opt(User)], ['query']),
   'registerUser': IDL.Func(
-    [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Float64],
+    [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Float64, IDL.Text],
     [IDL.Nat],
     [],
   ),
@@ -166,6 +170,7 @@ export const idlFactory = ({ IDL }) => {
     'role': IDL.Text,
     'email': IDL.Text,
     'isVerified': IDL.Bool,
+    'password': IDL.Text,
   });
   const User = IDL.Record({
     'id': IDL.Nat,
@@ -177,6 +182,7 @@ export const idlFactory = ({ IDL }) => {
     'role': IDL.Text,
     'email': IDL.Text,
     'isVerified': IDL.Bool,
+    'password': IDL.Text,
   });
   const Payment = IDL.Record({
     'id': IDL.Nat,
@@ -245,8 +251,10 @@ export const idlFactory = ({ IDL }) => {
       [IDL.Nat],
       [],
     ),
+    'loginUser': IDL.Func([IDL.Text, IDL.Text], [IDL.Opt(User)], ['query']),
+    'loginUserById': IDL.Func([IDL.Nat, IDL.Text], [IDL.Opt(User)], ['query']),
     'registerUser': IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Float64],
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Float64, IDL.Text],
       [IDL.Nat],
       [],
     ),

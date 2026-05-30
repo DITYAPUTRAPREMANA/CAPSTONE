@@ -62,6 +62,7 @@ export interface User {
   'role': string,
   'email': string,
   'isVerified': boolean,
+  'password': string,
 }
 export interface UserApprovalInfo {
   'status': ApprovalStatus,
@@ -75,6 +76,7 @@ export interface UserProfile {
   'role': string,
   'email': string,
   'isVerified': boolean,
+  'password': string,
 }
 export type UserRole = { 'admin': null } |
 { 'user': null } |
@@ -109,8 +111,10 @@ export interface _SERVICE {
     [bigint, bigint, number, string, string],
     bigint
   >,
+  'loginUser': ActorMethod<[string, string], [] | [User]>,
+  'loginUserById': ActorMethod<[bigint, string], [] | [User]>,
   'registerUser': ActorMethod<
-    [string, string, string, string, string, number],
+    [string, string, string, string, string, number, string],
     bigint
   >,
   'requestApproval': ActorMethod<[], undefined>,
