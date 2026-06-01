@@ -26,6 +26,7 @@ export default function OtpVerificationPage() {
   const [otpSent, setOtpSent] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [localOtpCode, setLocalOtpCode] = useState("");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const [userData, setUserData] = useState<{
@@ -138,8 +139,10 @@ export default function OtpVerificationPage() {
           body: JSON.stringify({ to: userData.email, name: userData.name, otp: newOtp }),
         });
         toast.success("OTP sent! Check your email.");
+        setLocalOtpCode("");
       } else {
-        toast.warning("Email gateway not configured. OTP generated locally.");
+        setLocalOtpCode(newOtp);
+        toast.warning(`Email gateway not configured. OTP generated locally: ${newOtp}`, { duration: 10000 });
       }
 
       setOtpSent(true);
@@ -318,6 +321,20 @@ export default function OtpVerificationPage() {
                   )}
 
                   <form onSubmit={handleVerify} className="space-y-5">
+                    {localOtpCode && (
+                      <div
+                        className="rounded-xl p-4 text-center border border-amber-200"
+                        style={{ backgroundColor: "#fffbeb" }}
+                      >
+                        <p className="text-xs font-semibold text-amber-700">
+                          ⚠️ Email gateway not configured. Use this code to verify:
+                        </p>
+                        <p className="text-2xl font-mono font-bold text-amber-900 mt-1.5 tracking-widest">
+                          {localOtpCode}
+                        </p>
+                      </div>
+                    )}
+
                     {/* OTP Input Boxes */}
                     <div>
                       <Label className="text-sm font-semibold block mb-3 text-center" style={{ color: "#1a3a5c" }}>

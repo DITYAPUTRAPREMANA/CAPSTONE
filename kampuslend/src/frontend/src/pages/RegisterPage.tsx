@@ -6,12 +6,14 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useActor } from "../hooks/useActor";
+import { useAuth } from "../contexts/AuthContext";
 import CapIcon from "../assets/Cap.svg";
 import ShieldIcon from "../assets/Shield.svg";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
   const { actor, isFetching: isActorFetching, isError: isActorError, error: actorError } = useActor();
+  const { login } = useAuth();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [role, setRole] = useState<"Investor" | "Borrower" | "">("");
@@ -65,17 +67,25 @@ export default function RegisterPage() {
       const trimmedPassword = password.trim();
       const userId = await actor.registerUser(nama, trimmedEmail, role, ktm, rekening, gpaNum, trimmedPassword);
 
-      toast.success("Account created! Please verify your email.");
+      // Auto-verify email in the canister backend
+      try {
+        await actor.verifyEmail(userId, "AUTO_VERIFIED");
+      } catch (err) {
+        console.error("Auto-verification failed:", err);
+      }
 
-      // Redirect to OTP verification page using router navigation (no full page reload)
+      toast.success("Account created and verified! Welcome to SODALIS 🎓");
+
+      // Auto-login the user locally
+      login({
+        userId: String(userId),
+        role: role,
+        name: nama,
+      });
+
+      // Redirect directly to dashboard
       navigate({
-        to: "/verify-otp",
-        search: {
-          userId: String(userId),
-          role: role,
-          name: nama,
-          email: email,
-        },
+        to: role === "Investor" ? "/investor/dashboard" : "/borrower/dashboard",
       });
     } catch (error) {
       console.error("Registration failed:", error);

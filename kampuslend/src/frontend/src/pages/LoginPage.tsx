@@ -46,7 +46,13 @@ export default function LoginPage() {
       actor.getUsersByRole("Borrower"),
     ])
       .then(([investors, borrowers]) => {
-        setDemoUsers([...investors, ...borrowers]);
+        const allUsers = [...investors, ...borrowers];
+        const seedUsers = allUsers.filter(
+          (u) =>
+            (u.name.startsWith("Investor ") || u.name.startsWith("Borrower ")) &&
+            u.email.endsWith("@email.com")
+        );
+        setDemoUsers(seedUsers);
       })
       .catch(() => { });
   }, [actor]);
@@ -151,11 +157,25 @@ export default function LoginPage() {
                     <p className="text-xs font-semibold text-amber-700">
                       💡 Demo Mode: Choose an available account
                     </p>
-                    <Select value={selectedDemo} onValueChange={setSelectedDemo}>
+                    <Select
+                      value={selectedDemo}
+                      onValueChange={(val) => {
+                        if (val === "custom_login") {
+                          setSelectedDemo("");
+                        } else {
+                          setSelectedDemo(val);
+                        }
+                      }}
+                    >
                       <SelectTrigger className="rounded-lg" data-ocid="login.select">
                         <SelectValue placeholder="Select demo account..." />
                       </SelectTrigger>
                       <SelectContent>
+                        {selectedDemo && (
+                          <SelectItem value="custom_login" className="text-red-500 font-semibold">
+                            ❌ Clear Selection (Use Credentials)
+                          </SelectItem>
+                        )}
                         {demoUsers.map((u) => (
                           <SelectItem key={String(u.id)} value={String(u.id)}>
                             {u.name} ({u.role})

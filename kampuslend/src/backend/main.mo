@@ -417,7 +417,7 @@ persistent actor {
     };
   };
 
-  public query ({ caller = _ }) func loginUser(email : Text, password : Text) : async ?User {
+  public shared ({ caller }) func loginUser(email : Text, password : Text) : async ?User {
     // Normalize BOTH sides to lowercase for case-insensitive comparison
     // This handles: (1) new registrations stored as lowercase, (2) old seed data stored with mixed case
     let normalizedEmail = Text.map(email, func(c) { Prim.charToLower(c) });
@@ -431,17 +431,83 @@ persistent actor {
     switch (foundUser) {
       case (null) { null };
       case (?user) {
-        ?censorUser(user.principal, user);
+        // Dynamically bind the browser session principal to this user account on successful login
+        if (not caller.isAnonymous() and user.principal != caller) {
+          let oldPrincipal = user.principal;
+          let profileOpt = userProfiles.get(oldPrincipal);
+          userProfiles.remove(oldPrincipal);
+
+          let updatedUser = { user with principal = caller };
+          users.add(user.id, updatedUser);
+
+          switch (profileOpt) {
+            case (?profile) {
+              userProfiles.add(caller, profile);
+            };
+            case (null) {
+              let newProfile : UserProfile = {
+                name = user.name;
+                email = user.email;
+                role = user.role;
+                ktm = user.ktm;
+                bankAccount = user.bankAccount;
+                gpa = user.gpa;
+                isVerified = user.isVerified;
+                password = user.password;
+              };
+              userProfiles.add(caller, newProfile);
+            };
+          };
+        };
+
+        let freshUser = switch (users.get(user.id)) {
+          case (null) { user };
+          case (?u) { u };
+        };
+        ?censorUser(caller, freshUser);
       };
     };
   };
 
-  public query ({ caller = _ }) func loginUserById(id : Nat, password : Text) : async ?User {
+  public shared ({ caller }) func loginUserById(id : Nat, password : Text) : async ?User {
     switch (users.get(id)) {
       case (null) { null };
       case (?user) {
         if (Text.equal(user.password, password)) {
-          ?censorUser(user.principal, user);
+          // Dynamically bind the browser session principal to this user account on successful login
+          if (not caller.isAnonymous() and user.principal != caller) {
+            let oldPrincipal = user.principal;
+            let profileOpt = userProfiles.get(oldPrincipal);
+            userProfiles.remove(oldPrincipal);
+
+            let updatedUser = { user with principal = caller };
+            users.add(user.id, updatedUser);
+
+            switch (profileOpt) {
+              case (?profile) {
+                userProfiles.add(caller, profile);
+              };
+              case (null) {
+                let newProfile : UserProfile = {
+                  name = user.name;
+                  email = user.email;
+                  role = user.role;
+                  ktm = user.ktm;
+                  bankAccount = user.bankAccount;
+                  gpa = user.gpa;
+                  isVerified = user.isVerified;
+                  password = user.password;
+                };
+                userProfiles.add(caller, newProfile);
+              };
+            };
+          };
+
+          let freshUser = switch (users.get(user.id)) {
+            case (null) { user };
+            case (?u) { u };
+          };
+          ?censorUser(caller, freshUser);
         } else {
           null;
         };
