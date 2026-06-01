@@ -153,8 +153,14 @@ persistent actor {
 
   // HELPER FUNCTIONS
 
+  // Returns the first user found for this principal (for backward compatibility)
   func getUserByPrincipal(principal : Principal) : ?User {
     users.values().toArray().find(func(user) { user.principal == principal });
+  };
+
+  // Returns ALL users registered under this principal (for dual-role support)
+  func getUsersByPrincipal(principal : Principal) : [User] {
+    users.values().toArray().filter(func(user) { user.principal == principal });
   };
 
   func _isLoanParticipant(caller : Principal, loanId : Nat) : Bool {
@@ -255,23 +261,39 @@ persistent actor {
 
   public shared ({ caller }) func registerUser(name : Text, email : Text, role : Text, ktm : Text, bankAccount : Text, gpa : Float, password : Text) : async Nat {
     if (not caller.isAnonymous()) {
-      switch (getUserByPrincipal(caller)) {
-        case (?existingUser) {
-          Runtime.trap(
-            "This identity is already registered as " # existingUser.role # ". One identity can only have one role."
-          );
+      // Get all existing users for this principal (dual-role support)
+      let existingUsers = getUsersByPrincipal(caller);
+
+      // Block if already registered with the same role
+      var alreadyHasRole = false;
+      for (u in existingUsers.values()) {
+        if (Text.equal(u.role, role)) {
+          alreadyHasRole := true;
         };
-        case (null) {};
+      };
+      if (alreadyHasRole) {
+        Runtime.trap(
+          "You are already registered as " # role # ". Cannot register the same role twice."
+        );
+      };
+
+      // Block if already has 2 roles (Investor + Borrower)
+      if (existingUsers.size() >= 2) {
+        Runtime.trap(
+          "Maximum 2 roles per identity reached. You can have one Borrower and one Investor account."
+        );
       };
     };
 
-    // Register should write directly to backend canister storage (blockchain state).
-    // If caller is authenticated, initialize access control to keep user role state in sync.
+    // Initialize access control only on first registration
     if (not caller.isAnonymous()) {
-      AccessControl.initialize(accessControlState, caller, "", "");
+      let existingUsers = getUsersByPrincipal(caller);
+      if (existingUsers.size() == 0) {
+        AccessControl.initialize(accessControlState, caller, "", "");
+      };
     };
 
-    // Persist user record immediately in canister state.
+    // Persist user record
     let userId = nextUserId;
     nextUserId += 1;
 
@@ -290,18 +312,25 @@ persistent actor {
 
     users.add(userId, newUser);
 
-    // Also persist profile state (direct blockchain write as well)
-    let profile : UserProfile = {
-      name;
-      email;
-      role;
-      ktm;
-      bankAccount;
-      gpa;
-      isVerified = false;
-      password;
+    // Only save userProfile on first registration (don't overwrite existing profile)
+    switch (userProfiles.get(caller)) {
+      case (null) {
+        let profile : UserProfile = {
+          name;
+          email;
+          role;
+          ktm;
+          bankAccount;
+          gpa;
+          isVerified = false;
+          password;
+        };
+        userProfiles.add(caller, profile);
+      };
+      case (?_) {
+        // Profile already exists from first registration — keep it
+      };
     };
-    userProfiles.add(caller, profile);
 
     userId;
   };

@@ -24,16 +24,27 @@ import { type ExternalModelInput, getAIScore } from "../../utils/aiService";
 import { formatRupiah, toSafeBigInt } from "../../utils/format";
 
 const TENORS = [3, 6, 12];
-const TUJUAN_OPTIONS = [
-  "Tuition Fee",
-  "Rent",
-  "Daily Needs",
-  "Productive Business",
-  "Others",
+const LOAN_PURPOSE_OPTIONS = ["Education", "Venture", "Personal", "Medical"];
+const HOME_OWNERSHIP_OPTIONS = ["Rent", "Own", "Mortgage"];
+const PARENT_JOB_OPTIONS = [
+  { value: "Wiraswasta", label: "Entrepreneur" },
+  { value: "Buruh", label: "Laborer" },
+  { value: "Petani", label: "Farmer" },
+  { value: "Pedagang", label: "Merchant" },
+  { value: "Karyawan Swasta", label: "Private Employee" },
+  { value: "PNS", label: "Civil Servant" },
+  { value: "Nelayan", label: "Fisherman" },
+  { value: "Pensiunan", label: "Pensioner" },
+  { value: "Wirausaha", label: "Self-employed" },
+  { value: "Sudah Meninggal", label: "Deceased" },
+  { value: "Teacher", label: "Teacher" },
+  { value: "Nurse", label: "Nurse" },
 ];
-const HOME_OWNERSHIP_OPTIONS = ["RENT", "OWN", "OTHER"];
-const PARENT_JOB_OPTIONS = ["EMPLOYEE", "ENTREPRENEUR", "CIVIL_SERVANT", "FREELANCE", "UNEMPLOYED"];
-const RESIDENCE_TYPE_OPTIONS = ["URBAN", "SUBURBAN", "RURAL"];
+const RESIDENCE_TYPE_OPTIONS = ["Urban", "Rural"];
+const WORKING_STUDENT_OPTIONS = [
+  { value: "Bekerja Karena Butuh", label: "Working (Required)" },
+  { value: "Bekerja Optional", label: "Working (Optional)" },
+];
 
 export default function BorrowerApply() {
   const { user } = useAuth();
@@ -48,12 +59,14 @@ export default function BorrowerApply() {
 
   // Data profil tambahan untuk model AI
   const [homeOwnership, setHomeOwnership] = useState("");
-  const [previousLoan, setPreviousLoan] = useState("NO");
+  const [previousLoan, setPreviousLoan] = useState("No");
+  const [paymentHistory, setPaymentHistory] = useState("");
   const [parentalIncome, setParentalIncome] = useState("");
-  const [workingStudent, setWorkingStudent] = useState("NO");
+  const [workingStudent, setWorkingStudent] = useState("");
   const [courseCredits, setCourseCredits] = useState("");
   const [liability, setLiability] = useState("0");
   const [attendance, setAttendance] = useState("");
+  const [gradeAverage, setGradeAverage] = useState("");
   const [parentJob, setParentJob] = useState("");
   const [residenceType, setResidenceType] = useState("");
 
@@ -64,18 +77,32 @@ export default function BorrowerApply() {
 
   const nominalNum = Number.parseFloat(nominal.replace(/[^0-9]/g, "")) || 0;
   const tenorNum = Number.parseInt(tenor) || 6;
-  const totalBunga = nominalNum * 0.02 * tenorNum;
+  const INTEREST_RATE = 0.03; // 3% fixed
+  const totalBunga = nominalNum * INTEREST_RATE * tenorNum;
   const totalBayar = nominalNum + totalBunga;
   const cicilanPerBulan = tenorNum > 0 ? totalBayar / tenorNum : 0;
+
+  const courseCreditsNum = Number.parseInt(courseCredits) || 0;
+  const attendanceNum = Number.parseFloat(attendance) || 0;
+  const gradeAverageNum = Number.parseFloat(gradeAverage) || 0;
 
   const isFormValid =
     nominalNum > 0 &&
     tujuan &&
     jurusan &&
     homeOwnership &&
-    parentalIncome &&
+    workingStudent &&
     courseCredits &&
+    courseCreditsNum >= 18 &&
+    courseCreditsNum <= 24 &&
     attendance &&
+    attendanceNum >= 0 &&
+    attendanceNum <= 100 &&
+    gradeAverage &&
+    gradeAverageNum >= 0 &&
+    gradeAverageNum <= 4.0 &&
+    paymentHistory &&
+    parentalIncome &&
     parentJob &&
     residenceType;
 
@@ -90,17 +117,18 @@ export default function BorrowerApply() {
       const extInput: ExternalModelInput = {
         Home_Ownership: homeOwnership,
         Loan_Purpose: tujuan,
-        Payment_History: previousLoan === "YES" ? 1 : 0,
         Previous_Loan: previousLoan,
-        Parental_Income_IDR_Monthly: Number.parseFloat(parentalIncome) || 0,
-        Loan_Amount_IDR: nominalNum,
         Working_Student: workingStudent,
-        Course_Credits: Number.parseInt(courseCredits) || 0,
-        Liability: Number.parseInt(liability) || 0,
-        Attendance: Number.parseFloat(attendance) || 0,
-        Grade_Average: 3.0,
         Parent_Job: parentJob,
         Residence_Type: residenceType,
+        Payment_History: Number.parseInt(paymentHistory) || 0,
+        Parental_Income_IDR_Monthly: Number.parseFloat(parentalIncome) || 0,
+        Loan_Amount_IDR: nominalNum,
+        Loan_Int_Rate: 3,
+        Course_Credits: courseCreditsNum,
+        Liability: Number.parseInt(liability) || 0,
+        Attendance: attendanceNum,
+        Grade_Average: gradeAverageNum,
       };
 
       const result = await getAIScore({
@@ -238,7 +266,7 @@ export default function BorrowerApply() {
                     <SelectValue placeholder="Select purpose..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {TUJUAN_OPTIONS.map((t) => (
+                    {LOAN_PURPOSE_OPTIONS.map((t) => (
                       <SelectItem key={t} value={t}>{t}</SelectItem>
                     ))}
                   </SelectContent>
@@ -287,7 +315,7 @@ export default function BorrowerApply() {
                   </SelectTrigger>
                   <SelectContent>
                     {PARENT_JOB_OPTIONS.map((o) => (
-                      <SelectItem key={o} value={o}>{o.replace(/_/g, " ")}</SelectItem>
+                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -317,8 +345,8 @@ export default function BorrowerApply() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="YES">YES</SelectItem>
-                      <SelectItem value="NO">NO</SelectItem>
+                      <SelectItem value="Yes">Yes</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -326,14 +354,30 @@ export default function BorrowerApply() {
                   <Label>Working Student</Label>
                   <Select value={workingStudent} onValueChange={setWorkingStudent}>
                     <SelectTrigger className="rounded-full" data-ocid="apply.working_student_select">
-                      <SelectValue />
+                      <SelectValue placeholder="Select..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="YES">YES</SelectItem>
-                      <SelectItem value="NO">NO</SelectItem>
+                      {WORKING_STUDENT_OPTIONS.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              {/* Payment History */}
+              <div className="space-y-2">
+                <Label htmlFor="payment_history">Payment History (months)</Label>
+                <Input
+                  id="payment_history"
+                  placeholder="e.g. 12"
+                  type="number"
+                  min={0}
+                  value={paymentHistory}
+                  onChange={(e) => setPaymentHistory(e.target.value)}
+                  className="rounded-full"
+                  data-ocid="apply.payment_history_input"
+                />
               </div>
 
               {/* Parental Income */}
@@ -341,7 +385,9 @@ export default function BorrowerApply() {
                 <Label htmlFor="parental_income">Parental Income / Month (Rp)</Label>
                 <Input
                   id="parental_income"
-                  placeholder="Example: 5000000"
+                  placeholder="e.g. 5000000"
+                  type="number"
+                  min={0}
                   value={parentalIncome}
                   onChange={(e) => setParentalIncome(e.target.value)}
                   className="rounded-full"
@@ -349,15 +395,16 @@ export default function BorrowerApply() {
                 />
               </div>
 
-              {/* SKS, Attendance, Dependents */}
-              <div className="grid grid-cols-3 gap-3">
+              {/* SKS & Attendance */}
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="course_credits">SKS</Label>
+                  <Label htmlFor="course_credits">SKS (18–24)</Label>
                   <Input
                     id="course_credits"
-                    placeholder="24"
+                    placeholder="18–24"
                     type="number"
-                    min={0}
+                    min={18}
+                    max={24}
                     value={courseCredits}
                     onChange={(e) => setCourseCredits(e.target.value)}
                     className="rounded-full"
@@ -365,10 +412,10 @@ export default function BorrowerApply() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="attendance">Attendance %</Label>
+                  <Label htmlFor="attendance">Attendance (%)</Label>
                   <Input
                     id="attendance"
-                    placeholder="85"
+                    placeholder="0–100"
                     type="number"
                     min={0}
                     max={100}
@@ -376,6 +423,25 @@ export default function BorrowerApply() {
                     onChange={(e) => setAttendance(e.target.value)}
                     className="rounded-full"
                     data-ocid="apply.attendance_input"
+                  />
+                </div>
+              </div>
+
+              {/* GPA & Dependents */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="grade_average">Grade Average (IPK)</Label>
+                  <Input
+                    id="grade_average"
+                    placeholder="0.0–4.0"
+                    type="number"
+                    min={0}
+                    max={4}
+                    step={0.01}
+                    value={gradeAverage}
+                    onChange={(e) => setGradeAverage(e.target.value)}
+                    className="rounded-full"
+                    data-ocid="apply.grade_average_input"
                   />
                 </div>
                 <div className="space-y-2">
@@ -409,7 +475,7 @@ export default function BorrowerApply() {
                     <span className="font-semibold">{formatRupiah(nominalNum)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Interest (2%/mo × tenor)</span>
+                    <span className="text-muted-foreground">Interest (3%/mo × tenor)</span>
                     <span className="font-semibold">{formatRupiah(totalBunga)}</span>
                   </div>
                   <Separator />

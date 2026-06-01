@@ -39,19 +39,22 @@ const AI_SCORING_URL = import.meta.env.VITE_AI_SCORING_URL as string | undefined
 
 /** Data lengkap yang dikirim ke endpoint POST /predict */
 export interface ExternalModelInput {
-  Home_Ownership: string;             // Kepemilikan rumah (RENT / OWN / OTHER)
-  Loan_Purpose: string;               // Tujuan pinjaman
-  Payment_History: number;            // Riwayat pembayaran (0 = tidak ada / buruk, 1 = baik)
-  Previous_Loan: string;              // Riwayat pinjaman sebelumnya (YES / NO)
+  // ── Categorical Features ──
+  Home_Ownership: string;   // Kepemilikan rumah: Rent | Own | Mortgage
+  Loan_Purpose: string;     // Tujuan pinjaman: Education | Venture | Personal | Medical
+  Previous_Loan: string;    // Pernah memiliki pinjaman sebelumnya: No | Yes
+  Working_Student: string;  // Status bekerja: Bekerja Karena Butuh | Bekerja Optional | Tidak Bekerja
+  Parent_Job: string;       // Pekerjaan orang tua
+  Residence_Type: string;   // Tipe tempat tinggal: Urban | Rural
+  // -- Numerical Features --
+  Payment_History: number;             // Riwayat pembayaran dalam bulan
   Parental_Income_IDR_Monthly: number; // Pendapatan bulanan orang tua (IDR)
-  Loan_Amount_IDR: number;            // Jumlah nominal pinjaman (IDR)
-  Working_Student: string;            // Mahasiswa bekerja (YES / NO)
-  Course_Credits: number;             // Jumlah SKS
-  Liability: number;                  // Jumlah tanggungan keluarga
-  Attendance: number;                 // Persentase kehadiran kuliah (0–100)
-  Grade_Average: number;              // Rata-rata nilai / IPK (0.0–4.0)
-  Parent_Job: string;                 // Pekerjaan orang tua
-  Residence_Type: string;             // Tipe tempat tinggal (URBAN / RURAL)
+  Loan_Amount_IDR: number;             // Jumlah nominal pinjaman (IDR)
+  Loan_Int_Rate: number;               // Suku bunga pinjaman (fixed: 3%)
+  Course_Credits: number;              // Jumlah SKS (18–24)
+  Liability: number;                   // Jumlah tanggungan finansial
+  Attendance: number;                  // Persentase kehadiran kuliah (0–100)
+  Grade_Average: number;               // IPK (0.0–4.0)
 }
 
 /** Struktur respons JSON dari API model */
@@ -85,6 +88,9 @@ function mapRecommendation(statusKelayakan: string, ficoScore: number): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function callExternalAI(extInput: ExternalModelInput): Promise<ScoringResult> {
+  // Debug: log payload sebelum dikirim ke API
+  console.log("[AI] Payload yang dikirim:", JSON.stringify(extInput, null, 2));
+
   const response = await fetch(AI_SCORING_URL!, {
     method: "POST",
     headers: {
@@ -96,6 +102,9 @@ async function callExternalAI(extInput: ExternalModelInput): Promise<ScoringResu
   });
 
   if (!response.ok) {
+    // Log detail error dari API (Pydantic validation errors)
+    const errorBody = await response.text().catch(() => "(no body)");
+    console.error(`[AI] HTTP ${response.status} error. Response body:`, errorBody);
     throw new Error(`AI API returned ${response.status}: ${response.statusText}`);
   }
 
