@@ -120,8 +120,8 @@ export const idlService = IDL.Service({
     [IDL.Nat],
     [],
   ),
-  'loginUser': IDL.Func([IDL.Text, IDL.Text], [IDL.Opt(User)], ['query']),
-  'loginUserById': IDL.Func([IDL.Nat, IDL.Text], [IDL.Opt(User)], ['query']),
+  'loginUser': IDL.Func([IDL.Text, IDL.Text], [IDL.Opt(User)], []),
+  'loginUserById': IDL.Func([IDL.Nat, IDL.Text], [IDL.Opt(User)], []),
   'registerUser': IDL.Func(
     [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Float64, IDL.Text],
     [IDL.Nat],
@@ -251,8 +251,8 @@ export const idlFactory = ({ IDL }) => {
       [IDL.Nat],
       [],
     ),
-    'loginUser': IDL.Func([IDL.Text, IDL.Text], [IDL.Opt(User)], ['query']),
-    'loginUserById': IDL.Func([IDL.Nat, IDL.Text], [IDL.Opt(User)], ['query']),
+    'loginUser': IDL.Func([IDL.Text, IDL.Text], [IDL.Opt(User)], []),
+    'loginUserById': IDL.Func([IDL.Nat, IDL.Text], [IDL.Opt(User)], []),
     'registerUser': IDL.Func(
       [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Float64, IDL.Text],
       [IDL.Nat],

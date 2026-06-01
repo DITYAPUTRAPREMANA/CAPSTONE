@@ -38,33 +38,10 @@ import { useActor } from "./hooks/useActor";
 
 const queryClient = new QueryClient();
 
-/** Seed data loader component — only runs for admin callers */
-function SeedLoader() {
-  const { actor } = useActor();
-  useEffect(() => {
-    if (!actor) return;
-    const seeded = localStorage.getItem("sodalis_seeded");
-    if (!seeded) {
-      // Only admins can add seed data — check first to avoid a backend trap
-      actor
-        .isCallerAdmin()
-        .then((isAdmin) => {
-          if (isAdmin) {
-            return actor.addSeedData();
-          }
-        })
-        .then(() => localStorage.setItem("sodalis_seeded", "true"))
-        .catch(() => { });
-    }
-  }, [actor]);
-  return null;
-}
-
 /** Root layout - provider + outlet */
 function RootLayout() {
   return (
     <>
-      <SeedLoader />
       <Outlet />
       <Toaster position="top-right" richColors />
     </>

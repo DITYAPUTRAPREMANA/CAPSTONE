@@ -2,13 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -24,8 +18,6 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedDemo, setSelectedDemo] = useState("");
-  const [demoUsers, setDemoUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -39,71 +31,65 @@ export default function LoginPage() {
     }
   }, [user, router]);
 
-  useEffect(() => {
-    if (!actor) return;
-    Promise.all([
-      actor.getUsersByRole("Investor"),
-      actor.getUsersByRole("Borrower"),
-    ])
-      .then(([investors, borrowers]) => {
-        const allUsers = [...investors, ...borrowers];
-        const seedUsers = allUsers.filter(
-          (u) =>
-            (u.name.startsWith("Investor ") || u.name.startsWith("Borrower ")) &&
-            u.email.endsWith("@email.com")
-        );
-        setDemoUsers(seedUsers);
-      })
-      .catch(() => { });
-  }, [actor]);
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("LoginPage: handleLogin triggered");
+
     if (!actor) {
+      console.warn("LoginPage: Actor is not initialized yet");
       toast.error("Backend connection is not ready, please try again later");
       return;
     }
 
     setIsLoading(true);
-    try {
-      let foundUser: User | null = null;
+    let foundUser: User | null = null;
 
-      if (selectedDemo) {
-        const demoUserId = BigInt(selectedDemo);
-        foundUser = await actor.loginUserById(demoUserId, "password123");
-      } else {
-        if (!email || !password) {
-          toast.error("Please enter email and password.");
-          setIsLoading(false);
-          return;
-        }
-        const trimmedEmail = email.trim().toLowerCase();
-        const trimmedPassword = password.trim();
-        foundUser = await actor.loginUser(trimmedEmail, trimmedPassword);
+    try {
+      if (!email || !password) {
+        toast.error("Please enter email and password.");
+        setIsLoading(false);
+        return;
       }
 
+      const trimmedEmail = email.trim().toLowerCase();
+      const trimmedPassword = password.trim();
+      console.log(`LoginPage: Requesting login for email: "${trimmedEmail}"`);
+
+      foundUser = await actor.loginUser(trimmedEmail, trimmedPassword);
+      console.log("LoginPage: Canister returned foundUser:", foundUser);
+
       if (!foundUser) {
+        console.warn("LoginPage: User authentication failed - invalid credentials");
         toast.error("Invalid email or password.");
         setIsLoading(false);
         return;
       }
 
+      console.log("LoginPage: Login successful, saving user session...");
       login({
         userId: String(foundUser.id),
         role: foundUser.role,
         name: foundUser.name,
       });
+
       toast.success(`Welcome, ${foundUser.name}!`);
-      router.navigate({
-        to:
-          foundUser.role === "Investor"
-            ? "/investor/dashboard"
-            : "/borrower/dashboard",
-      });
-    } catch {
+    } catch (error) {
+      console.error("LoginPage: Login process threw an exception:", error);
       toast.error("Login failed. Please try again.");
-    } finally {
       setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(false);
+
+    // Perform router navigation outside the try-catch block to prevent
+    // TanStack Router redirect promises from being intercepted as errors.
+    if (foundUser) {
+      const destination = foundUser.role === "Investor" ? "/investor/dashboard" : "/borrower/dashboard";
+      console.log(`LoginPage: Navigating to ${destination}`);
+      router.navigate({ to: destination });
     }
   };
 
@@ -152,40 +138,6 @@ export default function LoginPage() {
                   />
                 </div>
 
-                {demoUsers.length > 0 && (
-                  <div className="space-y-1 p-3 bg-amber-50 rounded-xl border border-amber-200">
-                    <p className="text-xs font-semibold text-amber-700">
-                      💡 Demo Mode: Choose an available account
-                    </p>
-                    <Select
-                      value={selectedDemo}
-                      onValueChange={(val) => {
-                        if (val === "custom_login") {
-                          setSelectedDemo("");
-                        } else {
-                          setSelectedDemo(val);
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="rounded-lg" data-ocid="login.select">
-                        <SelectValue placeholder="Select demo account..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {selectedDemo && (
-                          <SelectItem value="custom_login" className="text-red-500 font-semibold">
-                            ❌ Clear Selection (Use Credentials)
-                          </SelectItem>
-                        )}
-                        {demoUsers.map((u) => (
-                          <SelectItem key={String(u.id)} value={String(u.id)}>
-                            {u.name} ({u.role})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
                 <div className="space-y-1">
                   <Label htmlFor="password" className="text-sm" style={{ color: "#1a3a5c" }}>
                     Password
@@ -196,7 +148,7 @@ export default function LoginPage() {
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    required={!selectedDemo}
+                    required
                     className="rounded-lg text-sm"
                     data-ocid="login.password_input"
                   />
@@ -208,7 +160,7 @@ export default function LoginPage() {
 
                 <Button
                   type="submit"
-                  disabled={isLoading || (!email && !selectedDemo)}
+                  disabled={isLoading || !email || !password}
                   className="w-full rounded-lg text-white font-semibold py-5 mt-1"
                   style={{ backgroundColor: "#1a3a5c" }}
                   data-ocid="login.submit_button"

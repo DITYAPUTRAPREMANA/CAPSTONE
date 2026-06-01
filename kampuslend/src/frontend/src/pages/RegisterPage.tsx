@@ -67,25 +67,17 @@ export default function RegisterPage() {
       const trimmedPassword = password.trim();
       const userId = await actor.registerUser(nama, trimmedEmail, role, ktm, rekening, gpaNum, trimmedPassword);
 
-      // Auto-verify email in the canister backend
-      try {
-        await actor.verifyEmail(userId, "AUTO_VERIFIED");
-      } catch (err) {
-        console.error("Auto-verification failed:", err);
-      }
+      toast.success("Account created! Let's verify your email 🎓");
 
-      toast.success("Account created and verified! Welcome to SODALIS 🎓");
-
-      // Auto-login the user locally
-      login({
-        userId: String(userId),
-        role: role,
-        name: nama,
-      });
-
-      // Redirect directly to dashboard
+      // Redirect to OTP page
       navigate({
-        to: role === "Investor" ? "/investor/dashboard" : "/borrower/dashboard",
+        to: "/verify-otp",
+        search: {
+          userId: String(userId),
+          role: role,
+          name: nama,
+          email: trimmedEmail,
+        },
       });
     } catch (error) {
       console.error("Registration failed:", error);

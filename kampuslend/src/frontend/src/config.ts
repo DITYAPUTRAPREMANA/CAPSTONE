@@ -217,9 +217,9 @@ export async function createActorWithConfig(
       "backend_canister_id is not set. Ensure env.json has backend_canister_id and/or VITE_CANISTER_ID_BACKEND is configured.",
     );
   }
-  const resolvedOptions = options ?? {};
+  const { agentOptions, ...otherOptions } = options ?? {};
   const agent = new HttpAgent({
-    ...resolvedOptions.agentOptions,
+    ...agentOptions,
     host: config.backend_host || "http://127.0.0.1:8000",
   });
   if (
@@ -235,7 +235,7 @@ export async function createActorWithConfig(
     });
   }
   const actorOptions = {
-    ...resolvedOptions,
+    ...otherOptions,
     agent: agent,
     processError,
   };
