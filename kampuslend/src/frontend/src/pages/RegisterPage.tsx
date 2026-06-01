@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useActor } from "../hooks/useActor";
@@ -10,6 +10,7 @@ import CapIcon from "../assets/Cap.svg";
 import ShieldIcon from "../assets/Shield.svg";
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
   const { actor, isFetching: isActorFetching, isError: isActorError, error: actorError } = useActor();
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -60,18 +61,22 @@ export default function RegisterPage() {
     }
     try {
       const gpaNum = role === "Borrower" ? Number.parseFloat(gpa) || 0 : 0;
-      const userId = await actor.registerUser(nama, email.toLowerCase(), role, ktm, rekening, gpaNum, password);
+      const trimmedEmail = email.trim().toLowerCase();
+      const trimmedPassword = password.trim();
+      const userId = await actor.registerUser(nama, trimmedEmail, role, ktm, rekening, gpaNum, trimmedPassword);
 
       toast.success("Account created! Please verify your email.");
 
-      // Redirect to OTP verification page — OTP will be sent there via button
-      const params = new URLSearchParams({
-        userId: String(userId),
-        role: role,
-        name: nama,
-        email: email,
+      // Redirect to OTP verification page using router navigation (no full page reload)
+      navigate({
+        to: "/verify-otp",
+        search: {
+          userId: String(userId),
+          role: role,
+          name: nama,
+          email: email,
+        },
       });
-      window.location.href = `/verify-otp?${params.toString()}`;
     } catch (error) {
       console.error("Registration failed:", error);
       toast.error(

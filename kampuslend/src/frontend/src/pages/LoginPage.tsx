@@ -71,7 +71,9 @@ export default function LoginPage() {
           setIsLoading(false);
           return;
         }
-        foundUser = await actor.loginUser(email.toLowerCase(), password);
+        const trimmedEmail = email.trim().toLowerCase();
+        const trimmedPassword = password.trim();
+        foundUser = await actor.loginUser(trimmedEmail, trimmedPassword);
       }
 
       if (!foundUser) {

@@ -10,6 +10,7 @@ import Order "mo:core/Order";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
+import Prim "mo:⛔";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 import UserApproval "user-approval/approval";
@@ -297,11 +298,14 @@ persistent actor {
     let userId = nextUserId;
     nextUserId += 1;
 
+    // Normalize email to lowercase before storing to ensure case-insensitive login
+    let normalizedEmail = Text.map(email, func(c) { Prim.charToLower(c) });
+
     let newUser : User = {
       id = userId;
       principal = caller;
       name;
-      email;
+      email = normalizedEmail;
       role;
       ktm;
       bankAccount;
@@ -317,7 +321,7 @@ persistent actor {
       case (null) {
         let profile : UserProfile = {
           name;
-          email;
+          email = normalizedEmail;
           role;
           ktm;
           bankAccount;
@@ -393,11 +397,10 @@ persistent actor {
   };
 
   public query ({ caller }) func getUsersByRole(role : Text) : async [User] {
-    // Allow guest access so demo login can fetch user lists before authentication.
-    if (not (AccessControl.hasPermission(accessControlState, caller, #guest))) {
-      Runtime.trap("Unauthorized: Only users can view users by role");
-    };
-
+    // Accessible by all callers (including anonymous/session identities) — used
+    // by the login page to populate the demo account dropdown before the user
+    // has authenticated. Data is already censored via censorUser (email stripped
+    // for non-owners), so no sensitive information is exposed.
     let filtered = users.values().toArray().filter(func(user) { Text.equal(user.role, role) });
     Array.tabulate<User>(
       filtered.size(),
@@ -415,9 +418,13 @@ persistent actor {
   };
 
   public query ({ caller = _ }) func loginUser(email : Text, password : Text) : async ?User {
+    // Normalize BOTH sides to lowercase for case-insensitive comparison
+    // This handles: (1) new registrations stored as lowercase, (2) old seed data stored with mixed case
+    let normalizedEmail = Text.map(email, func(c) { Prim.charToLower(c) });
     var foundUser : ?User = null;
     for (user in users.values()) {
-      if (Text.equal(user.email, email) and Text.equal(user.password, password)) {
+      let storedEmail = Text.map(user.email, func(c) { Prim.charToLower(c) });
+      if (Text.equal(storedEmail, normalizedEmail) and Text.equal(user.password, password)) {
         foundUser := ?user;
       };
     };
