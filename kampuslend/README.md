@@ -4,5 +4,5 @@ Project ini merupakan aplikasi P2P Lending untuk mahasiswa, dibangun secara mand
 
 ### Build & Deploy
 
-- Jalankan `pnpm --filter '@caffeine/template-frontend' build:skip-bindings` (atau paket frontend Anda) sebelum deploy.
+- Jalankan `pnpm --filter 'kampuslend-frontend' build:skip-bindings` (atau paket frontend Anda) sebelum deploy.
 - Jalankan `dfx deploy` untuk deploy backend + frontend.
